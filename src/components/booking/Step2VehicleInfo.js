@@ -1,3 +1,5 @@
+import { carBrands, searchBrands, getYearsForModel } from '../../data/carBrands.js';
+
 export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }) {
     const container = document.createElement('div');
     container.className = 'booking-step step-vehicle-info';
@@ -5,88 +7,508 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
     const isPojasevi = serviceId === 'pojasevi';
     const isZvjezdano = serviceId === 'zvjezdano-nebo';
 
-    container.innerHTML = `
-    <h2 class="step-title">
-      <span class="heading-top">KORAK 2</span>
-      <span class="heading-bottom">Podaci o Vozilu</span>
-    </h2>
-    
-    <form class="vehicle-form glass" id="vehicle-form">
-      <div class="form-group">
-        <label class="form-label">Marka vozila</label>
-        <input type="text" class="input" name="marka" required value="${initialData.marka || ''}">
-      </div>
+    // State management
+    let state = {
+        stage: 'brand', // 'brand', 'model', 'year', 'manual', 'details'
+        selectedBrand: initialData.marka ? carBrands.find(b => b.name === initialData.marka) : null,
+        selectedModel: initialData.model || null,
+        selectedYear: initialData.godina || null,
+        searchQuery: '',
+        isManualEntry: false
+    };
 
-      <div class="form-group">
-        <label class="form-label">Model</label>
-        <input type="text" class="input" name="model" required value="${initialData.model || ''}">
-      </div>
+    // If we have initial data, skip to details stage
+    if (state.selectedBrand && state.selectedModel && state.selectedYear) {
+        state.stage = 'details';
+    }
 
-      <div class="form-group">
-        <label class="form-label">Godina</label>
-        <input type="number" class="input" name="godina" min="1980" max="2025" required value="${initialData.godina || ''}">
-      </div>
+    function render() {
+        container.innerHTML = `
+            <h2 class="step-title">
+                <span class="heading-top">KORAK 2</span>
+                <span class="heading-bottom">Podaci o Vozilu</span>
+            </h2>
+            
+            <div class="vehicle-selection-container glass">
+                ${renderBreadcrumb()}
+                ${renderStage()}
+            </div>
+        `;
 
-      ${isPojasevi ? `
-        <div class="form-group">
-          <label class="form-label">Broj pojaseva</label>
-          <select class="input" name="brojPojaseva" required>
-            <option value="">Odaberi...</option>
-            ${[1, 2, 3, 4, 5].map(n => `<option value="${n}" ${initialData.brojPojaseva == n ? 'selected' : ''}>${n}</option>`).join('')}
-          </select>
-        </div>
+        attachEventListeners();
+    }
 
-        <div class="checkbox-wrapper">
-          <input type="checkbox" class="checkbox" id="vlastiti-pojasevi" name="vlastitiPojasevi" ${initialData.vlastitiPojasevi ? 'checked' : ''}>
-          <label for="vlastiti-pojasevi">Nosim vlastite pojaseve / rastavljeni sustav</label>
-        </div>
-      ` : ''}
+    function renderBreadcrumb() {
+        const parts = [];
 
-      ${isZvjezdano ? `
-        <div class="form-group">
-          <label class="form-label">Broj zvjezdica</label>
-          <select class="input" name="brojZvjezdica" required>
-            <option value="">Odaberi...</option>
-            ${[100, 150, 200, 250, 300, 400, 500, 750, 1000].map(n => `
-              <option value="${n}" ${initialData.brojZvjezdica == n ? 'selected' : ''}>${n}</option>
-            `).join('')}
-          </select>
-        </div>
-      ` : ''}
+        if (state.selectedBrand) {
+            parts.push(`<span class="breadcrumb-item">${state.selectedBrand.name}</span>`);
+        }
+        if (state.selectedModel) {
+            parts.push(`<span class="breadcrumb-item">${state.selectedModel}</span>`);
+        }
+        if (state.selectedYear) {
+            parts.push(`<span class="breadcrumb-item">${state.selectedYear}</span>`);
+        }
 
-      <div class="form-group">
-        <label class="form-label">Kratka napomena (opcionalno)</label>
-        <textarea class="input" name="napomena" rows="4" placeholder="Dodatne informacije...">${initialData.napomena || ''}</textarea>
-      </div>
+        if (parts.length === 0) return '';
 
-      <div class="step-actions">
-        <button type="button" class="btn btn-secondary" id="back-btn">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-          Natrag
-        </button>
-        <button type="submit" class="btn btn-cta">
-          Nastavi
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </button>
-      </div>
-    </form>
-  `;
+        return `
+            <div class="breadcrumb">
+                ${parts.join('<span class="breadcrumb-separator">›</span>')}
+            </div>
+        `;
+    }
 
-    const form = container.querySelector('#vehicle-form');
+    function renderStage() {
+        switch (state.stage) {
+            case 'brand':
+                return renderBrandSelection();
+            case 'model':
+                return renderModelSelection();
+            case 'year':
+                return renderYearSelection();
+            case 'manual':
+                return renderManualEntry();
+            case 'details':
+                return renderDetailsForm();
+            default:
+                return '';
+        }
+    }
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        data.vlastitiPojasevi = form.querySelector('#vlastiti-pojasevi')?.checked || false;
-        onNext(data);
-    });
+    function renderBrandSelection() {
+        const filteredBrands = searchBrands(state.searchQuery);
 
-    container.querySelector('#back-btn').addEventListener('click', onBack);
+        return `
+            <div class="selection-stage">
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        class="search-input input" 
+                        placeholder="Pretraži marku vozila..." 
+                        value="${state.searchQuery}"
+                        id="brand-search"
+                    />
+                </div>
+
+                <div class="brands-grid">
+                    ${filteredBrands.map(brand => `
+                        <div class="brand-card" data-brand-id="${brand.id}">
+                            <div class="brand-logo">
+                                <img src="${brand.logo}" alt="${brand.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div class="brand-fallback" style="display:none;">${brand.name.charAt(0)}</div>
+                            </div>
+                            <div class="brand-name">${brand.name}</div>
+                        </div>
+                    `).join('')}
+                    
+                    ${filteredBrands.length > 0 ? `
+                        <div class="brand-card brand-card-other" id="other-brand-btn">
+                            <div class="brand-logo">
+                                <div class="brand-fallback" style="display:block;">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 5v14M5 12h14"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-name">Ostalo</div>
+                        </div>
+                    ` : ''}
+                </div>
+
+                ${filteredBrands.length === 0 ? `
+                    <div class="no-results">
+                        <p>Nema rezultata za "${state.searchQuery}"</p>
+                        <button class="btn btn-secondary" id="other-brand-btn-no-results">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            Unesi vozilo ručno
+                        </button>
+                    </div>
+                ` : ''}
+
+                <div class="step-actions">
+                    <button type="button" class="btn btn-secondary" id="back-btn">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Natrag
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderModelSelection() {
+        const models = state.selectedBrand.models;
+
+        return `
+            <div class="selection-stage">
+                <button class="back-to-stage-btn" id="back-to-brand">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Promijeni marku
+                </button>
+
+                <h3 class="stage-title">Odaberi model</h3>
+
+                <div class="models-grid">
+                    ${models.map(model => `
+                        <div class="model-card" data-model-name="${model.name}">
+                            <div class="model-name">${model.name}</div>
+                            <div class="model-years">${model.years[0]} - ${model.years[1]}</div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="step-actions">
+                    <button type="button" class="btn btn-secondary" id="back-btn">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Natrag
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderYearSelection() {
+        const modelData = state.selectedBrand.models.find(m => m.name === state.selectedModel);
+        const years = getYearsForModel(modelData);
+
+        return `
+            <div class="selection-stage">
+                <button class="back-to-stage-btn" id="back-to-model">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Promijeni model
+                </button>
+
+                <h3 class="stage-title">Odaberi godinu</h3>
+
+                <div class="years-grid">
+                    ${years.map(year => `
+                        <div class="year-card" data-year="${year}">
+                            ${year}
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="step-actions">
+                    <button type="button" class="btn btn-secondary" id="back-btn">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Natrag
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderManualEntry() {
+        return `
+            <div class="selection-stage">
+                <button class="back-to-stage-btn" id="back-to-brand-from-manual">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Natrag na odabir marke
+                </button>
+
+                <h3 class="stage-title">Unesi podatke o vozilu</h3>
+                <p class="stage-description">Unesite informacije o vašem vozilu ručno.</p>
+
+                <form class="manual-entry-form" id="manual-entry-form">
+                    <div class="form-group">
+                        <label class="form-label">Marka vozila *</label>
+                        <input 
+                            type="text" 
+                            class="input" 
+                            name="marka" 
+                            placeholder="npr. Tesla, Polestar, Rivian..." 
+                            required
+                            value="${state.selectedBrand?.name || ''}"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Model vozila *</label>
+                        <input 
+                            type="text" 
+                            class="input" 
+                            name="model" 
+                            placeholder="npr. Model 3, 2, R1T..." 
+                            required
+                            value="${state.selectedModel || ''}"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Godina proizvodnje *</label>
+                        <input 
+                            type="number" 
+                            class="input" 
+                            name="godina" 
+                            placeholder="npr. 2023" 
+                            min="1950" 
+                            max="2030" 
+                            required
+                            value="${state.selectedYear || ''}"
+                        />
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary" id="back-btn">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                            </svg>
+                            Natrag
+                        </button>
+                        <button type="submit" class="btn btn-cta">
+                            Nastavi
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        `;
+    }
+
+    function renderDetailsForm() {
+        return `
+            <div class="selection-stage">
+                <button class="back-to-stage-btn" id="back-to-year">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Promijeni godinu
+                </button>
+
+                <div class="selected-vehicle-summary">
+                    <h3>Odabrano vozilo</h3>
+                    <p class="vehicle-info">${state.selectedBrand.name} ${state.selectedModel} (${state.selectedYear})</p>
+                </div>
+
+                <form class="details-form" id="details-form">
+                    ${isPojasevi ? `
+                        <div class="form-group">
+                            <label class="form-label">Broj pojaseva</label>
+                            <select class="input" name="brojPojaseva" required>
+                                <option value="">Odaberi...</option>
+                                ${[1, 2, 3, 4, 5].map(n => `<option value="${n}" ${initialData.brojPojaseva == n ? 'selected' : ''}>${n}</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" class="checkbox" id="vlastiti-pojasevi" name="vlastitiPojasevi" ${initialData.vlastitiPojasevi ? 'checked' : ''}>
+                            <label for="vlastiti-pojasevi">Nosim vlastite pojaseve / rastavljeni sustav</label>
+                        </div>
+                    ` : ''}
+
+                    ${isZvjezdano ? `
+                        <div class="form-group">
+                            <label class="form-label">Broj zvjezdica</label>
+                            <select class="input" name="brojZvjezdica" required>
+                                <option value="">Odaberi...</option>
+                                ${[100, 150, 200, 250, 300, 400, 500, 750, 1000].map(n => `
+                                    <option value="${n}" ${initialData.brojZvjezdica == n ? 'selected' : ''}>${n}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                    ` : ''}
+
+                    <div class="form-group">
+                        <label class="form-label">Kratka napomena (opcionalno)</label>
+                        <textarea class="input" name="napomena" rows="4" placeholder="Dodatne informacije...">${initialData.napomena || ''}</textarea>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary" id="back-btn">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                            </svg>
+                            Natrag
+                        </button>
+                        <button type="submit" class="btn btn-cta">
+                            Nastavi
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        `;
+    }
+
+    function attachEventListeners() {
+        // Brand search
+        const searchInput = container.querySelector('#brand-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                state.searchQuery = e.target.value;
+                render();
+            });
+        }
+
+        // Brand selection
+        const brandCards = container.querySelectorAll('.brand-card:not(.brand-card-other)');
+        brandCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const brandId = card.dataset.brandId;
+                state.selectedBrand = carBrands.find(b => b.id === brandId);
+                state.stage = 'model';
+                render();
+            });
+        });
+
+        // "Other" brand button (in grid)
+        const otherBrandBtn = container.querySelector('#other-brand-btn');
+        if (otherBrandBtn) {
+            otherBrandBtn.addEventListener('click', () => {
+                state.stage = 'manual';
+                state.isManualEntry = true;
+                render();
+            });
+        }
+
+        // "Other" brand button (when no results)
+        const otherBrandBtnNoResults = container.querySelector('#other-brand-btn-no-results');
+        if (otherBrandBtnNoResults) {
+            otherBrandBtnNoResults.addEventListener('click', () => {
+                state.stage = 'manual';
+                state.isManualEntry = true;
+                render();
+            });
+        }
+
+        // Model selection
+        const modelCards = container.querySelectorAll('.model-card');
+        modelCards.forEach(card => {
+            card.addEventListener('click', () => {
+                state.selectedModel = card.dataset.modelName;
+                state.stage = 'year';
+                render();
+            });
+        });
+
+        // Year selection
+        const yearCards = container.querySelectorAll('.year-card');
+        yearCards.forEach(card => {
+            card.addEventListener('click', () => {
+                state.selectedYear = card.dataset.year;
+                state.stage = 'details';
+                render();
+            });
+        });
+
+        // Back to stage buttons
+        const backToBrand = container.querySelector('#back-to-brand');
+        if (backToBrand) {
+            backToBrand.addEventListener('click', () => {
+                state.stage = 'brand';
+                state.selectedBrand = null;
+                state.selectedModel = null;
+                state.selectedYear = null;
+                render();
+            });
+        }
+
+        const backToModel = container.querySelector('#back-to-model');
+        if (backToModel) {
+            backToModel.addEventListener('click', () => {
+                state.stage = 'model';
+                state.selectedModel = null;
+                state.selectedYear = null;
+                render();
+            });
+        }
+
+        const backToYear = container.querySelector('#back-to-year');
+        if (backToYear) {
+            backToYear.addEventListener('click', () => {
+                state.stage = 'year';
+                state.selectedYear = null;
+                render();
+            });
+        }
+
+        const backToBrandFromManual = container.querySelector('#back-to-brand-from-manual');
+        if (backToBrandFromManual) {
+            backToBrandFromManual.addEventListener('click', () => {
+                state.stage = 'brand';
+                state.isManualEntry = false;
+                render();
+            });
+        }
+
+        // Manual entry form submission
+        const manualEntryForm = container.querySelector('#manual-entry-form');
+        if (manualEntryForm) {
+            manualEntryForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(manualEntryForm);
+                const data = Object.fromEntries(formData.entries());
+
+                // Set manual vehicle data
+                state.selectedBrand = { name: data.marka };
+                state.selectedModel = data.model;
+                state.selectedYear = data.godina;
+                state.isManualEntry = true;
+                state.stage = 'details';
+                render();
+            });
+        }
+
+        // Details form submission
+        const detailsForm = container.querySelector('#details-form');
+        if (detailsForm) {
+            detailsForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(detailsForm);
+                const data = Object.fromEntries(formData.entries());
+                data.marka = state.selectedBrand.name;
+                data.model = state.selectedModel;
+                data.godina = state.selectedYear;
+                data.vlastitiPojasevi = detailsForm.querySelector('#vlastiti-pojasevi')?.checked || false;
+                onNext(data);
+            });
+        }
+
+        // Back button
+        const backBtn = container.querySelector('#back-btn');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                if (state.stage === 'brand') {
+                    onBack();
+                } else {
+                    // Go back one stage
+                    if (state.stage === 'model') {
+                        state.stage = 'brand';
+                        state.selectedBrand = null;
+                    } else if (state.stage === 'year') {
+                        state.stage = 'model';
+                        state.selectedModel = null;
+                    } else if (state.stage === 'details') {
+                        state.stage = 'year';
+                        state.selectedYear = null;
+                    }
+                    render();
+                }
+            });
+        }
+    }
+
+    // Initial render
+    render();
 
     return container;
 }
@@ -94,13 +516,304 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
 // Add styles
 const style = document.createElement('style');
 style.textContent = `
-  .vehicle-form {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: var(--spacing-2xl);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
-  }
+    .vehicle-selection-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: var(--spacing-2xl);
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-xl);
+        padding-bottom: var(--spacing-lg);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .breadcrumb-item {
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    .breadcrumb-separator {
+        color: var(--text-secondary);
+        opacity: 0.5;
+    }
+
+    .selection-stage {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xl);
+    }
+
+    .search-container {
+        width: 100%;
+    }
+
+    .search-input {
+        width: 100%;
+        font-size: 1rem;
+    }
+
+    .brands-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-lg);
+    }
+
+    @media (max-width: 1024px) {
+        .brands-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .brand-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-lg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-md);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .brand-card:hover {
+        background: rgba(0, 152, 255, 0.1);
+        border-color: var(--accent);
+        transform: translateY(-4px);
+    }
+
+    .brand-card-other {
+        background: rgba(0, 152, 255, 0.05);
+        border: 2px dashed rgba(0, 152, 255, 0.3);
+    }
+
+    .brand-card-other:hover {
+        background: rgba(0, 152, 255, 0.15);
+        border-color: var(--accent);
+    }
+
+    .brand-card-other .brand-fallback {
+        background: transparent;
+        border: 2px solid var(--accent);
+    }
+
+    .brand-card-other .icon {
+        width: 40px;
+        height: 40px;
+        color: var(--accent);
+    }
+
+    .brand-logo {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .brand-logo img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        filter: brightness(0.9);
+    }
+
+    .brand-fallback {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--accent);
+        border-radius: 50%;
+        font-size: 2rem;
+        font-weight: bold;
+        color: white;
+    }
+
+    .brand-name {
+        font-weight: 600;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .models-grid,
+    .years-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-md);
+    }
+
+    @media (max-width: 1024px) {
+        .models-grid,
+        .years-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .model-card,
+    .year-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-lg);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .model-card:hover,
+    .year-card:hover {
+        background: rgba(0, 152, 255, 0.1);
+        border-color: var(--accent);
+        transform: translateY(-2px);
+    }
+
+    .model-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .model-years {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+
+    .year-card {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .years-grid {
+        grid-template-columns: repeat(3, 1fr);
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    @media (max-width: 1024px) {
+        .years-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .back-to-stage-btn {
+        background: none;
+        border: none;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        cursor: pointer;
+        font-size: 0.9rem;
+        padding: var(--spacing-sm);
+        margin: calc(var(--spacing-lg) * -1) calc(var(--spacing-lg) * -1) 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .back-to-stage-btn:hover {
+        opacity: 0.8;
+    }
+
+    .back-to-stage-btn .icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .stage-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .stage-description {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .selected-vehicle-summary {
+        background: rgba(0, 152, 255, 0.1);
+        border: 1px solid var(--accent);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-lg);
+        text-align: center;
+    }
+
+    .selected-vehicle-summary h3 {
+        margin: 0 0 var(--spacing-sm) 0;
+        font-size: 1rem;
+        color: var(--text-secondary);
+    }
+
+    .vehicle-info {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--accent);
+    }
+
+    .details-form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-lg);
+    }
+
+    .no-results {
+        text-align: center;
+        padding: var(--spacing-2xl);
+        color: var(--text-secondary);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-lg);
+        align-items: center;
+    }
+
+    .no-results p {
+        margin: 0;
+    }
+
+    .manual-entry-form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-lg);
+    }
+
+    @media (max-width: 768px) {
+        .brands-grid {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+        }
+
+        .brand-logo {
+            width: 60px;
+            height: 60px;
+        }
+
+        .brand-fallback {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+
+        .brand-card-other .icon {
+            width: 30px;
+            height: 30px;
+        }
+
+        .models-grid,
+        .years-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 `;
 document.head.appendChild(style);

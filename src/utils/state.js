@@ -1,3 +1,5 @@
+import { supabase } from './supabase.js';
+
 // State management using localStorage for demo
 export const state = {
     // Services data
@@ -133,59 +135,165 @@ export const state = {
     reservations: [],
 
     // Methods
-    saveBooking(bookingData) {
-        const reservations = this.getReservations();
+    async saveBooking(bookingData) {
+        const { supabase } = await import('./supabase.js');
+
         const newReservation = {
-            id: Date.now(),
-            ...bookingData,
+            service_id: bookingData.service_id,
+            service_name: bookingData.service_name || this.services.find(s => s.id === bookingData.service_id)?.name,
+            marka: bookingData.marka,
+            model: bookingData.model,
+            godina: bookingData.godina,
+            broj_pojaseva: bookingData.broj_pojaseva ? parseInt(bookingData.broj_pojaseva) : null,
+            vlastiti_pojasevi: bookingData.vlastiti_pojasevi || false,
+            broj_zvjezdica: bookingData.broj_zvjezdica ? parseInt(bookingData.broj_zvjezdica) : null,
+            napomena: bookingData.napomena || null,
+            appointment_date: bookingData.appointment_date,
+            appointment_time: bookingData.appointment_time,
+            ime: bookingData.ime,
+            prezime: bookingData.prezime,
+            email: bookingData.email,
+            telefon: bookingData.telefon,
+            adresa: bookingData.adresa || null,
             status: 'pending',
-            createdAt: new Date().toISOString()
+            is_manual_entry: bookingData.is_manual_entry || false
         };
-        reservations.push(newReservation);
-        localStorage.setItem('reservations', JSON.stringify(reservations));
-        return newReservation;
+
+        const { data, error } = await supabase
+            .from('bookings')
+            .insert([newReservation])
+            .select();
+
+        if (error) {
+            console.error('Error saving booking:', error);
+            throw error;
+        }
+
+        return data[0];
     },
 
-    getReservations() {
-        const stored = localStorage.getItem('reservations');
-        return stored ? JSON.parse(stored) : [];
+    async getReservations() {
+        const { supabase } = await import('./supabase.js');
+
+        const { data, error } = await supabase
+            .from('bookings')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching reservations:', error);
+            return [];
+        }
+
+        return data || [];
     },
 
-    updateReservationStatus(id, status) {
-        const reservations = this.getReservations();
-        const index = reservations.findIndex(r => r.id === id);
-        if (index !== -1) {
-            reservations[index].status = status;
-            localStorage.setItem('reservations', JSON.stringify(reservations));
+    async updateReservationStatus(id, status) {
+        const { supabase } = await import('./supabase.js');
+
+        const { error } = await supabase
+            .from('bookings')
+            .update({ status })
+            .eq('id', id);
+
+        if (error) {
+            console.error('Error updating reservation:', error);
+            throw error;
         }
     },
 
-    getReviews() {
-        const stored = localStorage.getItem('reviews');
-        return stored ? JSON.parse(stored) : this.reviews;
-    },
+    // Service Configuration
+    async fetchServiceConfig() {
+        const { supabase } = await import('./supabase.js');
 
-    saveReview(review) {
-        const reviews = this.getReviews();
-        if (review.id) {
-            // Update existing
-            const index = reviews.findIndex(r => r.id === review.id);
-            if (index !== -1) {
-                reviews[index] = review;
-            }
-        } else {
-            // Add new
-            review.id = Date.now();
-            reviews.push(review);
+        const { data, error } = await supabase
+            .from('services')
+            .select('*');
+
+        if (error) {
+            console.warn('Error fetching service config:', error);
+            return;
         }
-        localStorage.setItem('reviews', JSON.stringify(reviews));
-        return review;
+
+        if (data && data.length > 0) {
+            // Merge config into local state
+            this.services = this.services.map(service => {
+                const config = data.find(c => c.id === service.id);
+                if (config) {
+                    return {
+                        ...service,
+                        duration: config.duration_minutes,
+                        durationPerUnit: config.duration_per_unit_minutes,
+                        durationRastavljeni: config.duration_rastavljeni_minutes
+                    };
+                }
+                return service;
+            });
+        }
+        return this.services;
     },
 
-    deleteReview(id) {
-        const reviews = this.getReviews();
-        const filtered = reviews.filter(r => r.id !== id);
-        localStorage.setItem('reviews', JSON.stringify(filtered));
+    async updateServiceConfig(id, config) {
+        const { supabase } = await import('./supabase.js');
+
+        const { error } = await supabase
+            .from('services')
+            .upsert({
+                id,
+                ...config,
+                updated_at: new Date().toISOString()
+            });
+
+        if (error) throw error;
+
+        // Refresh local state
+        await this.fetchServiceConfig();
+    },
+
+    // Reviews
+    async getReviews() {
+        const { supabase } = await import('./supabase.js');
+
+        const { data, error } = await supabase
+            .from('reviews')
+            .select('*')
+            .eq('is_approved', true)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching reviews:', error);
+            return [];
+        }
+
+        return data || [];
+    },
+
+    async saveReview(review) {
+        const { supabase } = await import('./supabase.js');
+
+        // Check if admin
+        const { data: { user } } = await supabase.auth.getUser();
+        const isAdmin = user?.user_metadata?.role === 'admin';
+
+        const { error } = await supabase
+            .from('reviews')
+            .insert([{
+                ...review,
+                is_approved: isAdmin // Auto-approve if admin
+            }]);
+
+        if (error) throw error;
+    },
+
+    async deleteReview(id) {
+        const { supabase } = await import('./supabase.js');
+
+        const { error } = await supabase
+            .from('reviews')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
     },
 
     // Calendar availability (mock data)

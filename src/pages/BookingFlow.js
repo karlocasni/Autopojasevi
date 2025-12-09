@@ -121,11 +121,38 @@ export function BookingFlow(data = {}) {
             case 5:
                 stepComponent = Step5Review({
                     bookingData,
-                    onNext: () => {
-                        // Save booking
-                        state.saveBooking(bookingData);
-                        currentStep = 6;
-                        renderStep();
+                    onNext: async () => {
+                        try {
+                            // Map bookingData to the shape expected by state.saveBooking
+                            const payload = {
+                                service_id: bookingData.serviceId,
+                                service_name: bookingData.serviceName || state.services.find(s => s.id === bookingData.serviceId)?.name,
+                                marka: bookingData.marka,
+                                model: bookingData.model,
+                                godina: bookingData.godina,
+                                broj_pojaseva: bookingData.brojPojaseva,
+                                vlastiti_pojasevi: bookingData.vlastitiPojasevi,
+                                broj_zvjezdica: bookingData.brojZvjezdica,
+                                napomena: bookingData.napomena,
+                                appointment_date: bookingData.date,
+                                appointment_time: bookingData.time,
+                                ime: bookingData.imePrezime ? bookingData.imePrezime.split(' ')[0] : '',
+                                prezime: bookingData.imePrezime ? bookingData.imePrezime.split(' ')[1] : '',
+                                email: bookingData.email,
+                                telefon: bookingData.telefon,
+                                adresa: bookingData.adresa,
+                                is_manual_entry: bookingData.isManualEntry || false
+                            };
+                            const saved = await state.saveBooking(payload);
+                            // Update bookingData with fields expected by success step
+                            bookingData.date = saved.appointment_date;
+                            bookingData.time = saved.appointment_time;
+                            currentStep = 6;
+                            renderStep();
+                        } catch (error) {
+                            console.error('Failed to save booking:', error);
+                            alert('Došlo je do greške pri spremanju rezervacije. Molimo pokušajte ponovno.');
+                        }
                     },
                     onBack: () => {
                         currentStep = 4;
@@ -139,6 +166,7 @@ export function BookingFlow(data = {}) {
                 break;
         }
 
+        // Render current view
         if (stepComponent) {
             stepCard.appendChild(stepComponent);
             container.appendChild(stepCard);
