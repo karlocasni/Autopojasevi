@@ -167,6 +167,18 @@ style.textContent = `
       flex-direction: row;
       justify-content: center;
     }
+    
+    .footer-logo-text {
+        font-size: 1.2rem;
+    }
+    
+    .footer-heading {
+        font-size: 1rem;
+    }
+    
+    .footer-link, .footer-address, .footer-hours, .footer-copyright, .footer-disclaimer {
+        font-size: 0.85rem;
+    }
   }
 `;
 document.head.appendChild(style);

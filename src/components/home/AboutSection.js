@@ -184,8 +184,29 @@ style.textContent = `
 
   @media (max-width: 640px) {
     .about-values {
-      flex-direction: column;
-      gap: var(--spacing-md);
+      flex-direction: row; /* Force row on mobile too */
+      flex-wrap: wrap; /* Allow wrapping if really needed but try to keep row */
+      gap: var(--spacing-sm);
+      justify-content: center;
+    }
+    
+    .value-item {
+        font-size: 0.75rem;
+    }
+    
+    .icon-lg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .about-image-wrapper {
+        height: 250px; /* Smaller height */
+        margin-top: var(--spacing-lg);
+    }
+    
+    .about-image-container {
+        /* Adjust positioning if needed to avoid overlap or just rely on flow */
+        transform: none !important; /* Disable parallax on mobile if it causes issues */
     }
   }
 `;

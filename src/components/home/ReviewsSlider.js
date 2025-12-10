@@ -325,7 +325,22 @@ style.textContent = `
     }
 
     .review-text {
-      font-size: 1.1rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    .review-author {
+        font-size: 0.85rem;
+    }
+    
+    .company-name {
+        font-size: 0.9rem;
+    }
+    
+    .company-logo {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
     }
   }
 `;

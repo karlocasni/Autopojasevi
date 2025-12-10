@@ -54,7 +54,7 @@ style.textContent = `
 
   @media (max-width: 768px) {
     .cta-title {
-      font-size: 1.8rem;
+      font-size: 1.4rem;
     }
   }
 `;

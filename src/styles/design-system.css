@@ -64,7 +64,13 @@
 
     /* Scaling down entire UI */
     :root {
-      font-size: 14px;
+      font-size: 13px;
+      /* Further reduced from 14px */
+    }
+
+    .container {
+      padding-left: var(--spacing-lg);
+      padding-right: var(--spacing-lg);
     }
 
     --spacing-xs: 0.25rem;

@@ -1,10 +1,10 @@
 export function ProgressBar({ currentStep, totalSteps = 6 }) {
-    const container = document.createElement('div');
-    container.className = 'progress-bar-container';
+  const container = document.createElement('div');
+  container.className = 'progress-bar-container';
 
-    const percentage = (currentStep / totalSteps) * 100;
+  const percentage = (currentStep / totalSteps) * 100;
 
-    container.innerHTML = `
+  container.innerHTML = `
     <div class="progress-steps">
       ${Array(totalSteps).fill(0).map((_, i) => `
         <div class="progress-step ${i < currentStep ? 'completed' : ''} ${i === currentStep - 1 ? 'active' : ''}">
@@ -18,19 +18,19 @@ export function ProgressBar({ currentStep, totalSteps = 6 }) {
     </div>
   `;
 
-    return container;
+  return container;
 }
 
 function getStepLabel(step) {
-    const labels = {
-        1: 'Usluga',
-        2: 'Vozilo',
-        3: 'Termin',
-        4: 'Podaci',
-        5: 'Pregled',
-        6: 'Gotovo'
-    };
-    return labels[step] || '';
+  const labels = {
+    1: 'Usluga',
+    2: 'Vozilo',
+    3: 'Termin',
+    4: 'Podaci',
+    5: 'Pregled',
+    6: 'Gotovo'
+  };
+  return labels[step] || '';
 }
 
 // Add styles
@@ -111,13 +111,19 @@ style.textContent = `
 
   @media (max-width: 768px) {
     .step-label {
-      font-size: 0.7rem;
+      font-size: 0.6rem;
+      letter-spacing: 0;
     }
 
     .step-number {
-      width: 32px;
-      height: 32px;
-      font-size: 0.9rem;
+      width: 24px;
+      height: 24px;
+      font-size: 0.8rem;
+      border-width: 1px;
+    }
+    
+    .progress-bar-container {
+        margin-bottom: var(--spacing-xl);
     }
   }
 `;

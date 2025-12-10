@@ -137,10 +137,16 @@ style.textContent = `
   @media (max-width: 1024px) {
     .contact-grid {
       grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+    }
+    
+    .contact-info {
+        padding: var(--spacing-lg);
+        gap: var(--spacing-lg);
     }
 
     .contact-map {
-      min-height: 400px;
+      min-height: 300px;
     }
   }
 `;

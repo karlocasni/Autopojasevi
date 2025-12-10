@@ -1,21 +1,21 @@
 import { router } from '../../utils/router.js';
 
 export function Step6Success({ bookingData }) {
-    const container = document.createElement('div');
-    container.className = 'booking-step step-success';
+  const container = document.createElement('div');
+  container.className = 'booking-step step-success';
 
-    const dateObj = new Date(bookingData.date);
-    const formattedDate = dateObj.toLocaleDateString('hr-HR', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    });
+  const dateObj = new Date(bookingData.date);
+  const formattedDate = dateObj.toLocaleDateString('hr-HR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
 
-    const hour = parseInt(bookingData.time.split(':')[0]);
-    const period = hour < 13 ? 'jutro' : 'popodne';
+  const hour = parseInt(bookingData.time.split(':')[0]);
+  const period = hour < 13 ? 'jutro' : 'popodne';
 
-    container.innerHTML = `
+  container.innerHTML = `
     <div class="success-content">
       <div class="success-icon">
         <svg class="icon-xl" viewBox="0 0 24 24" fill="currentColor">
@@ -62,11 +62,11 @@ export function Step6Success({ bookingData }) {
     </div>
   `;
 
-    container.querySelector('#home-btn').addEventListener('click', () => {
-        router.navigate('/');
-    });
+  container.querySelector('#home-btn').addEventListener('click', () => {
+    router.navigate('/');
+  });
 
-    return container;
+  return container;
 }
 
 // Add styles
@@ -167,11 +167,25 @@ style.textContent = `
 
   @media (max-width: 768px) {
     .success-title .heading-bottom {
-      font-size: 2rem;
+      font-size: 1.5rem;
     }
 
     .success-text {
-      font-size: 1rem;
+      font-size: 0.95rem;
+    }
+    
+    .detail-item {
+        font-size: 0.9rem;
+    }
+    
+    .success-icon {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .success-icon .icon-xl {
+        width: 48px;
+        height: 48px;
     }
   }
 `;

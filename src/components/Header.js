@@ -146,48 +146,85 @@ style.textContent = `
   }
 
   @media (max-width: 768px) {
-    .header {
-        padding: var(--spacing-sm) 0;
-    }
-
     .header-container {
       display: flex;
-      flex-direction: column;
+      flex-direction: row; /* Horizontal layout */
+      justify-content: space-between;
       align-items: center;
       gap: var(--spacing-sm);
     }
 
-    .header-nav {
-      width: 100%;
-      justify-content: center;
-      gap: var(--spacing-md);
-      font-size: 0.8rem;
-    }
-    
-    .header-nav:first-child {
-        justify-self: center;
-        order: 2; 
-    }
-
-    .header-nav:last-child {
-        justify-self: center;
-        order: 3; 
-    }
-
     .header-logo {
-      order: 1; 
-      width: 100%;
-      text-align: center;
+      height: auto;
       margin-bottom: 0;
+      flex: 0 0 auto;
+      text-align: left;
+      order: 1;
     }
 
     .logo-img {
-      height: 40px; /* Reduced from 50px */
+      height: 35px; /* Smaller */
+    }
+
+    /* Wrap both nav groups into a container if possible, or simulate it */
+    /* Since we can't easily change HTML structure here, we'll try to visually stack them on the right */
+    
+    .header-nav {
+      font-size: 0.75rem;
+      gap: var(--spacing-sm);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* We need to group the nav items on the right. 
+       The HTML structure has: nav (O nama...), logo, nav (Kontakt...).
+       We need to pull them out of flow or use flex ordering carefully.
+    */
+    
+    .header-nav:first-child {
+        order: 2;
+        display: none; /* Temporarily hide "O nama/FAQ" to simplify if needed, OR stack them */
+    }
+    
+    /* Re-thinking: To stack them on the right, we'd ideally need a wrapper. 
+       Without wrapper, we can try absolute positioning or grid. 
+       Let's use Grid for the container.
+    */
+    
+    .header-container {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-areas: 
+            "logo top-nav"
+            "logo bottom-nav";
+        align-items: center;
+    }
+    
+    .header-logo {
+        grid-area: logo;
+        order: unset;
+        width: auto;
+    }
+    
+    .header-nav:first-child {
+        grid-area: top-nav;
+        display: flex;
+        justify-content: flex-end;
+        order: unset;
+        margin-bottom: 2px;
+    }
+    
+    .header-nav:last-child {
+        grid-area: bottom-nav;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        order: unset;
     }
 
     #header-cta {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.85rem;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
     }
   }
 `;

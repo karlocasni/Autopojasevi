@@ -1,8 +1,8 @@
 export function HowItWorks() {
-    const section = document.createElement('section');
-    section.className = 'section how-it-works';
+  const section = document.createElement('section');
+  section.className = 'section how-it-works';
 
-    section.innerHTML = `
+  section.innerHTML = `
     <div class="container">
       <h2 class="section-title text-center mb-xl">
         <span class="heading-top">PROCES</span>
@@ -50,7 +50,7 @@ export function HowItWorks() {
     </div>
   `;
 
-    return section;
+  return section;
 }
 
 // Add styles
@@ -100,9 +100,25 @@ style.textContent = `
     text-transform: uppercase;
   }
 
-  .step-description {
-    color: var(--color-text-muted);
-    line-height: 1.8;
+  @media (max-width: 768px) {
+    .step-card {
+        gap: var(--spacing-lg);
+        padding: var(--spacing-lg) 0;
+    }
+    
+    .step-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .icon-xl {
+        width: 32px;
+        height: 32px;
+    }
+
+    .step-title {
+        font-size: 1.2rem;
+    }
   }
 `;
 document.head.appendChild(style);

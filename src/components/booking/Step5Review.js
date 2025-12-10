@@ -1,23 +1,23 @@
 import { state } from '../../utils/state.js';
 
 export function Step5Review({ bookingData, onNext, onBack }) {
-    const container = document.createElement('div');
-    container.className = 'booking-step step-review';
+  const container = document.createElement('div');
+  container.className = 'booking-step step-review';
 
-    const service = state.services.find(s => s.id === bookingData.serviceId);
-    const dateObj = new Date(bookingData.date);
-    const formattedDate = dateObj.toLocaleDateString('hr-HR', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+  const service = state.services.find(s => s.id === bookingData.serviceId);
+  const dateObj = new Date(bookingData.date);
+  const formattedDate = dateObj.toLocaleDateString('hr-HR', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
-    // Determine period
-    const hour = parseInt(bookingData.time.split(':')[0]);
-    const period = hour < 13 ? 'Jutro' : 'Popodne';
+  // Determine period
+  const hour = parseInt(bookingData.time.split(':')[0]);
+  const period = hour < 13 ? 'Jutro' : 'Popodne';
 
-    container.innerHTML = `
+  container.innerHTML = `
     <h2 class="step-title">
       <span class="heading-top">KORAK 5</span>
       <span class="heading-bottom">Pregled Rezervacije</span>
@@ -137,10 +137,10 @@ export function Step5Review({ bookingData, onNext, onBack }) {
     </div>
   `;
 
-    container.querySelector('#back-btn').addEventListener('click', onBack);
-    container.querySelector('#confirm-btn').addEventListener('click', () => onNext());
+  container.querySelector('#back-btn').addEventListener('click', onBack);
+  container.querySelector('#confirm-btn').addEventListener('click', () => onNext());
 
-    return container;
+  return container;
 }
 
 // Add styles
@@ -199,7 +199,27 @@ style.textContent = `
     font-size: 0.9rem;
     color: var(--color-text-muted);
     font-style: italic;
-    margin-top: var(--spacing-md);
+  @media (max-width: 768px) {
+    .review-container {
+      padding: var(--spacing-lg);
+      gap: var(--spacing-lg);
+    }
+    
+    .review-section-title {
+        font-size: 1rem;
+    }
+    
+    .review-value, .review-label {
+        font-size: 0.95rem;
+    }
+    
+    .review-icon {
+        font-size: 1.5rem;
+    }
+    
+    .review-section {
+        padding-bottom: var(--spacing-sm);
+    }
   }
 `;
 document.head.appendChild(style);

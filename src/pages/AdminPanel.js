@@ -72,6 +72,7 @@ export function AdminPanel() {
         @media (max-width: 1024px) {
           .admin-layout {
             grid-template-columns: 1fr;
+            height: auto;
           }
           
           .admin-sidebar {
@@ -80,30 +81,63 @@ export function AdminPanel() {
             flex-direction: row;
             flex-wrap: wrap;
             align-items: center;
+            justify-content: space-between;
             padding: var(--spacing-sm);
             gap: var(--spacing-sm);
             overflow-x: auto;
+            flex-shrink: 0;
           }
           
           .admin-logo {
             margin-bottom: 0;
-            width: 50px;
+            width: 40px;
+          }
+
+          .admin-logo-img {
+              height: 30px;
           }
           
           .admin-nav {
             flex-direction: row;
             overflow-x: auto;
             flex: 1;
-            padding-bottom: 5px; /* Scrollbar space */
+            padding-bottom: 0;
+            gap: 2px;
           }
           
           .admin-nav-item, .admin-logout {
-            padding: 10px;
+            padding: 8px;
             font-size: 0.8rem;
+            justify-content: center;
           }
           
           .admin-nav-item span, .admin-logout span {
-            display: none; /* Hide text on small screens, show only icons */
+            display: none; /* Hide text on small screens */
+          }
+          
+          .admin-content {
+              padding: var(--spacing-md);
+              overflow-x: hidden;
+          }
+
+          /* Force tables to be scrollable or convert to cards */
+          .table-container {
+             overflow-x: auto;
+             max-width: 100%;
+          }
+          
+          .admin-table {
+              min-width: 600px; /* Ensure table doesn't squash too much */
+          }
+          
+          /* Dashboard Widgets stack */
+          .dashboard-widgets {
+              grid-template-columns: 1fr;
+          }
+          
+          /* Calendar adjustments */
+          .calendar-weekdays, .calendar-days {
+              font-size: 0.7rem;
           }
         }
       </style>
