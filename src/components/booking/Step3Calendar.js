@@ -1,16 +1,16 @@
 import { state } from '../../utils/state.js';
 
 export function Step3Calendar({ onNext, onBack, initialData = {} }) {
-    const container = document.createElement('div');
-    container.className = 'booking-step step-calendar';
+  const container = document.createElement('div');
+  container.className = 'booking-step step-calendar';
 
-    const today = new Date();
-    let currentMonth = today.getMonth();
-    let currentYear = today.getFullYear();
-    let selectedDate = initialData.date || null;
-    let selectedTime = initialData.time || null;
+  const today = new Date();
+  let currentMonth = today.getMonth();
+  let currentYear = today.getFullYear();
+  let selectedDate = initialData.date || null;
+  let selectedTime = initialData.time || null;
 
-    container.innerHTML = `
+  container.innerHTML = `
     <h2 class="step-title">
       <span class="heading-top">KORAK 3</span>
       <span class="heading-bottom">Odaberi Termin</span>
@@ -61,6 +61,9 @@ export function Step3Calendar({ onNext, onBack, initialData = {} }) {
     
     <div class="time-slots-container hidden" id="time-slots">
       <h3 class="time-slots-title">Odaberi vrijeme</h3>
+      <p style="text-align: center; color: var(--color-text-muted); margin-bottom: var(--spacing-md); font-size: 0.9rem;">
+        Napomena: Vozilo je potrebno dovesti u jutarnjem (10-12h) ili popodnevnom (14-16h) terminu.
+      </p>
       <div class="time-slots-grid" id="time-slots-grid"></div>
     </div>
     
@@ -80,57 +83,59 @@ export function Step3Calendar({ onNext, onBack, initialData = {} }) {
     </div>
   `;
 
-    const renderCalendar = () => {
-        const monthNames = ['Siječanj', 'Veljača', 'Ožujak', 'Travanj', 'Svibanj', 'Lipanj',
-            'Srpanj', 'Kolovoz', 'Rujan', 'Listopad', 'Studeni', 'Prosinac'];
+  const renderCalendar = async () => {
+    const monthNames = ['Siječanj', 'Veljača', 'Ožujak', 'Travanj', 'Svibanj', 'Lipanj',
+      'Srpanj', 'Kolovoz', 'Rujan', 'Listopad', 'Studeni', 'Prosinac'];
 
-        container.querySelector('#calendar-month').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    container.querySelector('#calendar-month').textContent = `${monthNames[currentMonth]} ${currentYear}`;
 
-        const firstDay = new Date(currentYear, currentMonth, 1);
-        const lastDay = new Date(currentYear, currentMonth + 1, 0);
-        const daysInMonth = lastDay.getDate();
-        const startingDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Monday = 0
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Monday = 0
 
-        const availability = state.getCalendarData(currentYear, currentMonth);
-        const daysContainer = container.querySelector('#calendar-days');
-        daysContainer.innerHTML = '';
+    const availability = await state.getCalendarAvailability(currentYear, currentMonth);
+    const daysContainer = container.querySelector('#calendar-days');
+    daysContainer.innerHTML = '';
 
-        // Empty cells before first day
-        for (let i = 0; i < startingDayOfWeek; i++) {
-            const emptyDay = document.createElement('div');
-            emptyDay.className = 'calendar-day empty';
-            daysContainer.appendChild(emptyDay);
-        }
+    // Empty cells before first day
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      const emptyDay = document.createElement('div');
+      emptyDay.className = 'calendar-day empty';
+      daysContainer.appendChild(emptyDay);
+    }
 
-        // Days
-        for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(currentYear, currentMonth, day);
-            const isPast = date < today && date.toDateString() !== today.toDateString();
-            const status = availability[day] || 'unavailable';
+    // Days
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(currentYear, currentMonth, day);
+      const isPast = date < today && date.toDateString() !== today.toDateString();
 
-            const dayEl = document.createElement('button');
-            dayEl.className = `calendar-day ${status} ${isPast ? 'past' : ''}`;
-            dayEl.textContent = day;
-            dayEl.disabled = isPast || status === 'unavailable';
+      const dayData = availability[day] || { status: 'unavailable', count: 0 };
+      const status = dayData.status;
 
-            if (!dayEl.disabled) {
-                dayEl.addEventListener('click', () => {
-                    selectedDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    showTimeSlots(selectedDate);
-                });
-            }
+      const dayEl = document.createElement('button');
+      dayEl.className = `calendar-day ${status} ${isPast ? 'past' : ''}`;
+      dayEl.textContent = day;
+      dayEl.disabled = isPast || status === 'unavailable';
 
-            daysContainer.appendChild(dayEl);
-        }
-    };
+      if (!dayEl.disabled) {
+        dayEl.addEventListener('click', () => {
+          selectedDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          showTimeSlots(selectedDate);
+        });
+      }
 
-    const showTimeSlots = (date) => {
-        const timeSlotsContainer = container.querySelector('#time-slots');
-        const timeSlotsGrid = container.querySelector('#time-slots-grid');
+      daysContainer.appendChild(dayEl);
+    }
+  };
 
-        const slots = state.getTimeSlots(date);
+  const showTimeSlots = async (date) => {
+    const timeSlotsContainer = container.querySelector('#time-slots');
+    const timeSlotsGrid = container.querySelector('#time-slots-grid');
 
-        timeSlotsGrid.innerHTML = slots.map(slot => `
+    const slots = await state.getTimeSlots(date);
+
+    timeSlotsGrid.innerHTML = slots.map(slot => `
       <button class="time-slot ${!slot.available ? 'disabled' : ''}" 
               data-time="${slot.time}" 
               ${!slot.available ? 'disabled' : ''}>
@@ -138,53 +143,53 @@ export function Step3Calendar({ onNext, onBack, initialData = {} }) {
       </button>
     `).join('');
 
-        timeSlotsContainer.classList.remove('hidden');
+    timeSlotsContainer.classList.remove('hidden');
 
-        // Handle time selection
-        timeSlotsGrid.querySelectorAll('.time-slot').forEach(btn => {
-            btn.addEventListener('click', () => {
-                selectedTime = btn.dataset.time;
+    // Handle time selection
+    timeSlotsGrid.querySelectorAll('.time-slot').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedTime = btn.dataset.time;
 
-                // Update UI
-                timeSlotsGrid.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
+        // Update UI
+        timeSlotsGrid.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
 
-                // Enable next button
-                container.querySelector('#next-btn').disabled = false;
-            });
-        });
-    };
-
-    // Navigation
-    container.querySelector('#prev-month').addEventListener('click', () => {
-        currentMonth--;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        }
-        renderCalendar();
+        // Enable next button
+        container.querySelector('#next-btn').disabled = false;
+      });
     });
+  };
 
-    container.querySelector('#next-month').addEventListener('click', () => {
-        currentMonth++;
-        if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
-        renderCalendar();
-    });
-
-    container.querySelector('#back-btn').addEventListener('click', onBack);
-
-    container.querySelector('#next-btn').addEventListener('click', () => {
-        if (selectedDate && selectedTime) {
-            onNext({ date: selectedDate, time: selectedTime });
-        }
-    });
-
+  // Navigation
+  container.querySelector('#prev-month').addEventListener('click', () => {
+    currentMonth--;
+    if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear--;
+    }
     renderCalendar();
+  });
 
-    return container;
+  container.querySelector('#next-month').addEventListener('click', () => {
+    currentMonth++;
+    if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear++;
+    }
+    renderCalendar();
+  });
+
+  container.querySelector('#back-btn').addEventListener('click', onBack);
+
+  container.querySelector('#next-btn').addEventListener('click', () => {
+    if (selectedDate && selectedTime) {
+      onNext({ date: selectedDate, time: selectedTime });
+    }
+  });
+
+  renderCalendar();
+
+  return container;
 }
 
 // Add styles

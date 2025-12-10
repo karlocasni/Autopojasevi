@@ -173,6 +173,8 @@ export function AdminPanel() {
         contentArea.appendChild(renderServices());
       } else if (viewName === 'reviews') {
         contentArea.appendChild(renderReviews());
+      } else if (viewName === 'calendar') {
+        contentArea.appendChild(renderCalendarView());
       } else if (viewName === 'settings') {
         contentArea.appendChild(renderSettings());
       } else {
@@ -263,11 +265,149 @@ export function AdminPanel() {
     return container;
   }
 
+  function renderCalendarView() {
+    const container = document.createElement('div');
+    const today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
+
+    container.innerHTML = `
+      <h1 class="admin-title">Kalendar Rezervacija</h1>
+      <div class="glass" style="padding: var(--spacing-xl);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+          <button class="btn btn-secondary" id="prev-month">&lt;</button>
+          <h2 id="calendar-month" style="margin: 0; text-transform: uppercase;"></h2>
+          <button class="btn btn-secondary" id="next-month">&gt;</button>
+        </div>
+        
+        <div class="calendar-weekdays" style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: bold; margin-bottom: var(--spacing-md); color: var(--color-text-muted);">
+          <div>Pon</div><div>Uto</div><div>Sri</div><div>Čet</div><div>Pet</div><div>Sub</div><div>Ned</div>
+        </div>
+        
+        <div id="calendar-days" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--spacing-xs);"></div>
+      </div>
+
+      <!-- Day Details Modal -->
+      <div id="day-modal" class="glass" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; padding: var(--spacing-xl); z-index: 1000; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+          <h3 id="modal-date" style="margin: 0;"></h3>
+          <button id="close-day-modal" style="background: none; border: none; color: white; cursor: pointer;">✕</button>
+        </div>
+        <div id="day-reservations-list"></div>
+      </div>
+      <div id="day-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999;"></div>
+    `;
+
+    const dayModal = container.querySelector('#day-modal');
+    const dayOverlay = container.querySelector('#day-modal-overlay');
+    const closeModal = () => {
+      dayModal.style.display = 'none';
+      dayOverlay.style.display = 'none';
+    };
+    container.querySelector('#close-day-modal').onclick = closeModal;
+    dayOverlay.onclick = closeModal;
+
+    const render = async () => {
+      const monthNames = ['Siječanj', 'Veljača', 'Ožujak', 'Travanj', 'Svibanj', 'Lipanj',
+        'Srpanj', 'Kolovoz', 'Rujan', 'Listopad', 'Studeni', 'Prosinac'];
+
+      container.querySelector('#calendar-month').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+      const availability = await state.getCalendarAvailability(currentYear, currentMonth);
+      const daysContainer = container.querySelector('#calendar-days');
+      daysContainer.innerHTML = '';
+
+      const firstDay = new Date(currentYear, currentMonth, 1);
+      const lastDay = new Date(currentYear, currentMonth + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startingDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+
+      // Empty cells
+      for (let i = 0; i < startingDayOfWeek; i++) {
+        daysContainer.appendChild(document.createElement('div'));
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayData = availability[day] || { status: 'unavailable', count: 0 };
+
+        const btn = document.createElement('button');
+        btn.className = 'calendar-day';
+        btn.style.aspectRatio = '1';
+        btn.style.border = '1px solid rgba(255,255,255,0.1)';
+        btn.style.background = 'rgba(255,255,255,0.05)';
+        btn.style.color = 'white';
+        btn.style.cursor = 'pointer';
+        btn.style.position = 'relative';
+
+        // Color based on status
+        if (dayData.status === 'unavailable') btn.style.borderColor = '#ef4444'; // Red
+        else if (dayData.status === 'almost-full') btn.style.borderColor = '#eab308'; // Yellow
+        else btn.style.borderColor = '#22c55e'; // Green
+
+        // Tooltip
+        btn.title = `Broj rezervacija: ${dayData.count}`;
+
+        btn.innerHTML = `
+                <span style="font-weight: bold;">${day}</span>
+                ${dayData.count > 0 ? `<div style="font-size: 0.8rem; margin-top: 5px; color: var(--color-text-muted);">${dayData.count} rez.</div>` : ''}
+            `;
+
+        btn.onclick = async () => {
+          const reservations = await state.getReservationsByDate(dateStr);
+          container.querySelector('#modal-date').textContent = new Date(dateStr).toLocaleDateString('hr-HR');
+          const list = container.querySelector('#day-reservations-list');
+
+          if (reservations.length === 0) {
+            list.innerHTML = '<p>Nema rezervacija za ovaj dan.</p>';
+          } else {
+            list.innerHTML = reservations.map(r => `
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px; margin-bottom: 10px; border-radius: 4px; border-left: 3px solid ${r.status === 'confirmed' ? '#10b981' : (r.status === 'cancelled' ? '#ef4444' : '#fbbf24')}">
+                            <div style="font-weight: bold;">${r.appointment_time} - ${r.ime} ${r.prezime}</div>
+                            <div style="font-size: 0.9rem; color: #aaa;">${r.service_name}</div>
+                            <div style="font-size: 0.8rem;">Status: ${r.status}</div>
+                        </div>
+                    `).join('');
+          }
+
+          dayModal.style.display = 'block';
+          dayOverlay.style.display = 'block';
+        };
+
+        daysContainer.appendChild(btn);
+      }
+    };
+
+    container.querySelector('#prev-month').addEventListener('click', () => {
+      currentMonth--;
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      render();
+    });
+
+    container.querySelector('#next-month').addEventListener('click', () => {
+      currentMonth++;
+      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      render();
+    });
+
+    render();
+    return container;
+  }
+
   function renderReservations() {
     const container = document.createElement('div');
 
     container.innerHTML = `
-    <h1 class="admin-title">Rezervacije</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+      <h1 class="admin-title" style="margin: 0;">Rezervacije</h1>
+      <select id="status-filter" class="input" style="width: auto;">
+        <option value="all">Sve rezervacije</option>
+        <option value="pending">Na čekanju</option>
+        <option value="confirmed">Potvrđeno</option>
+        <option value="completed">Završeno</option>
+        <option value="cancelled">Otkazano</option>
+      </select>
+    </div>
     
     <div class="table-container glass">
       <table class="admin-table">
@@ -326,11 +466,18 @@ export function AdminPanel() {
     closeModalBtn.addEventListener('click', closeModal);
     overlay.addEventListener('click', closeModal);
 
+    container.querySelector('#status-filter').addEventListener('change', loadReservations);
+
     async function loadReservations() {
+      const filterValue = container.querySelector('#status-filter').value;
       tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: var(--spacing-xl);">Učitavanje...</td></tr>';
 
       try {
-        const reservations = await state.getReservations();
+        let reservations = await state.getReservations();
+
+        if (filterValue !== 'all') {
+          reservations = reservations.filter(r => r.status === filterValue);
+        }
 
         if (reservations.length === 0) {
           tbody.innerHTML = `
@@ -448,6 +595,28 @@ export function AdminPanel() {
 
         modalActions.appendChild(declineBtn);
         modalActions.appendChild(approveBtn);
+      } else if (r.status === 'confirmed') {
+        const completeBtn = document.createElement('button');
+        completeBtn.className = 'btn btn-primary';
+        completeBtn.style.background = '#10b981'; // Green
+        completeBtn.textContent = 'Završi';
+        completeBtn.onclick = async () => {
+          if (confirm('Jeste li sigurni da želite označiti ovu rezervaciju kao završenu?')) {
+            completeBtn.disabled = true;
+            completeBtn.textContent = '...';
+            await state.updateReservationStatus(r.id, 'completed');
+            closeModal();
+            loadReservations();
+          }
+        };
+
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'btn btn-secondary';
+        closeBtn.textContent = 'Zatvori';
+        closeBtn.onclick = closeModal;
+
+        modalActions.appendChild(closeBtn);
+        modalActions.appendChild(completeBtn);
       } else {
         const closeBtn = document.createElement('button');
         closeBtn.className = 'btn btn-secondary';
@@ -471,7 +640,33 @@ export function AdminPanel() {
     container.innerHTML = `
       <h1 class="admin-title">Konfiguracija Usluga</h1>
       <div id="services-list" class="settings-grid">
-        <p>Učitavanje...</p>
+        <!-- Global Settings -->
+        <div class="settings-card glass" style="border-color: var(--color-accent);">
+          <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+            <div style="font-size: 2rem;">⚙️</div>
+            <div>
+              <h3 style="margin: 0;">Globalne Postavke</h3>
+              <p style="color: var(--color-text-muted); font-size: 0.9rem;">Opće postavke rezervacija</p>
+            </div>
+          </div>
+
+          <form class="service-config-form" data-id="global_config">
+            <div class="form-group">
+              <label class="form-label">Max. rezervacija po danu</label>
+              <input type="number" name="duration" class="input" value="${state.maxReservations || 4}" required min="1" max="20">
+              <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 5px;">
+                Određuje koliko se termina može rezervirati u jednom danu prije nego što postane nedostupan.
+              </p>
+            </div>
+            
+            <div style="margin-top: var(--spacing-lg); display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn btn-primary btn-sm">Spremi Postavke</button>
+            </div>
+            <div class="message"></div>
+          </form>
+        </div>
+
+        <p>Učitavanje usluga...</p>
       </div>
     `;
 
@@ -482,6 +677,9 @@ export function AdminPanel() {
         // Ensure we have the latest config
         await state.fetchServiceConfig();
         const services = state.services;
+
+        // Generate Global Settings Card with updated state
+
 
         list.innerHTML = services.map(service => {
           const isPojasevi = service.id === 'pojasevi';
@@ -532,9 +730,15 @@ export function AdminPanel() {
             const formData = new FormData(form);
 
             const config = {};
-            if (formData.has('duration')) config.duration_minutes = parseInt(formData.get('duration'));
-            if (formData.has('durationPerUnit')) config.duration_per_unit_minutes = parseInt(formData.get('durationPerUnit'));
-            if (formData.has('durationRastavljeni')) config.duration_rastavljeni_minutes = parseInt(formData.get('durationRastavljeni'));
+            // Special handling for global config reusing duration_minutes column
+            if (id === 'global_config') {
+              if (formData.has('duration')) config.duration_minutes = parseInt(formData.get('duration'));
+              // We don't need other fields for global config
+            } else {
+              if (formData.has('duration')) config.duration_minutes = parseInt(formData.get('duration'));
+              if (formData.has('durationPerUnit')) config.duration_per_unit_minutes = parseInt(formData.get('durationPerUnit'));
+              if (formData.has('durationRastavljeni')) config.duration_rastavljeni_minutes = parseInt(formData.get('durationRastavljeni'));
+            }
 
             btn.disabled = true;
             btn.textContent = 'Spremanje...';
@@ -587,6 +791,10 @@ export function AdminPanel() {
         <div class="form-group">
           <label class="form-label">Tvrtka (opcionalno)</label>
           <input type="text" id="review-company" class="input" placeholder="Naziv tvrtke">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Slika profila / Logo (opcionalno)</label>
+          <input type="file" id="review-image" class="input" accept="image/*">
         </div>
         <div class="form-group">
           <label class="form-label">Ocjena</label>
@@ -652,6 +860,20 @@ export function AdminPanel() {
         text: container.querySelector('#review-text').value
       };
 
+      const imageFile = container.querySelector('#review-image').files[0];
+      if (imageFile) {
+        try {
+          const imageUrl = await state.uploadReviewImage(imageFile);
+          review.logo = imageUrl;
+        } catch (error) {
+          console.error('Image upload failed:', error);
+          showMessage(formMessage, 'Greška pri uploadu slike: ' + error.message, 'error');
+          btn.disabled = false;
+          btn.textContent = originalText;
+          return;
+        }
+      }
+
       try {
         await state.saveReview(review);
         showMessage(formMessage, 'Recenzija uspješno spremljena!', 'success');
@@ -683,9 +905,12 @@ export function AdminPanel() {
       reviewsList.innerHTML = reviews.map(review => `
       <div class="review-admin-card glass">
         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--spacing-md);">
-          <div>
-            <div style="font-weight: 900; font-size: 1.1rem;">${review.author}</div>
-            ${review.company ? `<div style="color: var(--color-text-muted); font-size: 0.9rem;">${review.company}</div>` : ''}
+          <div style="display: flex; gap: var(--spacing-md); align-items: center;">
+            ${review.logo ? `<img src="${review.logo}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">` : ''}
+            <div>
+              <div style="font-weight: 900; font-size: 1.1rem;">${review.author}</div>
+              ${review.company ? `<div style="color: var(--color-text-muted); font-size: 0.9rem;">${review.company}</div>` : ''}
+            </div>
           </div>
           <div style="display: flex; align-items: center; gap: var(--spacing-xs); color: #fbbf24;">
             <span style="font-weight: 900; font-size: 1.2rem;">${review.rating}</span>
