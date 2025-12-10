@@ -97,27 +97,48 @@ function ln(r,e){for(var t=0;t<e.length;t++){const s=e[t];if(typeof s!="string"&
   }
 
   @media (max-width: 768px) {
+    .header {
+        padding: var(--spacing-sm) 0;
+    }
+
     .header-container {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-sm);
     }
 
     .header-nav {
+      width: 100%;
+      justify-content: center;
       gap: var(--spacing-md);
       font-size: 0.8rem;
     }
+    
+    .header-nav:first-child {
+        justify-self: center;
+        order: 2; 
+    }
+
+    .header-nav:last-child {
+        justify-self: center;
+        order: 3; 
+    }
 
     .header-logo {
-      order: -1;
+      order: 1; 
       width: 100%;
       text-align: center;
-      margin-bottom: var(--spacing-sm);
+      margin-bottom: 0;
     }
 
     .logo-img {
-      height: 50px;
-      margin: 0 auto;
+      height: 40px; /* Reduced from 50px */
+    }
+
+    #header-cta {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
     }
   }
 `;document.head.appendChild(vr);function mr(){const r=document.createElement("footer");return r.className="footer",r.innerHTML=`
@@ -462,17 +483,34 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
   }
 
   @media (max-width: 768px) {
-  .hero-title .heading-top {
-    font-size: 0.9em;
-  }
+    .hero-content {
+        padding: var(--spacing-xl) 0;
+    }
+
+    .hero-text {
+        margin-bottom: var(--spacing-lg);
+    }
+  
+    .hero-title .heading-top {
+      font-size: 1rem;
+    }
 
     .hero-title .heading-bottom {
-      font-size: 3.5rem;
+      font-size: 2rem;
       line-height: 1.1;
     }
     
     .search-input {
-      font-size: 1rem;
+      font-size: 0.9rem;
+    }
+    
+    .search-box {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .search-icon {
+        width: 18px;
+        height: 18px;
     }
   }
 `;document.head.appendChild(Hs);function Pi(){const r=document.createElement("section");return r.className="section how-it-works",r.innerHTML=`
@@ -652,6 +690,19 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
   @media (max-width: 640px) {
     .services-grid {
       grid-template-columns: 1fr;
+    }
+    
+    .service-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .service-icon {
+        font-size: 3rem;
+    }
+    
+    .service-title {
+        font-size: 1.1rem;
+        min-height: auto;
     }
   }
 `;document.head.appendChild(Fs);function Ii(){const r=document.createElement("section");return r.className="cta-banner",r.innerHTML=`
@@ -1481,11 +1532,28 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
     text-transform: uppercase;
   }
 
-  .step-actions {
-    display: flex;
-    justify-content: center;
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-lg);
+  @media (max-width: 768px) {
+    .service-selection-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .service-icon-large {
+        font-size: 3rem;
+    }
+    
+    .service-name {
+        font-size: 1rem;
+    }
+    
+    .step-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .step-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
   }
 `;document.head.appendChild(Qs);function Hi({serviceId:r,onNext:e,onBack:t}){const s=document.createElement("div");s.className="booking-step step-service-details";const n=C.services.find(a=>a.id===r);return n?(s.innerHTML=`
     <div class="service-details-grid">
@@ -2397,9 +2465,45 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
     color: #ffffff;
   }
 
-  .time-slot:disabled {
     opacity: 0.3;
     cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    .calendar-container {
+        padding: var(--spacing-sm);
+    }
+    
+    .calendar-weekdays {
+        font-size: 0.75rem;
+        gap: 2px;
+    }
+    
+    .calendar-days {
+        gap: 2px;
+    }
+    
+    .calendar-day {
+        font-size: 0.8rem;
+        border-width: 0.5px;
+    }
+    
+    .calendar-legend {
+        flex-direction: column;
+        align-items: flex-start; /* Align left */
+        gap: var(--spacing-xs);
+        font-size: 0.8rem;
+    }
+    
+    .time-slots-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+    
+    .time-slot {
+        font-size: 0.9rem;
+        padding: var(--spacing-sm);
+    }
   }
 `;document.head.appendChild(tn);function Wi({onNext:r,onBack:e,initialData:t={}}){const s=document.createElement("div");s.className="booking-step step-customer-info",s.innerHTML=`
     <h2 class="step-title">
@@ -2879,8 +2983,48 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
           <div id="admin-view"></div>
         </main>
       </div>
+      <style>
+        /* Mobile Layout for Admin Panel */
+        @media (max-width: 1024px) {
+          .admin-layout {
+            grid-template-columns: 1fr;
+          }
+          
+          .admin-sidebar {
+            height: auto;
+            position: relative;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: var(--spacing-sm);
+            gap: var(--spacing-sm);
+            overflow-x: auto;
+          }
+          
+          .admin-logo {
+            margin-bottom: 0;
+            width: 50px;
+          }
+          
+          .admin-nav {
+            flex-direction: row;
+            overflow-x: auto;
+            flex: 1;
+            padding-bottom: 5px; /* Scrollbar space */
+          }
+          
+          .admin-nav-item, .admin-logout {
+            padding: 10px;
+            font-size: 0.8rem;
+          }
+          
+          .admin-nav-item span, .admin-logout span {
+            display: none; /* Hide text on small screens, show only icons */
+          }
+        }
+      </style>
     `,r.querySelectorAll(".admin-nav-item").forEach(g=>{g.addEventListener("click",()=>{e=g.dataset.view,t()})}),r.innerHTML=`
-    <div class="admin-layout">
+      < div class="admin-layout" >
       <aside class="admin-sidebar glass">
         <div class="admin-logo">
           <img src="/images/logo.jpg" alt="Admin" class="admin-logo-img">
@@ -2941,56 +3085,56 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
       <main class="admin-content">
         <div id="admin-view"></div>
       </main>
-    </div>
-  `,r.querySelector(".admin-logout").addEventListener("click",async()=>{await te.logout(),U.navigate("/admin/login")});const d=r.querySelectorAll(".admin-nav-item"),h=r.querySelector(".admin-content");function p(g){d.forEach(v=>{v.dataset.view===g?v.classList.add("active"):v.classList.remove("active")}),h.innerHTML="",g==="dashboard"?h.appendChild(s()):g==="reservations"?h.appendChild(a()):g==="services"?h.appendChild(i()):g==="reviews"?h.appendChild(o()):g==="calendar"?h.appendChild(n()):g==="settings"?h.appendChild(c()):h.innerHTML=`
-        <div class="glass" style="padding: var(--spacing-2xl); text-align: center;">
+    </div >
+    `,r.querySelector(".admin-logout").addEventListener("click",async()=>{await te.logout(),U.navigate("/admin/login")});const d=r.querySelectorAll(".admin-nav-item"),h=r.querySelector(".admin-content");function p(g){d.forEach(v=>{v.dataset.view===g?v.classList.add("active"):v.classList.remove("active")}),h.innerHTML="",g==="dashboard"?h.appendChild(s()):g==="reservations"?h.appendChild(a()):g==="services"?h.appendChild(i()):g==="reviews"?h.appendChild(o()):g==="calendar"?h.appendChild(n()):g==="settings"?h.appendChild(c()):h.innerHTML=`
+    < div class="glass" style = "padding: var(--spacing-2xl); text-align: center;" >
           <h2>${g.charAt(0).toUpperCase()+g.slice(1)}</h2>
           <p style="margin-top: var(--spacing-md); color: var(--color-text-muted);">
             Ova sekcija je u razvoju.
           </p>
+        </div >
+    `}return d.forEach(g=>{g.addEventListener("click",()=>{e=g.dataset.view,p(g.dataset.view)})}),p("dashboard"),r};function s(){const d=document.createElement("div");return d.innerHTML=`
+    < h1 class="admin-title" > Dashboard</h1 >
+
+      <div class="dashboard-widgets">
+        <div class="widget glass">
+          <div class="widget-icon">
+            <svg class="icon icon-xl text-accent" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+            </svg>
+          </div>
+          <div class="widget-content">
+            <h3 class="widget-value" id="today-count">...</h3>
+            <p class="widget-label">Rezervacije danas</p>
+          </div>
         </div>
-      `}return d.forEach(g=>{g.addEventListener("click",()=>{e=g.dataset.view,p(g.dataset.view)})}),p("dashboard"),r};function s(){const d=document.createElement("div");return d.innerHTML=`
-    <h1 class="admin-title">Dashboard</h1>
-    
-    <div class="dashboard-widgets">
-      <div class="widget glass">
-        <div class="widget-icon">
-          <svg class="icon icon-xl text-accent" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-          </svg>
+
+        <div class="widget glass">
+          <div class="widget-icon">
+            <svg class="icon icon-xl text-accent" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+          </div>
+          <div class="widget-content">
+            <h3 class="widget-value" id="total-count">...</h3>
+            <p class="widget-label">Ukupno rezervacija</p>
+          </div>
         </div>
-        <div class="widget-content">
-          <h3 class="widget-value" id="today-count">...</h3>
-          <p class="widget-label">Rezervacije danas</p>
+
+        <div class="widget glass">
+          <div class="widget-icon">
+            <svg class="icon icon-xl text-accent" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z" />
+            </svg>
+          </div>
+          <div class="widget-content">
+            <h3 class="widget-value" id="reviews-count">...</h3>
+            <p class="widget-label">Recenzije</p>
+          </div>
         </div>
       </div>
-      
-      <div class="widget glass">
-        <div class="widget-icon">
-          <svg class="icon icon-xl text-accent" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-          </svg>
-        </div>
-        <div class="widget-content">
-          <h3 class="widget-value" id="total-count">...</h3>
-          <p class="widget-label">Ukupno rezervacija</p>
-        </div>
-      </div>
-      
-      <div class="widget glass">
-        <div class="widget-icon">
-          <svg class="icon icon-xl text-accent" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/>
-          </svg>
-        </div>
-        <div class="widget-content">
-          <h3 class="widget-value" id="reviews-count">...</h3>
-          <p class="widget-label">Recenzije</p>
-        </div>
-      </div>
-    </div>
   `,C.getReservations().then(h=>{const p=new Date().toISOString().split("T")[0],g=h.filter(v=>v.appointment_date===p).length;d.querySelector("#today-count").textContent=g,d.querySelector("#total-count").textContent=h.length}).catch(h=>{console.error("Error loading dashboard data:",h),d.querySelector("#today-count").textContent="0",d.querySelector("#total-count").textContent="0"}),d.querySelector("#reviews-count").textContent=C.reviews.length,d}function n(){const d=document.createElement("div"),h=new Date;let p=h.getMonth(),g=h.getFullYear();d.innerHTML=`
-      <h1 class="admin-title">Kalendar Rezervacija</h1>
+    < h1 class="admin-title" > Kalendar Rezervacija</h1 >
       <div class="glass" style="padding: var(--spacing-xl);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
           <button class="btn btn-secondary" id="prev-month">&lt;</button>
@@ -3005,7 +3149,7 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
         <div id="calendar-days" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--spacing-xs);"></div>
       </div>
 
-      <!-- Day Details Modal -->
+      <!--Day Details Modal-- >
       <div id="day-modal" class="glass" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; padding: var(--spacing-xl); z-index: 1000; max-height: 80vh; overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
           <h3 id="modal-date" style="margin: 0;"></h3>
@@ -3014,17 +3158,17 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
         <div id="day-reservations-list"></div>
       </div>
       <div id="day-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999;"></div>
-    `;const v=d.querySelector("#day-modal"),m=d.querySelector("#day-modal-overlay"),b=()=>{v.style.display="none",m.style.display="none"};d.querySelector("#close-day-modal").onclick=b,m.onclick=b;const y=async()=>{const x=["Siječanj","Veljača","Ožujak","Travanj","Svibanj","Lipanj","Srpanj","Kolovoz","Rujan","Listopad","Studeni","Prosinac"];d.querySelector("#calendar-month").textContent=`${x[p]} ${g}`;const _=await C.getCalendarAvailability(g,p),w=d.querySelector("#calendar-days");w.innerHTML="";const k=new Date(g,p,1),j=new Date(g,p+1,0).getDate(),P=k.getDay()===0?6:k.getDay()-1;for(let M=0;M<P;M++)w.appendChild(document.createElement("div"));for(let M=1;M<=j;M++){const F=`${g}-${String(p+1).padStart(2,"0")}-${String(M).padStart(2,"0")}`,q=_[M]||{status:"unavailable",count:0},A=document.createElement("button");A.className="calendar-day",A.style.aspectRatio="1",A.style.border="1px solid rgba(255,255,255,0.1)",A.style.background="rgba(255,255,255,0.05)",A.style.color="white",A.style.cursor="pointer",A.style.position="relative",q.status==="unavailable"?A.style.borderColor="#ef4444":q.status==="almost-full"?A.style.borderColor="#eab308":A.style.borderColor="#22c55e",A.title=`Broj rezervacija: ${q.count}`,A.innerHTML=`
-                <span style="font-weight: bold;">${M}</span>
-                ${q.count>0?`<div style="font-size: 0.8rem; margin-top: 5px; color: var(--color-text-muted);">${q.count} rez.</div>`:""}
-            `,A.onclick=async()=>{const se=await C.getReservationsByDate(F);d.querySelector("#modal-date").textContent=new Date(F).toLocaleDateString("hr-HR");const D=d.querySelector("#day-reservations-list");se.length===0?D.innerHTML="<p>Nema rezervacija za ovaj dan.</p>":D.innerHTML=se.map(Z=>`
-                        <div style="background: rgba(255,255,255,0.05); padding: 10px; margin-bottom: 10px; border-radius: 4px; border-left: 3px solid ${Z.status==="confirmed"?"#10b981":Z.status==="cancelled"?"#ef4444":"#fbbf24"}">
+  `;const v=d.querySelector("#day-modal"),m=d.querySelector("#day-modal-overlay"),b=()=>{v.style.display="none",m.style.display="none"};d.querySelector("#close-day-modal").onclick=b,m.onclick=b;const y=async()=>{const x=["Siječanj","Veljača","Ožujak","Travanj","Svibanj","Lipanj","Srpanj","Kolovoz","Rujan","Listopad","Studeni","Prosinac"];d.querySelector("#calendar-month").textContent=`${x[p]} ${g} `;const _=await C.getCalendarAvailability(g,p),w=d.querySelector("#calendar-days");w.innerHTML="";const k=new Date(g,p,1),j=new Date(g,p+1,0).getDate(),P=k.getDay()===0?6:k.getDay()-1;for(let M=0;M<P;M++)w.appendChild(document.createElement("div"));for(let M=1;M<=j;M++){const F=`${g} -${String(p+1).padStart(2,"0")} -${String(M).padStart(2,"0")} `,q=_[M]||{status:"unavailable",count:0},A=document.createElement("button");A.className="calendar-day",A.style.aspectRatio="1",A.style.border="1px solid rgba(255,255,255,0.1)",A.style.background="rgba(255,255,255,0.05)",A.style.color="white",A.style.cursor="pointer",A.style.position="relative",q.status==="unavailable"?A.style.borderColor="#ef4444":q.status==="almost-full"?A.style.borderColor="#eab308":A.style.borderColor="#22c55e",A.title=`Broj rezervacija: ${q.count} `,A.innerHTML=`
+    < span style = "font-weight: bold;" > ${M}</span >
+      ${q.count>0?`<div style="font-size: 0.8rem; margin-top: 5px; color: var(--color-text-muted);">${q.count} rez.</div>`:""}
+  `,A.onclick=async()=>{const se=await C.getReservationsByDate(F);d.querySelector("#modal-date").textContent=new Date(F).toLocaleDateString("hr-HR");const D=d.querySelector("#day-reservations-list");se.length===0?D.innerHTML="<p>Nema rezervacija za ovaj dan.</p>":D.innerHTML=se.map(Z=>`
+    < div style = "background: rgba(255,255,255,0.05); padding: 10px; margin-bottom: 10px; border-radius: 4px; border-left: 3px solid ${Z.status==="confirmed"?"#10b981":Z.status==="cancelled"?"#ef4444":"#fbbf24"}" >
                             <div style="font-weight: bold;">${Z.appointment_time} - ${Z.ime} ${Z.prezime}</div>
                             <div style="font-size: 0.9rem; color: #aaa;">${Z.service_name}</div>
                             <div style="font-size: 0.8rem;">Status: ${Z.status}</div>
-                        </div>
-                    `).join(""),v.style.display="block",m.style.display="block"},w.appendChild(A)}};return d.querySelector("#prev-month").addEventListener("click",()=>{p--,p<0&&(p=11,g--),y()}),d.querySelector("#next-month").addEventListener("click",()=>{p++,p>11&&(p=0,g++),y()}),y(),d}function a(){const d=document.createElement("div");d.innerHTML=`
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+                        </div >
+    `).join(""),v.style.display="block",m.style.display="block"},w.appendChild(A)}};return d.querySelector("#prev-month").addEventListener("click",()=>{p--,p<0&&(p=11,g--),y()}),d.querySelector("#next-month").addEventListener("click",()=>{p++,p>11&&(p=0,g++),y()}),y(),d}function a(){const d=document.createElement("div");d.innerHTML=`
+    < div style = "display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);" >
       <h1 class="admin-title" style="margin: 0;">Rezervacije</h1>
       <select id="status-filter" class="input" style="width: auto;">
         <option value="all">Sve rezervacije</option>
@@ -3033,10 +3177,10 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
         <option value="completed">Završeno</option>
         <option value="cancelled">Otkazano</option>
       </select>
-    </div>
+    </div >
     
-    <div class="table-container glass">
-      <table class="admin-table">
+    <div class="table-container glass" style="overflow-x: auto;">
+      <table class="admin-table" style="min-width: 800px;">
         <thead>
           <tr>
             <th>Klijent</th>
@@ -3057,7 +3201,7 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
       </table>
     </div>
 
-    <!-- Reservation Details Modal -->
+    <!--Reservation Details Modal-- >
     <div id="reservation-modal" class="glass" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 600px; padding: var(--spacing-xl); z-index: 1000; max-height: 90vh; overflow-y: auto;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
         <h2 class="settings-title" style="margin: 0;">Detalji Rezervacije</h2>
@@ -3076,13 +3220,13 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
     </div>
     <div id="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999;"></div>
   `;const h=d.querySelector("#reservations-tbody"),p=d.querySelector("#reservation-modal"),g=d.querySelector("#modal-overlay"),v=d.querySelector("#modal-content"),m=d.querySelector("#modal-actions"),b=d.querySelector("#close-modal-btn"),y=()=>{p.style.display="none",g.style.display="none"};b.addEventListener("click",y),g.addEventListener("click",y),d.querySelector("#status-filter").addEventListener("change",x);async function x(){const w=d.querySelector("#status-filter").value;h.innerHTML='<tr><td colspan="6" style="text-align: center; padding: var(--spacing-xl);">Učitavanje...</td></tr>';try{let k=await C.getReservations();if(w!=="all"&&(k=k.filter(S=>S.status===w)),k.length===0){h.innerHTML=`
-          <tr>
-            <td colspan="6" style="text-align: center; padding: var(--spacing-xl); color: var(--color-text-muted);">
-              Nema rezervacija
-            </td>
-          </tr>
-        `;return}h.innerHTML=k.map(S=>{const j=C.services.find(q=>q.id===S.service_id),P=`${S.ime} ${S.prezime}`,M=new Date(S.appointment_date).toLocaleDateString("hr-HR");let F="status-pending";return S.status==="confirmed"&&(F="status-confirmed"),S.status==="cancelled"&&(F="status-completed"),`
-          <tr>
+    < tr >
+    <td colspan="6" style="text-align: center; padding: var(--spacing-xl); color: var(--color-text-muted);">
+      Nema rezervacija
+    </td>
+          </tr >
+    `;return}h.innerHTML=k.map(S=>{const j=C.services.find(q=>q.id===S.service_id),P=`${S.ime} ${S.prezime} `,M=new Date(S.appointment_date).toLocaleDateString("hr-HR");let F="status-pending";return S.status==="confirmed"&&(F="status-confirmed"),S.status==="cancelled"&&(F="status-completed"),`
+    < tr >
             <td>${P}</td>
             <td>${S.marka} ${S.model}</td>
             <td>${(j==null?void 0:j.name)||S.service_name}</td>
@@ -3091,9 +3235,9 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
             <td>
               <button class="btn btn-secondary btn-sm btn-open-reservation" data-id="${S.id}">Otvori</button>
             </td>
-          </tr>
-        `}).join(""),h.querySelectorAll(".btn-open-reservation").forEach(S=>{S.addEventListener("click",()=>{const j=k.find(P=>P.id===S.dataset.id);_(j)})})}catch(k){console.error("Error loading reservations:",k),h.innerHTML='<tr><td colspan="6" style="text-align: center; color: var(--color-error);">Greška pri učitavanju</td></tr>'}}function _(w){const k=C.services.find(j=>j.id===w.service_id),S=new Date(w.appointment_date).toLocaleDateString("hr-HR");if(v.innerHTML=`
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+          </tr >
+    `}).join(""),h.querySelectorAll(".btn-open-reservation").forEach(S=>{S.addEventListener("click",()=>{const j=k.find(P=>P.id===S.dataset.id);_(j)})})}catch(k){console.error("Error loading reservations:",k),h.innerHTML='<tr><td colspan="6" style="text-align: center; color: var(--color-error);">Greška pri učitavanju</td></tr>'}}function _(w){const k=C.services.find(j=>j.id===w.service_id),S=new Date(w.appointment_date).toLocaleDateString("hr-HR");if(v.innerHTML=`
+    < div style = "display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);" >
         <div>
           <h4 style="color: var(--color-text-muted); font-size: 0.9rem;">Klijent</h4>
           <p style="font-weight: bold;">${w.ime} ${w.prezime}</p>
@@ -3116,15 +3260,15 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
           <h4 style="color: var(--color-text-muted); font-size: 0.9rem;">Status</h4>
           <span class="status-badge status-${w.status}">${w.status}</span>
         </div>
-      </div>
-      ${w.napomena?`
+      </div >
+    ${w.napomena?`
         <div style="margin-top: var(--spacing-md);">
           <h4 style="color: var(--color-text-muted); font-size: 0.9rem;">Napomena</h4>
           <p style="background: rgba(255,255,255,0.05); padding: var(--spacing-sm); border-radius: 4px;">${w.napomena}</p>
         </div>
       `:""}
-    `,m.innerHTML="",w.status==="pending"){const j=document.createElement("button");j.className="btn btn-primary",j.textContent="Prihvati",j.onclick=async()=>{j.disabled=!0,j.textContent="...",await C.updateReservationStatus(w.id,"confirmed"),y(),x()};const P=document.createElement("button");P.className="btn btn-secondary",P.style.color="#ef4444",P.style.borderColor="rgba(239, 68, 68, 0.3)",P.textContent="Odbij",P.onclick=async()=>{confirm("Jeste li sigurni da želite odbiti ovu rezervaciju?")&&(P.disabled=!0,P.textContent="...",await C.updateReservationStatus(w.id,"cancelled"),y(),x())},m.appendChild(P),m.appendChild(j)}else if(w.status==="confirmed"){const j=document.createElement("button");j.className="btn btn-primary",j.style.background="#10b981",j.textContent="Završi",j.onclick=async()=>{confirm("Jeste li sigurni da želite označiti ovu rezervaciju kao završenu?")&&(j.disabled=!0,j.textContent="...",await C.updateReservationStatus(w.id,"completed"),y(),x())};const P=document.createElement("button");P.className="btn btn-secondary",P.textContent="Zatvori",P.onclick=y,m.appendChild(P),m.appendChild(j)}else{const j=document.createElement("button");j.className="btn btn-secondary",j.textContent="Zatvori",j.onclick=y,m.appendChild(j)}p.style.display="block",g.style.display="block"}return x(),d}function i(){const d=document.createElement("div");d.innerHTML=`
-      <h1 class="admin-title">Konfiguracija Usluga</h1>
+  `,m.innerHTML="",w.status==="pending"){const j=document.createElement("button");j.className="btn btn-primary",j.textContent="Prihvati",j.onclick=async()=>{j.disabled=!0,j.textContent="...",await C.updateReservationStatus(w.id,"confirmed"),y(),x()};const P=document.createElement("button");P.className="btn btn-secondary",P.style.color="#ef4444",P.style.borderColor="rgba(239, 68, 68, 0.3)",P.textContent="Odbij",P.onclick=async()=>{confirm("Jeste li sigurni da želite odbiti ovu rezervaciju?")&&(P.disabled=!0,P.textContent="...",await C.updateReservationStatus(w.id,"cancelled"),y(),x())},m.appendChild(P),m.appendChild(j)}else if(w.status==="confirmed"){const j=document.createElement("button");j.className="btn btn-primary",j.style.background="#10b981",j.textContent="Završi",j.onclick=async()=>{confirm("Jeste li sigurni da želite označiti ovu rezervaciju kao završenu?")&&(j.disabled=!0,j.textContent="...",await C.updateReservationStatus(w.id,"completed"),y(),x())};const P=document.createElement("button");P.className="btn btn-secondary",P.textContent="Zatvori",P.onclick=y,m.appendChild(P),m.appendChild(j)}else{const j=document.createElement("button");j.className="btn btn-secondary",j.textContent="Zatvori",j.onclick=y,m.appendChild(j)}p.style.display="block",g.style.display="block"}return x(),d}function i(){const d=document.createElement("div");d.innerHTML=`
+    < h1 class="admin-title" > Konfiguracija Usluga</h1 >
       <div id="services-list" class="settings-grid">
         <!-- Global Settings -->
         <div class="settings-card glass" style="border-color: var(--color-accent);">
@@ -3140,11 +3284,11 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
             <div class="form-group">
               <label class="form-label">Max. rezervacija po danu</label>
               <input type="number" name="duration" class="input" value="${C.maxReservations||4}" required min="1" max="20">
-              <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 5px;">
-                Određuje koliko se termina može rezervirati u jednom danu prije nego što postane nedostupan.
-              </p>
+                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 5px;">
+                  Određuje koliko se termina može rezervirati u jednom danu prije nego što postane nedostupan.
+                </p>
             </div>
-            
+
             <div style="margin-top: var(--spacing-lg); display: flex; justify-content: flex-end;">
               <button type="submit" class="btn btn-primary btn-sm">Spremi Postavke</button>
             </div>
@@ -3154,8 +3298,8 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
 
         <p>Učitavanje usluga...</p>
       </div>
-    `;const h=d.querySelector("#services-list");async function p(){try{await C.fetchServiceConfig();const g=C.services;h.innerHTML=g.map(v=>{const m=v.id==="pojasevi";return`
-            <div class="settings-card glass">
+  `;const h=d.querySelector("#services-list");async function p(){try{await C.fetchServiceConfig();const g=C.services;h.innerHTML=g.map(v=>{const m=v.id==="pojasevi";return`
+    < div class="settings-card glass" >
               <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
                 <div style="font-size: 2rem;">${v.icon}</div>
                 <div>
@@ -3186,9 +3330,9 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
                 </div>
                 <div class="message"></div>
               </form>
-            </div>
-          `}).join(""),h.querySelectorAll("form").forEach(v=>{v.addEventListener("submit",async m=>{m.preventDefault();const b=v.dataset.id,y=v.querySelector("button"),x=v.querySelector(".message"),_=new FormData(v),w={};b==="global_config"?_.has("duration")&&(w.duration_minutes=parseInt(_.get("duration"))):(_.has("duration")&&(w.duration_minutes=parseInt(_.get("duration"))),_.has("durationPerUnit")&&(w.duration_per_unit_minutes=parseInt(_.get("durationPerUnit"))),_.has("durationRastavljeni")&&(w.duration_rastavljeni_minutes=parseInt(_.get("durationRastavljeni")))),y.disabled=!0,y.textContent="Spremanje...";try{await C.updateServiceConfig(b,w),u(x,"Spremljeno!","success")}catch(k){console.error(k),u(x,"Greška","error")}finally{y.disabled=!1,y.textContent="Spremi Promjene"}})})}catch(g){console.error(g),h.innerHTML='<p style="color: var(--color-error);">Greška pri učitavanju usluga.</p>'}}return p(),d}function o(){const d=document.createElement("div");d.innerHTML=`
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-xl);">
+            </div >
+    `}).join(""),h.querySelectorAll("form").forEach(v=>{v.addEventListener("submit",async m=>{m.preventDefault();const b=v.dataset.id,y=v.querySelector("button"),x=v.querySelector(".message"),_=new FormData(v),w={};b==="global_config"?_.has("duration")&&(w.duration_minutes=parseInt(_.get("duration"))):(_.has("duration")&&(w.duration_minutes=parseInt(_.get("duration"))),_.has("durationPerUnit")&&(w.duration_per_unit_minutes=parseInt(_.get("durationPerUnit"))),_.has("durationRastavljeni")&&(w.duration_rastavljeni_minutes=parseInt(_.get("durationRastavljeni")))),y.disabled=!0,y.textContent="Spremanje...";try{await C.updateServiceConfig(b,w),u(x,"Spremljeno!","success")}catch(k){console.error(k),u(x,"Greška","error")}finally{y.disabled=!1,y.textContent="Spremi Promjene"}})})}catch(g){console.error(g),h.innerHTML='<p style="color: var(--color-error);">Greška pri učitavanju usluga.</p>'}}return p(),d}function o(){const d=document.createElement("div");d.innerHTML=`
+    < div style = "display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-xl);" >
       <h1 class="admin-title" style="margin: 0;">Recenzije</h1>
       <button id="add-review-btn" class="btn btn-primary">
         <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
@@ -3196,9 +3340,9 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
         </svg>
         Nova Recenzija
       </button>
-    </div>
+    </div >
 
-    <!-- Add Review Form (Hidden by default) -->
+    < !--Add Review Form(Hidden by default )-- >
     <div id="add-review-form-container" class="glass" style="display: none; padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
       <h2 class="settings-title">Dodaj Novu Recenziju</h2>
       <form id="add-review-form" class="settings-form">
@@ -3240,7 +3384,7 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
       <p>Učitavanje recenzija...</p>
     </div>
   `;const h=d.querySelector("#reviews-list"),p=d.querySelector("#add-review-btn"),g=d.querySelector("#add-review-form-container"),v=d.querySelector("#cancel-review-btn"),m=d.querySelector("#add-review-form"),b=d.querySelector("#review-form-message");p.addEventListener("click",()=>{g.style.display="block",p.style.display="none"}),v.addEventListener("click",()=>{g.style.display="none",p.style.display="flex",m.reset(),b.textContent="",b.className="message"}),m.addEventListener("submit",async x=>{x.preventDefault();const _=m.querySelector('button[type="submit"]'),w=_.textContent;_.disabled=!0,_.textContent="Spremanje...";const k={author:d.querySelector("#review-author").value,company:d.querySelector("#review-company").value,rating:d.querySelector("#review-rating").value,text:d.querySelector("#review-text").value},S=d.querySelector("#review-image").files[0];if(S)try{const j=await C.uploadReviewImage(S);k.logo=j}catch(j){console.error("Image upload failed:",j),u(b,"Greška pri uploadu slike: "+j.message,"error"),_.disabled=!1,_.textContent=w;return}try{await C.saveReview(k),u(b,"Recenzija uspješno spremljena!","success"),setTimeout(()=>{g.style.display="none",p.style.display="flex",m.reset(),y()},1500)}catch(j){u(b,"Greška pri spremanju: "+j.message,"error")}finally{_.disabled=!1,_.textContent=w}});async function y(){h.innerHTML="<p>Učitavanje...</p>";const x=await C.getReviews();if(!x||x.length===0){h.innerHTML="<p>Nema recenzija.</p>";return}h.innerHTML=x.map(_=>`
-      <div class="review-admin-card glass">
+    < div class="review-admin-card glass" >
         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--spacing-md);">
           <div style="display: flex; gap: var(--spacing-md); align-items: center;">
             ${_.logo?`<img src="${_.logo}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">`:""}
@@ -3266,299 +3410,299 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
             Obriši
           </button>
         </div>
-      </div>
+      </div >
     `).join(""),h.querySelectorAll(".btn-delete-review").forEach(_=>{let w;_.addEventListener("click",async k=>{k.preventDefault();const S=_.dataset.id;if(_.classList.contains("confirming")){clearTimeout(w),_.disabled=!0,_.textContent="Brisanje...";try{await C.deleteReview(S),y()}catch(j){console.error(j),_.textContent="Greška"}}else _.classList.add("confirming"),_.textContent="Potvrdi?",_.style.background="#ef4444",_.style.color="white",w=setTimeout(()=>{_.classList.remove("confirming"),_.textContent="Obriši",_.style.background="rgba(239, 68, 68, 0.2)",_.style.color="#ef4444"},3e3)})})}return y(),d}const l=document.createElement("style");l.textContent=`
-  .page-admin {
-    min-height: 100vh;
-    background: var(--color-primary);
+      .page - admin {
+    min - height: 100vh;
+    background: var(--color - primary);
   }
 
-  .admin-layout {
+  .admin - layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
-    min-height: 100vh;
+    grid - template - columns: 280px 1fr;
+    min - height: 100vh;
   }
 
-  .admin-sidebar {
+  .admin - sidebar {
     position: sticky;
     top: 0;
     height: 100vh;
     display: flex;
-    flex-direction: column;
-    padding: var(--spacing-xl);
-    border-right: 1px solid var(--glass-border);
+    flex - direction: column;
+    padding: var(--spacing - xl);
+    border - right: 1px solid var(--glass - border);
   }
 
-  .admin-logo {
-    margin-bottom: var(--spacing-2xl);
-    text-align: center;
+  .admin - logo {
+    margin - bottom: var(--spacing - 2xl);
+    text - align: center;
   }
 
-  .admin-logo-img {
+  .admin - logo - img {
     height: 60px;
     width: auto;
   }
 
-  .admin-nav {
+  .admin - nav {
     flex: 1;
     display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
+    flex - direction: column;
+    gap: var(--spacing - sm);
   }
 
-  .admin-nav-item {
+  .admin - nav - item {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md);
+    align - items: center;
+    gap: var(--spacing - md);
+    padding: var(--spacing - md);
     background: transparent;
     border: 1px solid transparent;
-    color: var(--color-text);
-    font-family: var(--font-body);
-    font-size: 0.95rem;
+    color: var(--color - text);
+    font - family: var(--font - body);
+    font - size: 0.95rem;
     cursor: pointer;
-    transition: all var(--transition-fast);
-    text-align: left;
+    transition: all var(--transition - fast);
+    text - align: left;
   }
 
-  .admin-nav-item:hover {
-    background: var(--glass-bg);
-    border-color: var(--glass-border);
+  .admin - nav - item:hover {
+    background: var(--glass - bg);
+    border - color: var(--glass - border);
   }
 
-  .admin-nav-item.active {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
+  .admin - nav - item.active {
+    background: var(--color - accent);
+    border - color: var(--color - accent);
     color: #ffffff;
   }
 
-  .admin-logout {
-    margin-top: auto;
-    width: 100%;
-    justify-content: flex-start;
+  .admin - logout {
+    margin - top: auto;
+    width: 100 %;
+    justify - content: flex - start;
   }
 
-  .admin-content {
-    padding: var(--spacing-2xl);
-    overflow-y: auto;
+  .admin - content {
+    padding: var(--spacing - 2xl);
+    overflow - y: auto;
   }
 
-  .admin-view {
-    max-width: 1400px;
+  .admin - view {
+    max - width: 1400px;
     margin: 0 auto;
   }
 
-  .admin-title {
-    font-size: 2rem;
-    margin-bottom: var(--spacing-xl);
+  .admin - title {
+    font - size: 2rem;
+    margin - bottom: var(--spacing - xl);
   }
 
-  .admin-header {
+  .admin - header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-xl);
+    justify - content: space - between;
+    align - items: center;
+    margin - bottom: var(--spacing - xl);
   }
 
-  .dashboard-widgets {
+  .dashboard - widgets {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--spacing-lg);
+    grid - template - columns: repeat(auto - fit, minmax(250px, 1fr));
+    gap: var(--spacing - lg);
   }
 
   .widget {
-    padding: var(--spacing-xl);
+    padding: var(--spacing - xl);
     display: flex;
-    gap: var(--spacing-lg);
-    align-items: center;
+    gap: var(--spacing - lg);
+    align - items: center;
   }
 
-  .widget-icon {
-    flex-shrink: 0;
+  .widget - icon {
+    flex - shrink: 0;
   }
 
-  .widget-content {
+  .widget - content {
     flex: 1;
   }
 
-  .widget-value {
-    font-size: 2.5rem;
-    font-weight: 900;
-    color: var(--color-accent);
-    line-height: 1;
-    margin-bottom: var(--spacing-xs);
+  .widget - value {
+    font - size: 2.5rem;
+    font - weight: 900;
+    color: var(--color - accent);
+    line - height: 1;
+    margin - bottom: var(--spacing - xs);
   }
 
-  .widget-label {
-    font-size: 0.9rem;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+  .widget - label {
+    font - size: 0.9rem;
+    color: var(--color - text - muted);
+    text - transform: uppercase;
+    letter - spacing: 0.05em;
   }
 
-  .table-container {
-    padding: var(--spacing-lg);
-    overflow-x: auto;
+  .table - container {
+    padding: var(--spacing - lg);
+    overflow - x: auto;
   }
 
-  .admin-table {
-    width: 100%;
-    border-collapse: collapse;
+  .admin - table {
+    width: 100 %;
+    border - collapse: collapse;
   }
 
-  .admin-table th {
-    text-align: left;
-    padding: var(--spacing-md);
-    border-bottom: 2px solid var(--glass-border);
-    font-weight: 900;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    color: var(--color-text-muted);
+  .admin - table th {
+    text - align: left;
+    padding: var(--spacing - md);
+    border - bottom: 2px solid var(--glass - border);
+    font - weight: 900;
+    text - transform: uppercase;
+    font - size: 0.9rem;
+    color: var(--color - text - muted);
   }
 
-  .admin-table td {
-    padding: var(--spacing-md);
-    border-bottom: 1px solid var(--glass-border);
+  .admin - table td {
+    padding: var(--spacing - md);
+    border - bottom: 1px solid var(--glass - border);
   }
 
-  .status-badge {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: 2px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
+  .status - badge {
+    padding: var(--spacing - xs) var(--spacing - sm);
+    border - radius: 2px;
+    font - size: 0.85rem;
+    font - weight: 700;
+    text - transform: uppercase;
   }
 
-  .status-pending {
+  .status - pending {
     background: rgba(255, 255, 0, 0.2);
     color: #ffff00;
   }
 
-  .status-confirmed {
+  .status - confirmed {
     background: rgba(0, 255, 0, 0.2);
     color: #00ff00;
   }
 
-  .status-completed {
+  .status - completed {
     background: rgba(0, 150, 255, 0.2);
     color: #0096ff;
   }
 
-  .btn-sm {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: 0.85rem;
+  .btn - sm {
+    padding: var(--spacing - xs) var(--spacing - sm);
+    font - size: 0.85rem;
   }
 
-  .reviews-grid {
+  .reviews - grid {
     display: grid;
-    gap: var(--spacing-lg);
+    gap: var(--spacing - lg);
   }
 
-  .review-admin-card {
-    padding: var(--spacing-xl);
+  .review - admin - card {
+    padding: var(--spacing - xl);
   }
 
-  .review-admin-header {
+  .review - admin - header {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: var(--spacing-md);
+    justify - content: space - between;
+    align - items: flex - start;
+    margin - bottom: var(--spacing - md);
   }
 
-  .company-info {
+  .company - info {
     display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
+    flex - direction: column;
+    gap: var(--spacing - sm);
   }
 
   .rating {
     display: flex;
-    gap: var(--spacing-xs);
+    gap: var(--spacing - xs);
   }
 
-  .rating .star {
+  .rating.star {
     width: 20px;
     height: 20px;
-    color: var(--color-text-muted);
+    color: var(--color - text - muted);
   }
 
-  .rating .star.filled {
+  .rating.star.filled {
     color: #ffd700;
   }
 
-  .review-actions {
+  .review - actions {
     display: flex;
-    gap: var(--spacing-sm);
+    gap: var(--spacing - sm);
   }
 
-  @media (max-width: 1024px) {
-    .admin-layout {
-      grid-template-columns: 1fr;
+  @media(max - width: 1024px) {
+    .admin - layout {
+      grid - template - columns: 1fr;
     }
 
-    .admin-sidebar {
+    .admin - sidebar {
       position: relative;
       height: auto;
     }
   }
-`,document.head.appendChild(l);function c(){const d=document.createElement("div");d.innerHTML=`
-    <h1 class="admin-title">Postavke</h1>
-    
-    <div class="settings-grid">
-      <!-- Change Password Section -->
-      <div class="settings-card glass" style="grid-column: 1 / -1;">
-        <h2 class="settings-title">Promjena Lozinke</h2>
-        <form id="change-password-form" class="settings-form">
-          <div class="form-group">
-            <label class="form-label">Nova lozinka</label>
-            <input type="password" id="new-password" class="input" required minlength="6">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Potvrdi novu lozinku</label>
-            <input type="password" id="confirm-password" class="input" required minlength="6">
-          </div>
-          <button type="submit" class="btn btn-primary">Promijeni Lozinku</button>
-        </form>
-        <div id="password-message" class="message"></div>
-      </div>
+  `,document.head.appendChild(l);function c(){const d=document.createElement("div");d.innerHTML=`
+    < h1 class="admin-title" > Postavke</h1 >
 
-      <!-- Admin Management Section -->
-      <div class="settings-card glass" style="grid-column: 1 / -1;">
-        <h2 class="settings-title">Upravljanje Adminima</h2>
-        
-        <div class="admin-management-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl);">
+      <div class="settings-grid">
+        <!-- Change Password Section -->
+        <div class="settings-card glass" style="grid-column: 1 / -1;">
+          <h2 class="settings-title">Promjena Lozinke</h2>
+          <form id="change-password-form" class="settings-form">
+            <div class="form-group">
+              <label class="form-label">Nova lozinka</label>
+              <input type="password" id="new-password" class="input" required minlength="6">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Potvrdi novu lozinku</label>
+              <input type="password" id="confirm-password" class="input" required minlength="6">
+            </div>
+            <button type="submit" class="btn btn-primary">Promijeni Lozinku</button>
+          </form>
+          <div id="password-message" class="message"></div>
+        </div>
+
+        <!-- Admin Management Section -->
+        <div class="settings-card glass" style="grid-column: 1 / -1;">
+          <h2 class="settings-title">Upravljanje Adminima</h2>
+
+          <div class="admin-management-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl);">
             <!-- Create Admin Form -->
             <div class="create-admin-section">
-                <h3 style="margin-bottom: var(--spacing-md);">Dodaj Novog Admina</h3>
-                <p class="settings-desc">Novi korisnik će automatski imati admin prava.</p>
-                <form id="create-admin-form" class="settings-form">
+              <h3 style="margin-bottom: var(--spacing-md);">Dodaj Novog Admina</h3>
+              <p class="settings-desc">Novi korisnik će automatski imati admin prava.</p>
+              <form id="create-admin-form" class="settings-form">
                 <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="new-admin-email" class="input" required>
+                  <label class="form-label">Email</label>
+                  <input type="email" id="new-admin-email" class="input" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Lozinka</label>
-                    <input type="password" id="new-admin-password" class="input" required minlength="6">
+                  <label class="form-label">Lozinka</label>
+                  <input type="password" id="new-admin-password" class="input" required minlength="6">
                 </div>
                 <button type="submit" class="btn btn-secondary">Kreiraj Admina</button>
-                </form>
-                <div id="create-admin-message" class="message"></div>
+              </form>
+              <div id="create-admin-message" class="message"></div>
             </div>
 
             <!-- Admin List -->
             <div class="admin-list-section">
-                <h3 style="margin-bottom: var(--spacing-md);">Postojeći Admini</h3>
-                <div id="admin-list-container">
-                    <p>Učitavanje...</p>
-                </div>
-                <div id="delete-admin-message" class="message"></div>
+              <h3 style="margin-bottom: var(--spacing-md);">Postojeći Admini</h3>
+              <div id="admin-list-container">
+                <p>Učitavanje...</p>
+              </div>
+              <div id="delete-admin-message" class="message"></div>
             </div>
+          </div>
         </div>
       </div>
-    </div>
-  `;const h=d.querySelector("#change-password-form"),p=d.querySelector("#password-message");h.addEventListener("submit",async x=>{x.preventDefault();const _=d.querySelector("#new-password").value,w=d.querySelector("#confirm-password").value;if(_!==w){u(p,"Lozinke se ne podudaraju","error");return}const k=h.querySelector("button"),S=k.textContent;k.disabled=!0,k.textContent="Spremanje...";const{error:j}=await te.updatePassword(_);k.disabled=!1,k.textContent=S,j?u(p,"Greška pri promjeni lozinke: "+j.message,"error"):(u(p,"Lozinka uspješno promijenjena","success"),h.reset())});const g=d.querySelector("#create-admin-form"),v=d.querySelector("#create-admin-message");g.addEventListener("submit",async x=>{x.preventDefault();const _=d.querySelector("#new-admin-email").value,w=d.querySelector("#new-admin-password").value,k=g.querySelector("button"),S=k.textContent;k.disabled=!0,k.textContent="Kreiranje...";const{error:j}=await te.createAdmin(_,w);k.disabled=!1,k.textContent=S,j?u(v,"Greška: "+j.message,"error"):(u(v,"Admin uspješno kreiran!","success"),g.reset(),y())});const m=d.querySelector("#admin-list-container"),b=d.querySelector("#delete-admin-message");async function y(){m.innerHTML="<p>Učitavanje...</p>";const{admins:x,error:_}=await te.listAdmins();if(_){m.innerHTML=`<p style="color: var(--color-error);">Greška pri učitavanju: ${_.message}</p>`;return}if(!x||x.length===0){m.innerHTML="<p>Nema pronađenih admina.</p>";return}const{user:w}=await te.getCurrentUser(),k=`
-        <div class="admin-list" style="display: flex; flex-direction: column; gap: 0.5rem;">
-            ${x.map(S=>`
+  `;const h=d.querySelector("#change-password-form"),p=d.querySelector("#password-message");h.addEventListener("submit",async x=>{x.preventDefault();const _=d.querySelector("#new-password").value,w=d.querySelector("#confirm-password").value;if(_!==w){u(p,"Lozinke se ne podudaraju","error");return}const k=h.querySelector("button"),S=k.textContent;k.disabled=!0,k.textContent="Spremanje...";const{error:j}=await te.updatePassword(_);k.disabled=!1,k.textContent=S,j?u(p,"Greška pri promjeni lozinke: "+j.message,"error"):(u(p,"Lozinka uspješno promijenjena","success"),h.reset())});const g=d.querySelector("#create-admin-form"),v=d.querySelector("#create-admin-message");g.addEventListener("submit",async x=>{x.preventDefault();const _=d.querySelector("#new-admin-email").value,w=d.querySelector("#new-admin-password").value,k=g.querySelector("button"),S=k.textContent;k.disabled=!0,k.textContent="Kreiranje...";const{error:j}=await te.createAdmin(_,w);k.disabled=!1,k.textContent=S,j?u(v,"Greška: "+j.message,"error"):(u(v,"Admin uspješno kreiran!","success"),g.reset(),y())});const m=d.querySelector("#admin-list-container"),b=d.querySelector("#delete-admin-message");async function y(){m.innerHTML="<p>Učitavanje...</p>";const{admins:x,error:_}=await te.listAdmins();if(_){m.innerHTML=`< p style = "color: var(--color-error);" > Greška pri učitavanju: ${_.message}</p > `;return}if(!x||x.length===0){m.innerHTML="<p>Nema pronađenih admina.</p>";return}const{user:w}=await te.getCurrentUser(),k=`
+    < div class="admin-list" style = "display: flex; flex-direction: column; gap: 0.5rem;" >
+      ${x.map(S=>`
                 <div class="admin-item glass" style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05);">
                     <div>
                         <div style="font-weight: bold;">${S.email}</div>
@@ -3571,54 +3715,54 @@ ${m}`}class L extends Error{constructor({message:e,code:t,cause:s,name:n}){var a
                     `:'<span style="font-size: 0.8rem; color: var(--color-primary);">Vi</span>'}
                 </div>
             `).join("")}
-        </div>
-    `;m.innerHTML=k,d.querySelectorAll(".btn-delete-admin").forEach(S=>{let j;S.addEventListener("click",async P=>{P.preventDefault(),P.stopPropagation();const M=S.dataset.id;if(S.classList.contains("confirming")){clearTimeout(j),S.disabled=!0,S.textContent="Brisanje...";const{success:F,error:q}=await te.deleteAdmin(M);F?(u(b,"Admin uspješno obrisan","success"),y()):(u(b,"Greška pri brisanju: "+((q==null?void 0:q.message)||"Nepoznata greška"),"error"),S.disabled=!1,S.textContent="Obriši",S.classList.remove("confirming"),S.style.background="rgba(239, 68, 68, 0.2)",S.style.color="#ef4444")}else S.classList.add("confirming"),S.textContent="Potvrdi?",S.style.background="#ef4444",S.style.color="white",j=setTimeout(()=>{S.classList.remove("confirming"),S.textContent="Obriši",S.style.background="rgba(239, 68, 68, 0.2)",S.style.color="#ef4444"},3e3)})})}return y(),d}function u(d,h,p){d.textContent=h,d.className=`message message-${p}`,setTimeout(()=>{d.textContent="",d.className="message"},5e3)}const f=document.createElement("style");return f.textContent=`
-  /* Settings Styles */
-  .settings-grid {
+        </div >
+    `;m.innerHTML=k,d.querySelectorAll(".btn-delete-admin").forEach(S=>{let j;S.addEventListener("click",async P=>{P.preventDefault(),P.stopPropagation();const M=S.dataset.id;if(S.classList.contains("confirming")){clearTimeout(j),S.disabled=!0,S.textContent="Brisanje...";const{success:F,error:q}=await te.deleteAdmin(M);F?(u(b,"Admin uspješno obrisan","success"),y()):(u(b,"Greška pri brisanju: "+((q==null?void 0:q.message)||"Nepoznata greška"),"error"),S.disabled=!1,S.textContent="Obriši",S.classList.remove("confirming"),S.style.background="rgba(239, 68, 68, 0.2)",S.style.color="#ef4444")}else S.classList.add("confirming"),S.textContent="Potvrdi?",S.style.background="#ef4444",S.style.color="white",j=setTimeout(()=>{S.classList.remove("confirming"),S.textContent="Obriši",S.style.background="rgba(239, 68, 68, 0.2)",S.style.color="#ef4444"},3e3)})})}return y(),d}function u(d,h,p){d.textContent=h,d.className=`message message - ${p} `,setTimeout(()=>{d.textContent="",d.className="message"},5e3)}const f=document.createElement("style");return f.textContent=`
+    /* Settings Styles */
+    .settings - grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: var(--spacing-xl);
+    grid - template - columns: repeat(auto - fit, minmax(300px, 1fr));
+    gap: var(--spacing - xl);
   }
 
-  .settings-card {
-    padding: var(--spacing-xl);
+  .settings - card {
+    padding: var(--spacing - xl);
   }
 
-  .settings-title {
-    font-size: var(--font-size-xl);
-    margin-bottom: var(--spacing-md);
-    color: var(--color-text);
+  .settings - title {
+    font - size: var(--font - size - xl);
+    margin - bottom: var(--spacing - md);
+    color: var(--color - text);
   }
 
-  .settings-desc {
-    color: var(--color-text-muted);
-    margin-bottom: var(--spacing-lg);
-    font-size: var(--font-size-sm);
+  .settings - desc {
+    color: var(--color - text - muted);
+    margin - bottom: var(--spacing - lg);
+    font - size: var(--font - size - sm);
   }
 
-  .settings-form {
+  .settings - form {
     display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
+    flex - direction: column;
+    gap: var(--spacing - md);
   }
 
   .message {
-    margin-top: var(--spacing-md);
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-sm);
-    font-size: var(--font-size-sm);
+    margin - top: var(--spacing - md);
+    padding: var(--spacing - sm) var(--spacing - md);
+    border - radius: var(--radius - sm);
+    font - size: var(--font - size - sm);
   }
 
-  .message-error {
+  .message - error {
     background: rgba(239, 68, 68, 0.1);
     color: #ef4444;
   }
 
-  .message-success {
+  .message - success {
     background: rgba(34, 197, 94, 0.1);
     color: #22c55e;
   }
-`,document.head.appendChild(f),t(),r}function Zi(){const r=document.createElement("div");r.className="page-admin-login";let e="",t="",s=!1,n="",a=!1,i=!1;const o=()=>{r.innerHTML=`
+  `,document.head.appendChild(f),t(),r}function Zi(){const r=document.createElement("div");r.className="page-admin-login";let e="",t="",s=!1,n="",a=!1,i=!1;const o=()=>{r.innerHTML=`
             <div class="login-container">
                 <div class="login-card glass">
                     <div class="login-header">
