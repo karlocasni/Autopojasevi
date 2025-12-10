@@ -2,10 +2,10 @@ import { router } from '../../utils/router.js';
 import { state } from '../../utils/state.js';
 
 export function ServicesWidget() {
-    const section = document.createElement('section');
-    section.className = 'section services-widget';
+  const section = document.createElement('section');
+  section.className = 'section services-widget';
 
-    const servicesHTML = state.services.map(service => `
+  const servicesHTML = state.services.map(service => `
     <div class="card service-card" data-service-id="${service.id}">
       <div class="service-icon">${service.icon}</div>
       <h3 class="service-title">${service.name}</h3>
@@ -19,7 +19,7 @@ export function ServicesWidget() {
     </div>
   `).join('');
 
-    section.innerHTML = `
+  section.innerHTML = `
     <div class="container">
       <h2 class="section-title text-center mb-xl">
         <span class="heading-top">USLUGE</span>
@@ -32,17 +32,17 @@ export function ServicesWidget() {
     </div>
   `;
 
-    // Add click handlers
-    section.querySelectorAll('.service-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-            if (e.target.closest('.service-btn')) {
-                const serviceId = card.dataset.serviceId;
-                router.navigate('/booking', { serviceId });
-            }
-        });
+  // Add click handlers
+  section.querySelectorAll('.service-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.service-btn')) {
+        const serviceId = card.dataset.serviceId;
+        router.navigate('/booking', { serviceId });
+      }
     });
+  });
 
-    return section;
+  return section;
 }
 
 // Add styles
@@ -106,6 +106,19 @@ style.textContent = `
   @media (max-width: 640px) {
     .services-grid {
       grid-template-columns: 1fr;
+    }
+    
+    .service-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .service-icon {
+        font-size: 3rem;
+    }
+    
+    .service-title {
+        font-size: 1.1rem;
+        min-height: auto;
     }
   }
 `;

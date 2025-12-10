@@ -1,19 +1,19 @@
 import { state } from '../../utils/state.js';
 
 export function Step1ServiceSelection({ onNext, selectedServiceId }) {
-    const container = document.createElement('div');
-    container.className = 'booking-step step-service-selection';
+  const container = document.createElement('div');
+  container.className = 'booking-step step-service-selection';
 
-    let selected = selectedServiceId || null;
+  let selected = selectedServiceId || null;
 
-    const servicesHTML = state.services.map(service => `
+  const servicesHTML = state.services.map(service => `
     <div class="service-selection-card card ${service.id === selected ? 'selected' : ''}" data-service-id="${service.id}">
       <div class="service-icon-large">${service.icon}</div>
       <h3 class="service-name">${service.name}</h3>
     </div>
   `).join('');
 
-    container.innerHTML = `
+  container.innerHTML = `
     <h2 class="step-title">
       <span class="heading-top">KORAK 1</span>
       <span class="heading-bottom">Odaberi Uslugu</span>
@@ -33,28 +33,28 @@ export function Step1ServiceSelection({ onNext, selectedServiceId }) {
     </div>
   `;
 
-    // Handle selection
-    const cards = container.querySelectorAll('.service-selection-card');
-    const nextBtn = container.querySelector('#next-btn');
+  // Handle selection
+  const cards = container.querySelectorAll('.service-selection-card');
+  const nextBtn = container.querySelector('#next-btn');
 
-    cards.forEach(card => {
-        card.addEventListener('click', () => {
-            selected = card.dataset.serviceId;
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      selected = card.dataset.serviceId;
 
-            // Update UI
-            cards.forEach(c => c.classList.remove('selected'));
-            card.classList.add('selected');
-            nextBtn.disabled = false;
-        });
+      // Update UI
+      cards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      nextBtn.disabled = false;
     });
+  });
 
-    nextBtn.addEventListener('click', () => {
-        if (selected) {
-            onNext({ serviceId: selected });
-        }
-    });
+  nextBtn.addEventListener('click', () => {
+    if (selected) {
+      onNext({ serviceId: selected });
+    }
+  });
 
-    return container;
+  return container;
 }
 
 // Add styles
@@ -109,11 +109,28 @@ style.textContent = `
     text-transform: uppercase;
   }
 
-  .step-actions {
-    display: flex;
-    justify-content: center;
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-lg);
+  @media (max-width: 768px) {
+    .service-selection-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .service-icon-large {
+        font-size: 3rem;
+    }
+    
+    .service-name {
+        font-size: 1rem;
+    }
+    
+    .step-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .step-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
   }
 `;
 document.head.appendChild(style);

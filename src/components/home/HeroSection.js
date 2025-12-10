@@ -211,17 +211,34 @@ style.textContent = `
   }
 
   @media (max-width: 768px) {
-  .hero-title .heading-top {
-    font-size: 0.9em;
-  }
+    .hero-content {
+        padding: var(--spacing-xl) 0;
+    }
+
+    .hero-text {
+        margin-bottom: var(--spacing-lg);
+    }
+  
+    .hero-title .heading-top {
+      font-size: 1rem;
+    }
 
     .hero-title .heading-bottom {
-      font-size: 3.5rem;
+      font-size: 2rem;
       line-height: 1.1;
     }
     
     .search-input {
-      font-size: 1rem;
+      font-size: 0.9rem;
+    }
+    
+    .search-box {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .search-icon {
+        width: 18px;
+        height: 18px;
     }
   }
 `;

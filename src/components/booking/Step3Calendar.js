@@ -354,9 +354,45 @@ style.textContent = `
     color: #ffffff;
   }
 
-  .time-slot:disabled {
     opacity: 0.3;
     cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    .calendar-container {
+        padding: var(--spacing-sm);
+    }
+    
+    .calendar-weekdays {
+        font-size: 0.75rem;
+        gap: 2px;
+    }
+    
+    .calendar-days {
+        gap: 2px;
+    }
+    
+    .calendar-day {
+        font-size: 0.8rem;
+        border-width: 0.5px;
+    }
+    
+    .calendar-legend {
+        flex-direction: column;
+        align-items: flex-start; /* Align left */
+        gap: var(--spacing-xs);
+        font-size: 0.8rem;
+    }
+    
+    .time-slots-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+    
+    .time-slot {
+        font-size: 0.9rem;
+        padding: var(--spacing-sm);
+    }
   }
 `;
 document.head.appendChild(style);
