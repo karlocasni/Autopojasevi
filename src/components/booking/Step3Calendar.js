@@ -105,22 +105,40 @@ export function Step3Calendar({ onNext, onBack, initialData = {} }) {
       daysContainer.appendChild(emptyDay);
     }
 
+    const cutOff = new Date();
+    cutOff.setHours(cutOff.getHours() + 24);
+    const isZvjezdano = initialData.serviceId === 'zvjezdano-nebo';
+
     // Days
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentYear, currentMonth, day);
-      const isPast = date < today && date.toDateString() !== today.toDateString();
+      const dayEnd = new Date(date);
+      dayEnd.setHours(23, 59, 59);
+
+      const isRestricted = dayEnd < cutOff;
 
       const dayData = availability[day] || { status: 'unavailable', count: 0 };
-      const status = dayData.status;
+      let status = dayData.status;
 
       const dayEl = document.createElement('button');
-      dayEl.className = `calendar-day ${status} ${isPast ? 'past' : ''}`;
+
+      let isUnavailable = status === 'unavailable';
+      // For Zvjezdano Nebo, day must be empty (count === 0)
+      if (isZvjezdano && dayData.count > 0) {
+        isUnavailable = true;
+        status = 'unavailable';
+      }
+
+      dayEl.className = `calendar-day ${status} ${isRestricted ? 'past' : ''}`;
       dayEl.textContent = day;
-      dayEl.disabled = isPast || status === 'unavailable';
+      dayEl.disabled = isRestricted || isUnavailable;
 
       if (!dayEl.disabled) {
         dayEl.addEventListener('click', () => {
           selectedDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          // Visual selection
+          daysContainer.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+          dayEl.classList.add('selected');
           showTimeSlots(selectedDate);
         });
       }
@@ -135,13 +153,24 @@ export function Step3Calendar({ onNext, onBack, initialData = {} }) {
 
     const slots = await state.getTimeSlots(date);
 
-    timeSlotsGrid.innerHTML = slots.map(slot => `
-      <button class="time-slot ${!slot.available ? 'disabled' : ''}" 
+    const cutOff = new Date();
+    cutOff.setHours(cutOff.getHours() + 24);
+
+    timeSlotsGrid.innerHTML = slots.map(slot => {
+      const [h, m] = slot.time.split(':');
+      const slotDate = new Date(date);
+      slotDate.setHours(parseInt(h), parseInt(m));
+
+      const isTooSoon = slotDate < cutOff;
+      const isDisabled = !slot.available || isTooSoon;
+
+      return `
+      <button class="time-slot ${isDisabled ? 'disabled' : ''}" 
               data-time="${slot.time}" 
-              ${!slot.available ? 'disabled' : ''}>
+              ${isDisabled ? 'disabled' : ''}>
         ${slot.time}
       </button>
-    `).join('');
+    `}).join('');
 
     timeSlotsContainer.classList.remove('hidden');
 
@@ -361,11 +390,13 @@ style.textContent = `
   @media (max-width: 768px) {
     .calendar-container {
         padding: var(--spacing-sm);
+        max-width: 100%;
     }
     
     .calendar-weekdays {
-        font-size: 0.75rem;
-        gap: 2px;
+        font-size: 0.65rem;
+        gap: 1px;
+        margin-bottom: var(--spacing-sm);
     }
     
     .calendar-days {
@@ -373,15 +404,19 @@ style.textContent = `
     }
     
     .calendar-day {
-        font-size: 0.8rem;
-        border-width: 0.5px;
+        font-size: 0.75rem;
+        border-width: 1px;
+        aspect-ratio: 1; /* Keep square */
+        height: auto;
     }
     
     .calendar-legend {
-        flex-direction: column;
-        align-items: flex-start; /* Align left */
-        gap: var(--spacing-xs);
-        font-size: 0.8rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        font-size: 0.7rem;
+        padding-top: var(--spacing-md);
     }
     
     .time-slots-grid {
@@ -390,8 +425,13 @@ style.textContent = `
     }
     
     .time-slot {
-        font-size: 0.9rem;
-        padding: var(--spacing-sm);
+        font-size: 0.85rem;
+        padding: 6px 10px;
+    }
+    
+    .time-slots-title {
+        font-size: 1.1rem;
+        margin-bottom: var(--spacing-md);
     }
   }
 `;

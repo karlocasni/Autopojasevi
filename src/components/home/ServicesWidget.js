@@ -5,11 +5,15 @@ export function ServicesWidget() {
   const section = document.createElement('section');
   section.className = 'section services-widget';
 
-  const servicesHTML = state.services.map(service => `
+  const render = () => {
+    const servicesHTML = state.services.map(service => `
     <div class="card service-card" data-service-id="${service.id}">
       <div class="service-icon">${service.icon}</div>
       <h3 class="service-title">${service.name}</h3>
       <p class="service-description">${service.description}</p>
+      ${service.is_request_price ? '<p class="service-price" style="font-weight: bold; color: var(--color-accent); margin-bottom: 10px; font-size: 1.1rem;">Cijena na upit</p>' : (service.price ? `<p class="service-price" style="font-weight: bold; color: var(--color-accent); margin-bottom: 10px; font-size: 1.1rem;">
+          ${service.is_from ? '<span style="font-size: 0.9em; opacity: 0.8; font-weight: normal;">od</span> ' : ''}${service.price.toFixed(2)} EUR
+      </p>` : '')}
       <button class="btn btn-primary service-btn">
         Rezerviraj
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -19,7 +23,7 @@ export function ServicesWidget() {
     </div>
   `).join('');
 
-  section.innerHTML = `
+    section.innerHTML = `
     <div class="container">
       <h2 class="section-title text-center mb-xl">
         <span class="heading-top">USLUGE</span>
@@ -32,14 +36,23 @@ export function ServicesWidget() {
     </div>
   `;
 
-  // Add click handlers
-  section.querySelectorAll('.service-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('.service-btn')) {
-        const serviceId = card.dataset.serviceId;
-        router.navigate('/booking', { serviceId });
-      }
+    // Add click handlers
+    section.querySelectorAll('.service-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.service-btn')) {
+          const serviceId = card.dataset.serviceId;
+          router.navigate('/booking', { serviceId });
+        }
+      });
     });
+  };
+
+  // Initial render (likely with defaults)
+  render();
+
+  // Fetch updated config/prices and re-render
+  state.loadServices().then(() => {
+    render();
   });
 
   return section;
@@ -71,9 +84,29 @@ style.textContent = `
   }
 
   .service-icon {
-    font-size: 4rem;
-    line-height: 1;
+    width: 80px;
+    height: 80px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
     margin-bottom: var(--spacing-sm);
+    color: var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+  }
+
+  .service-card:hover .service-icon {
+    background: rgba(254, 0, 2, 0.1);
+    border-color: var(--color-accent);
+    transform: scale(1.1);
+  }
+
+  .service-icon svg {
+    width: 40px;
+    height: 40px;
+    stroke-width: 1.5;
   }
 
   .service-title {
@@ -83,6 +116,7 @@ style.textContent = `
     min-height: 2.6em;
     display: flex;
     align-items: center;
+    justify-content: center;
   }
 
   .service-description {
@@ -113,7 +147,13 @@ style.textContent = `
     }
     
     .service-icon {
-        font-size: 3rem;
+        width: 60px;
+        height: 60px;
+    }
+
+    .service-icon svg {
+        width: 30px;
+        height: 30px;
     }
     
     .service-title {

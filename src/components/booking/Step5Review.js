@@ -5,6 +5,25 @@ export function Step5Review({ bookingData, onNext, onBack }) {
   container.className = 'booking-step step-review';
 
   const service = state.services.find(s => s.id === bookingData.serviceId);
+  // Calculate Price
+  let calculatedPrice = null;
+  if (service.id === 'pojasevi' && bookingData.brojPojaseva) {
+    // Default prices: Standard 69, Disassembled 39. Prioritize service config if available.
+    const priceStandard = service.price || 69;
+    const priceDisassembled = service.price_disassembled || 39;
+    const perBelt = bookingData.vlastitiPojasevi ? priceDisassembled : priceStandard;
+    calculatedPrice = parseInt(bookingData.brojPojaseva) * perBelt;
+  } else if (service.id === 'zvjezdano-nebo' && bookingData.brojZvjezdica) {
+    // Default 1.19 per star
+    const pricePerStar = service.price_per_star || 1.19;
+    calculatedPrice = parseInt(bookingData.brojZvjezdica) * pricePerStar;
+  } else if (service.price) {
+    calculatedPrice = service.price;
+  }
+
+  // Save for Step 6
+  bookingData.totalPrice = calculatedPrice;
+
   const dateObj = new Date(bookingData.date);
   const formattedDate = dateObj.toLocaleDateString('hr-HR', {
     weekday: 'long',
@@ -30,6 +49,14 @@ export function Step5Review({ bookingData, onNext, onBack }) {
           <span class="review-icon">${service.icon}</span>
           <span class="review-value">${service.name}</span>
         </div>
+        ${calculatedPrice !== null ? `
+        <div class="review-item" style="margin-top: 10px;">
+          <span class="review-label">Cijena:</span>
+          <span class="review-value" style="font-size: 1.2rem; font-weight: bold; color: var(--color-accent);">
+            ${calculatedPrice.toFixed(2)} €
+          </span>
+        </div>
+        ` : ''}
       </div>
 
       <div class="review-section">
@@ -101,7 +128,7 @@ export function Step5Review({ bookingData, onNext, onBack }) {
           <div class="review-item">
             <span class="review-label">Podsjetnici:</span>
             <span class="review-value">
-              ${bookingData.whatsappPodsjetnik ? 'WhatsApp' : ''}
+              ${bookingData.whatsappPodsjetnik ? 'SMS' : ''}
               ${bookingData.whatsappPodsjetnik && bookingData.emailPodsjetnik ? ', ' : ''}
               ${bookingData.emailPodsjetnik ? 'Email' : ''}
             </span>
@@ -217,6 +244,25 @@ style.textContent = `
         font-size: 1.5rem;
     }
     
+    .review-item {
+        flex-wrap: wrap; 
+        gap: 4px;
+        align-items: flex-start;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .review-label {
+        font-size: 0.85rem;
+        min-width: 80px;
+        flex-shrink: 0;
+    }
+
+    .review-value {
+        font-size: 0.9rem;
+        word-break: break-word; /* Ensure long emails wrap */
+        flex: 1;
+    }
+
     .review-section {
         padding-bottom: var(--spacing-sm);
     }

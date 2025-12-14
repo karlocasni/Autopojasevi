@@ -18,7 +18,10 @@ export function AdminLogin() {
             <div class="login-container">
                 <div class="login-card glass">
                     <div class="login-header">
-                        <h1 class="login-title">Admin Panel</h1>
+                        <a href="/" id="home-link" style="display: inline-block; margin-bottom: 1rem;">
+                      <div class="login-logo-container">
+      <img src="/images/logo.png" alt="Admin" class="login-logo" style="cursor: pointer; width: 120px; height: auto;">
+    </div>                    </a>
                         <p class="login-subtitle">Prijavite se za pristup</p>
                     </div>
 
@@ -114,6 +117,12 @@ export function AdminLogin() {
         const resetForm = page.querySelector('#reset-form');
         const forgotPasswordBtn = page.querySelector('#forgot-password');
         const backToLoginBtn = page.querySelector('#back-to-login');
+        const homeLink = page.querySelector('#home-link');
+
+        homeLink?.addEventListener('click', (e) => {
+            e.preventDefault();
+            router.navigate('/');
+        });
 
         if (loginForm) {
             loginForm.addEventListener('submit', handleLogin);

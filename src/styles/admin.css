@@ -1,0 +1,395 @@
+/* --- Admin Panel General Layout --- */
+:root {
+    --admin-sidebar-width: 310px;
+    --header-height: 60px;
+}
+
+.admin-layout {
+    display: grid;
+    grid-template-columns: var(--admin-sidebar-width) minmax(0, 1fr);
+    min-height: 100vh;
+    gap: 0;
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+
+.admin-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-xl);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    border-right: 1px solid var(--glass-border);
+    background: rgba(10, 10, 10, 0.4);
+}
+
+.admin-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.admin-logo-img {
+    height: 40px;
+    width: auto;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.admin-nav-item,
+.admin-logout {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+    text-align: left;
+    width: 100%;
+    font-size: 0.95rem;
+}
+
+.admin-nav-item:hover,
+.admin-logout:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text);
+    padding-left: var(--spacing-xl);
+    /* Slide effect */
+}
+
+.admin-nav-item.active {
+    background: var(--color-accent);
+    color: #ffffff;
+    box-shadow: var(--shadow-glow-red);
+}
+
+.admin-nav-item .icon,
+.admin-logout .icon {
+    width: 20px;
+    height: 20px;
+}
+
+.admin-content {
+    padding: var(--spacing-2xl);
+    /* Increased from xl */
+    overflow-x: hidden;
+    max-width: 100%;
+    margin: 0;
+}
+
+.admin-title {
+    font-size: 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-xl);
+    background: linear-gradient(to right, #fff, #aaa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Dashboard Widgets */
+.dashboard-widgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.widget {
+    padding: var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.widget-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(254, 0, 2, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+    flex-shrink: 0;
+}
+
+.widget-value {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.widget-label {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}
+
+.filter-pill {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.filter-pill:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.filter-pill.active {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+}
+
+/* Tables */
+.table-container {
+    overflow-x: auto;
+    width: 100%;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+    /* Force scroll on small screens */
+}
+
+.admin-table th,
+.admin-table td {
+    padding: var(--spacing-md);
+    text-align: left;
+    border-bottom: 1px solid var(--glass-border);
+    font-size: 0.95rem;
+}
+
+.admin-table th {
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-pending {
+    background: rgba(251, 191, 36, 0.1);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.status-confirmed {
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-completed {
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.status-cancelled {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Settings Card */
+.settings-card {
+    padding: var(--spacing-2xl);
+    /* Add significant padding */
+    width: 100%;
+}
+
+/* --- Mobile Navigation & Layout --- */
+.mobile-header {
+    display: none;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(20px);
+    padding: var(--spacing-md);
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--glass-border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.mobile-menu-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-text);
+    padding: 8px;
+}
+
+@media (max-width: 1024px) {
+    :root {
+        --admin-sidebar-width: 0px;
+    }
+
+    .admin-layout {
+        display: block;
+        /* Stack everything */
+    }
+
+    .mobile-header {
+        display: flex;
+    }
+
+    .admin-sidebar {
+        position: fixed;
+        top: 60px;
+        /* Below header */
+        left: 0;
+        width: 280px;
+        height: calc(100vh - 60px);
+        background: #000;
+        z-index: 999;
+        transform: translateX(-100%);
+        transition: transform var(--transition-base);
+        border-right: 1px solid var(--glass-border);
+        padding-top: var(--spacing-lg);
+    }
+
+    .admin-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .admin-logo {
+        display: none;
+        /* Show in mobile header instead */
+    }
+
+    .admin-content {
+        padding: var(--spacing-md);
+    }
+
+    .admin-title {
+        font-size: 1.5rem;
+    }
+
+    /* Widget adjustments */
+    .dashboard-widgets {
+        grid-template-columns: 1fr;
+    }
+
+    .widget {
+        padding: var(--spacing-lg);
+    }
+
+    /* Calendar Mobile */
+    .calendar-weekdays,
+    .calendar-days {
+        gap: 2px !important;
+    }
+
+    .calendar-day {
+        font-size: 0.8rem;
+    }
+
+    /* Mobile Tables & content optimization */
+    .admin-table {
+        min-width: 100%;
+        /* Remove forced scroll */
+        table-layout: fixed;
+        /* Better control */
+    }
+
+    .admin-table th,
+    .admin-table td {
+        padding: 4px 6px;
+        /* Drastically reduce padding */
+        font-size: 0.75rem;
+        /* Smaller font */
+        word-wrap: break-word;
+        /* Prevent overflow */
+        white-space: normal;
+    }
+
+    .admin-table th {
+        font-size: 0.7rem;
+    }
+
+    .settings-card {
+        padding: var(--spacing-md);
+        /* Reduce padding from 2xl */
+    }
+
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+
+    /* Specific column adjustments usually need nth-child or classes.
+       Since we can't easily add classes to js rendered HTML without editing JS,
+       we rely on general compactness. */
+
+    /* Hide non-critical info if needed or make it tiny */
+    .status-badge {
+        padding: 2px 4px;
+        font-size: 0.65rem;
+    }
+
+    .hide-mobile {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+
+    /* Even smaller screens (phones) */
+    .admin-title {
+        font-size: 1.25rem;
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .admin-content {
+        padding: var(--spacing-sm);
+    }
+
+    /* Force tables to stack if they really can't fit,
+       but user requested "fit into screen", usually implies compact table or cards.
+       Let's stick to compact table for now, but optimize inputs in Usluge. */
+
+    .service-price-input,
+    .service-price-to-input {
+        width: 60px !important;
+        /* Smaller inputs */
+        font-size: 0.8rem;
+        padding: 4px;
+    }
+}

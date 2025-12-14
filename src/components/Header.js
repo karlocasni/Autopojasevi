@@ -13,7 +13,7 @@ export function Header() {
       </nav>
       
       <div class="header-logo">
-        <img src="/images/logo.jpg" alt="Autopojasevi.hr" class="logo-img">
+        <img src="/images/logo.png" alt="Autopojasevi.hr" class="logo-img" style="cursor: pointer">
       </div>
       
       <nav class="header-nav">
@@ -28,7 +28,7 @@ export function Header() {
   window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
 
-    if (currentScroll > 100) {
+    if (currentScroll > 10) {
       header.classList.add('scrolled');
     } else {
       header.classList.remove('scrolled');
@@ -43,12 +43,24 @@ export function Header() {
       e.preventDefault();
       const section = e.target.textContent.toLowerCase();
 
+      if (window.location.pathname !== '/') {
+        router.navigate('/');
+      }
+
+      let targetId = null;
       if (section === 'o nama') {
-        document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth' });
+        targetId = 'about-section';
       } else if (section === 'faq') {
-        document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' });
+        targetId = 'faq-section';
       } else if (section === 'kontakt') {
-        document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' });
+        targetId = 'contact-section';
+      }
+
+      if (targetId) {
+        setTimeout(() => {
+          const el = document.getElementById(targetId);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
       }
     });
   });
@@ -56,6 +68,12 @@ export function Header() {
   // CTA button
   header.querySelector('#header-cta').addEventListener('click', () => {
     router.navigate('/booking');
+  });
+
+  // Logo click
+  header.querySelector('.logo-img').addEventListener('click', () => {
+    router.navigate('/');
+    window.scrollTo(0, 0);
   });
 
   return header;
@@ -212,6 +230,7 @@ style.textContent = `
         justify-content: flex-end;
         order: unset;
         margin-bottom: 2px;
+        justify-self: end;
     }
     
     .header-nav:last-child {

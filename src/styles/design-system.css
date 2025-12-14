@@ -169,11 +169,6 @@
   border: 1px solid var(--glass-border);
 }
 
-.btn-primary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
 .btn-cta {
   background: var(--color-accent);
   color: #ffffff;
@@ -183,21 +178,32 @@
   box-shadow: var(--shadow-md);
 }
 
-.btn-cta:hover {
-  background: #cc0002;
-  box-shadow: var(--shadow-glow-red);
-  transform: translateY(-2px);
-}
-
 .btn-secondary {
   background: transparent;
   color: var(--color-text);
   border: 1px solid var(--glass-border);
 }
 
-.btn-secondary:hover {
-  background: var(--glass-bg);
-  border-color: var(--color-text);
+@media (hover: hover) {
+  .btn-primary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .btn-cta:hover {
+    background: #cc0002;
+    box-shadow: var(--shadow-glow-red);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary:hover {
+    background: var(--glass-bg);
+    border-color: var(--color-text);
+  }
+}
+
+.btn:active {
+  transform: translateY(1px);
 }
 
 .btn:disabled {
@@ -224,8 +230,19 @@
   background: rgba(0, 0, 0, 0.5);
 }
 
+
 .input::placeholder {
   color: var(--color-text-muted);
+}
+
+/* Autofill Fix */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #1c1c1c inset !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 textarea.input {

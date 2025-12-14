@@ -39,21 +39,9 @@ export function HeroSection() {
   const searchInput = section.querySelector('#hero-search-input');
   const searchResults = section.querySelector('#search-results');
 
-  searchInput.addEventListener('input', (e) => {
-    const query = e.target.value.toLowerCase().trim();
-
-    if (query.length === 0) {
-      searchResults.classList.add('hidden');
-      return;
-    }
-
-    const filtered = state.services.filter(service =>
-      service.name.toLowerCase().includes(query) ||
-      service.description.toLowerCase().includes(query)
-    );
-
-    if (filtered.length > 0) {
-      searchResults.innerHTML = filtered.map(service => `
+  const renderResults = (services) => {
+    if (services.length > 0) {
+      searchResults.innerHTML = services.map(service => `
         <div class="search-result-item glass" data-service-id="${service.id}">
           <span class="result-icon">${service.icon}</span>
           <span class="result-name">${service.name}</span>
@@ -71,6 +59,31 @@ export function HeroSection() {
     } else {
       searchResults.classList.add('hidden');
     }
+  };
+
+  const performSearch = (query) => {
+    const cleanQuery = query.toLowerCase().trim();
+
+    if (cleanQuery.length === 0) {
+      // Show all services by default
+      renderResults(state.services);
+      return;
+    }
+
+    const filtered = state.services.filter(service =>
+      service.name.toLowerCase().includes(cleanQuery) ||
+      service.description.toLowerCase().includes(cleanQuery)
+    );
+
+    renderResults(filtered);
+  };
+
+  searchInput.addEventListener('input', (e) => {
+    performSearch(e.target.value);
+  });
+
+  searchInput.addEventListener('focus', () => {
+    performSearch(searchInput.value);
   });
 
   // Close results when clicking outside
@@ -202,7 +215,17 @@ style.textContent = `
   }
 
   .result-icon {
-    font-size: 1.5rem;
+    width: 24px;
+    height: 24px;
+    color: var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .result-icon svg {
+    width: 100%;
+    height: 100%;
   }
 
   .result-name {

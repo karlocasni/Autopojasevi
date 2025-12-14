@@ -15,8 +15,7 @@ export function AboutSection() {
           <div class="about-content">
             <p>
               <strong>Autopojasevi.hr</strong> je brend koji spaja stručnost, sigurnost i stil. 
-              Osnivač i vlasnik <strong>Ismael Hadžić</strong>, poznat content creator, 
-              prepoznao je potrebu za profesionalnom i pouzdanom uslugom u automobilskoj industriji.
+              Prepoznali smo potrebu za profesionalnom i pouzdanom uslugom u automobilskoj industriji.
             </p>
             
             <p>

@@ -33,8 +33,13 @@ export function Step6Success({ bookingData }) {
           Hvala! Vaš termin je rezerviran za <strong>${formattedDate}</strong> u <strong>${period}</strong>.
         </p>
         <p class="success-text">
-          Poslali smo vam potvrdu na <strong>Email</strong> i <strong>WhatsApp</strong>.
+          Poslali smo vam potvrdu na <strong>Email</strong> i <strong>SMS</strong>.
         </p>
+        ${bookingData.totalPrice ? `
+        <p class="success-text" style="font-size: 1.4rem; margin-top: 15px;">
+            Ukupna cijena: <strong>${bookingData.totalPrice.toFixed(2)} €</strong>
+        </p>
+        ` : ''}
       </div>
       
       <div class="success-details">

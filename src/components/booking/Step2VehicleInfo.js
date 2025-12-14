@@ -6,6 +6,7 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
 
     const isPojasevi = serviceId === 'pojasevi';
     const isZvjezdano = serviceId === 'zvjezdano-nebo';
+    const isMapiranje = serviceId === 'mapiranje';
 
     // State management
     let state = {
@@ -301,10 +302,13 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
                     ${isPojasevi ? `
                         <div class="form-group">
                             <label class="form-label">Broj pojaseva</label>
-                            <select class="input" name="brojPojaseva" required>
+                            <select class="input" name="brojPojaseva" id="broj-pojaseva" required>
                                 <option value="">Odaberi...</option>
-                                ${[1, 2, 3, 4, 5].map(n => `<option value="${n}" ${initialData.brojPojaseva == n ? 'selected' : ''}>${n}</option>`).join('')}
+                                ${[1, 2, 3, 4, 5, 6, 7].map(n => `<option value="${n}" ${initialData.brojPojaseva == n ? 'selected' : ''}>${n}</option>`).join('')}
                             </select>
+                            <div id="seatbelt-warning" style="visibility: hidden; margin-top: 10px; font-size: 0.9rem; color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); background: rgba(251, 191, 36, 0.1); padding: 10px; border-radius: 4px;">
+                                Ne preporučujemo ugradnju manje od 4 pojasa zbog zakonskih regulativa.
+                            </div>
                         </div>
 
                         <div class="checkbox-wrapper">
@@ -318,10 +322,22 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
                             <label class="form-label">Broj zvjezdica</label>
                             <select class="input" name="brojZvjezdica" required>
                                 <option value="">Odaberi...</option>
-                                ${[100, 150, 200, 250, 300, 400, 500, 750, 1000].map(n => `
+                                ${[500, 600, 700, 750, 800, 900, 1000].map(n => `
                                     <option value="${n}" ${initialData.brojZvjezdica == n ? 'selected' : ''}>${n}</option>
                                 `).join('')}
                             </select>
+                        </div>
+                    ` : ''}
+
+                    ${isMapiranje ? `
+                        <div class="form-group">
+                            <label class="form-label">Broj šasije (VIN)</label>
+                            <input type="text" class="input" name="vinBroj" placeholder="Unesite broj šasije" required value="${initialData.vinBroj || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Slika verzije softvera</label>
+                            <input type="file" class="input" name="softverSlika" accept="image/*" ${initialData.softverSlika ? '' : 'required'}>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:5px;">Molimo učitajte sliku trenutne verzije softvera.</p>
                         </div>
                     ` : ''}
 
@@ -469,8 +485,26 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
         }
 
         // Details form submission
+        // Details form submission
         const detailsForm = container.querySelector('#details-form');
         if (detailsForm) {
+            // Seatbelt warning listener
+            const brojPojasevaInput = detailsForm.querySelector('#broj-pojaseva');
+            if (brojPojasevaInput) {
+                const warningDiv = detailsForm.querySelector('#seatbelt-warning');
+                const checkWarning = () => {
+                    const val = parseInt(brojPojasevaInput.value);
+                    if (val > 0 && val < 4) {
+                        warningDiv.style.visibility = 'visible';
+                    } else {
+                        warningDiv.style.visibility = 'hidden';
+                    }
+                };
+                brojPojasevaInput.addEventListener('change', checkWarning);
+                // Initial check
+                checkWarning();
+            }
+
             detailsForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const formData = new FormData(detailsForm);

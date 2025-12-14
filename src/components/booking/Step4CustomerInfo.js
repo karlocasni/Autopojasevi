@@ -1,8 +1,8 @@
 export function Step4CustomerInfo({ onNext, onBack, initialData = {} }) {
-    const container = document.createElement('div');
-    container.className = 'booking-step step-customer-info';
+  const container = document.createElement('div');
+  container.className = 'booking-step step-customer-info';
 
-    container.innerHTML = `
+  container.innerHTML = `
     <h2 class="step-title">
       <span class="heading-top">KORAK 4</span>
       <span class="heading-bottom">Vaši Podaci</span>
@@ -29,18 +29,6 @@ export function Step4CustomerInfo({ onNext, onBack, initialData = {} }) {
         <input type="text" class="input" name="registracija" required placeholder="ZG-1234-AB" value="${initialData.registracija || ''}">
       </div>
 
-      <div class="form-checkboxes">
-        <div class="checkbox-wrapper">
-          <input type="checkbox" class="checkbox" id="whatsapp-reminder" name="whatsappPodsjetnik" ${initialData.whatsappPodsjetnik ? 'checked' : ''}>
-          <label for="whatsapp-reminder">Želim WhatsApp podsjetnik dan prije termina</label>
-        </div>
-
-        <div class="checkbox-wrapper">
-          <input type="checkbox" class="checkbox" id="email-reminder" name="emailPodsjetnik" ${initialData.emailPodsjetnik ? 'checked' : ''}>
-          <label for="email-reminder">Želim mail podsjetnik dan prije termina</label>
-        </div>
-      </div>
-
       <div class="step-actions">
         <button type="button" class="btn btn-secondary" id="back-btn">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -58,20 +46,21 @@ export function Step4CustomerInfo({ onNext, onBack, initialData = {} }) {
     </form>
   `;
 
-    const form = container.querySelector('#customer-form');
+  const form = container.querySelector('#customer-form');
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        data.whatsappPodsjetnik = form.querySelector('#whatsapp-reminder').checked;
-        data.emailPodsjetnik = form.querySelector('#email-reminder').checked;
-        onNext(data);
-    });
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    // Default to true as we send reminders no matter what
+    data.whatsappPodsjetnik = true;
+    data.emailPodsjetnik = true;
+    onNext(data);
+  });
 
-    container.querySelector('#back-btn').addEventListener('click', onBack);
+  container.querySelector('#back-btn').addEventListener('click', onBack);
 
-    return container;
+  return container;
 }
 
 // Add styles

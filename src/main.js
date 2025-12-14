@@ -1,5 +1,7 @@
 import '/src/styles/design-system.css';
 import '/src/styles/main.css';
+import '/src/styles/admin.css';
+
 import { router } from './utils/router.js';
 import { HomePage } from './pages/HomePage.js';
 import { BookingFlow } from './pages/BookingFlow.js';

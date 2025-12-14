@@ -1,17 +1,33 @@
 import { state } from '../../utils/state.js';
 
 export function Step1bServiceDetails({ serviceId, onNext, onBack }) {
-    const container = document.createElement('div');
-    container.className = 'booking-step step-service-details';
+  const container = document.createElement('div');
+  container.className = 'booking-step step-service-details';
 
-    const service = state.services.find(s => s.id === serviceId);
+  const service = state.services.find(s => s.id === serviceId);
 
-    if (!service) {
-        container.innerHTML = '<p>Service not found</p>';
-        return container;
+  if (!service) {
+    container.innerHTML = '<p>Service not found</p>';
+    return container;
+  }
+
+  let priceText = '';
+  const formatPrice = (p) => Number.isInteger(p) ? p : p.toFixed(2);
+
+  if (service.id === 'zvjezdano-nebo') {
+    priceText = 'od 595 € do 1190 €';
+  } else if (service.is_request_price) {
+    priceText = 'Na upit';
+  } else if (service.price) {
+    const p1 = formatPrice(service.price);
+    if (service.is_from) {
+      priceText = `od ${p1} €${service.price_to ? ' do ' + formatPrice(service.price_to) + ' €' : ''}`;
+    } else {
+      priceText = `${p1} €`;
     }
+  }
 
-    container.innerHTML = `
+  container.innerHTML = `
     <div class="service-details-grid">
       <div class="service-details-left">
         <div class="service-header">
@@ -31,6 +47,12 @@ export function Step1bServiceDetails({ serviceId, onNext, onBack }) {
             </div>
           `).join('')}
         </div>
+
+        ${priceText ? `
+            <div class="service-price-display" style="font-size: 1.25rem; font-weight: bold; color: var(--color-accent); margin-bottom: var(--spacing-sm);">
+                ${priceText}
+            </div>
+        ` : ''}
         
         <button class="btn btn-cta" id="continue-btn">
           Nastavi
@@ -53,11 +75,11 @@ export function Step1bServiceDetails({ serviceId, onNext, onBack }) {
     </div>
   `;
 
-    container.querySelector('#continue-btn').addEventListener('click', () => {
-        onNext({ serviceId });
-    });
+  container.querySelector('#continue-btn').addEventListener('click', () => {
+    onNext({ serviceId });
+  });
 
-    return container;
+  return container;
 }
 
 // Add styles
@@ -134,6 +156,20 @@ style.textContent = `
   @media (max-width: 1024px) {
     .service-details-grid {
       grid-template-columns: 1fr;
+      gap: var(--spacing-xl);
+    }
+    
+    .service-image-placeholder {
+        padding: var(--spacing-lg);
+        aspect-ratio: 21/9; /* Much shorter on mobile */
+    }
+    
+    .placeholder-icon {
+        font-size: 2.5rem;
+    }
+    
+    .service-title-large {
+        font-size: 1.5rem;
     }
   }
 `;

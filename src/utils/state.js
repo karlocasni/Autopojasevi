@@ -7,7 +7,7 @@ export const state = {
         {
             id: 'pojasevi',
             name: 'Ugradnja pojaseva',
-            icon: '🔧',
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 13.5 10.5 17.7a4 4 0 0 0 0 5.6 4 4 0 0 0 5.6 0l4.2-4.2a4 4 0 0 0 0-5.6l-5.6-5.6"/><path d="M20.2 13.5 13.5 20.2"/><path d="M4 11V4h7"/><path d="M2.5 7.5 11 16"/></svg>`,
             description: 'Profesionalna ugradnja sigurnosnih pojaseva. Možete donijeti i rastavljeni sustav za pojaseve.',
             sellingPoints: [
                 'Certificirana ugradnja',
@@ -20,7 +20,7 @@ export const state = {
         {
             id: 'zvjezdano-nebo',
             name: 'Ugradnja zvjezdanog neba',
-            icon: '✨',
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/></svg>`,
             description: 'Luksuzna ugradnja LED zvjezdanog neba u strop vozila. Odaberite broj zvjezdica (100-1000).',
             sellingPoints: [
                 'Premium LED tehnologija',
@@ -33,7 +33,7 @@ export const state = {
         {
             id: 'zatamnjivanje',
             name: 'Zatamnjivanje zadnjih stakala',
-            icon: '🪟',
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM21 9H3M21 15H3M12 3v18"/></svg>`,
             description: 'Profesionalno zatamnjivanje stakala prema zakonskim propisima.',
             sellingPoints: [
                 'Zakonski propisi',
@@ -45,13 +45,13 @@ export const state = {
         },
         {
             id: 'mapiranje',
-            name: 'Mapiranje vozila',
-            icon: '💻',
-            description: 'Profesionalno mapiranje i optimizacija performansi vašeg vozila.',
+            name: 'Kodiranje vozila',
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+            description: 'Profesionalno kodiranje i optimizacija softvera vašeg vozila.',
             sellingPoints: [
                 'Povećane performanse',
                 'Bolja ekonomičnost',
-                'Sigurno mapiranje',
+                'Sigurno kodiranje',
                 'Garancija na uslugu'
             ],
             images: ['/images/service-mapping-1.jpg', '/images/service-mapping-2.jpg']
@@ -141,6 +141,17 @@ export const state = {
     async saveBooking(bookingData) {
         const { supabase } = await import('./supabase.js');
 
+        let softwareImageUrl = null;
+
+        // Handle file upload if present
+        if (bookingData.softverSlika instanceof File) {
+            try {
+                softwareImageUrl = await this.uploadBookingFile(bookingData.softverSlika);
+            } catch (e) {
+                console.error('Failed to upload software image', e);
+            }
+        }
+
         const newReservation = {
             service_id: bookingData.service_id,
             service_name: bookingData.service_name || this.services.find(s => s.id === bookingData.service_id)?.name,
@@ -150,6 +161,8 @@ export const state = {
             broj_pojaseva: bookingData.broj_pojaseva ? parseInt(bookingData.broj_pojaseva) : null,
             vlastiti_pojasevi: bookingData.vlastiti_pojasevi || false,
             broj_zvjezdica: bookingData.broj_zvjezdica ? parseInt(bookingData.broj_zvjezdica) : null,
+            vin: bookingData.vinBroj || null,
+            software_version_image_url: softwareImageUrl,
             napomena: bookingData.napomena || null,
             appointment_date: bookingData.appointment_date,
             appointment_time: bookingData.appointment_time,
@@ -173,6 +186,25 @@ export const state = {
         }
 
         return data[0];
+    },
+
+    async uploadBookingFile(file) {
+        const { supabase } = await import('./supabase.js');
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+            .from('booking-files')
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data } = supabase.storage
+            .from('booking-files')
+            .getPublicUrl(filePath);
+
+        return data.publicUrl;
     },
 
     async getReservations() {
@@ -215,7 +247,7 @@ export const state = {
 
         if (error) {
             console.warn('Error fetching service config:', error);
-            return;
+            // Don't return here, standard services still need to be available
         }
 
         if (data && data.length > 0) {
@@ -233,7 +265,8 @@ export const state = {
                         ...service,
                         duration: config.duration_minutes,
                         durationPerUnit: config.duration_per_unit_minutes,
-                        durationRastavljeni: config.duration_rastavljeni_minutes
+                        durationRastavljeni: config.duration_rastavljeni_minutes,
+                        price: config.price // Load price
                     };
                 }
                 return service;
@@ -242,19 +275,34 @@ export const state = {
         return this.services;
     },
 
+    async loadServices() {
+        return await this.fetchServiceConfig();
+    },
+
     async updateServiceConfig(id, config) {
         const { supabase } = await import('./supabase.js');
 
-        const { error } = await supabase
-            .from('services')
-            .upsert({
-                id,
-                name: 'Service Config', // Default for new rows
-                icon: '⚙️',            // Default for new rows
-                description: 'Config',  // Default for new rows
-                ...config,
-                updated_at: new Date().toISOString()
-            });
+        // Find existing static data to ensure we populate required fields if creating a new DB row
+        const existingService = this.services.find(s => s.id === id);
+
+        const payload = {
+            id,
+            ...config,
+            updated_at: new Date().toISOString()
+        };
+
+        // If this is a new row (or we want to ensure data coherence), add the static info
+        if (existingService) {
+            payload.name = existingService.name;
+            payload.icon = existingService.icon;
+            // Only add description if not already in config (though config usually doesn't have it)
+            if (!payload.description) payload.description = existingService.description;
+        } else {
+            // Fallback if not found in local state (unlikely)
+            payload.name = payload.name || 'Service Config';
+        }
+
+        const { error } = await supabase.from('services').upsert(payload);
 
         if (error) {
             console.error('Update Service Config Error:', JSON.stringify(error, null, 2));
@@ -263,6 +311,12 @@ export const state = {
 
         // Refresh local state
         await this.fetchServiceConfig();
+    },
+
+    // Reviews
+    async loadReviews() {
+        this.reviews = await this.getReviews();
+        return this.reviews;
     },
 
     // Reviews
@@ -384,13 +438,16 @@ export const state = {
                 const count = counts[dateStr] || 0;
                 let status = 'available';
 
-                if (count >= state.maxReservations) {
+                const closedDays = JSON.parse(localStorage.getItem('closed_days') || '[]');
+                if (closedDays.some(d => d.date === dateStr)) {
+                    status = 'unavailable';
+                } else if (count >= state.maxReservations) {
                     status = 'unavailable';
                 } else if (count >= (state.maxReservations - 1)) {
                     status = 'almost-full';
                 }
 
-                availability[day] = { status, count };
+                availability[day] = { status, count: count || 0 };
             }
         }
 
@@ -412,6 +469,21 @@ export const state = {
         }
 
         return data || [];
+    },
+
+    async getReservationById(id) {
+        const { supabase } = await import('./supabase.js');
+        const { data, error } = await supabase
+            .from('bookings')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) {
+            console.error('Error fetching reservation:', error);
+            return null;
+        }
+        return data;
     },
 
     async getTimeSlots(date) {
@@ -439,5 +511,125 @@ export const state = {
             { time: '15:00', available: !isDayFull },
             { time: '15:30', available: !isDayFull }
         ];
+    },
+
+    // Extended Review Methods
+    async addReview(review) {
+        const { supabase } = await import('./supabase.js');
+        // Explicitly set approved to true since this is admin adding it
+        const { error } = await supabase.from('reviews').insert([{ ...review, is_approved: true }]);
+        if (error) throw error;
+    },
+
+    async updateReview(id, review) {
+        const { supabase } = await import('./supabase.js');
+        const { error } = await supabase.from('reviews').update(review).eq('id', id);
+        if (error) throw error;
+    },
+
+    // Service Config with extended price fields
+    async fetchServiceConfig() {
+        const { supabase } = await import('./supabase.js');
+        const { data, error } = await supabase.from('services').select('*');
+
+        if (error) {
+            console.warn('Error fetching service config:', error);
+        } else if (data) {
+            const globalConfig = data.find(c => c.id === 'global_config');
+            if (globalConfig) this.maxReservations = globalConfig.duration_minutes || 4;
+
+            this.services = this.services.map(service => {
+                const config = data.find(c => c.id === service.id);
+                if (config) {
+                    return {
+                        ...service,
+                        duration: config.duration_minutes,
+                        durationPerUnit: config.duration_per_unit_minutes,
+                        durationRastavljeni: config.duration_rastavljeni_minutes,
+                        price: config.price,
+                        is_from: config.is_from,
+                        price_to: config.price_to,
+                        is_request_price: config.is_request_price,
+                        price_disassembled: config.price_disassembled,
+                        price_per_star: config.price_per_star
+                    };
+                }
+                return service;
+            });
+        }
+        return this.services;
+    },
+
+    async updateServiceConfig(id, config) {
+        const { supabase } = await import('./supabase.js');
+
+        // Find existing static data to ensure we populate required fields if creating a new DB row
+        const existingService = this.services.find(s => s.id === id);
+
+        const payload = {
+            id,
+            ...config,
+            updated_at: new Date().toISOString()
+        };
+
+        // If this is a new row (or we want to ensure data coherence), add the static info
+        if (existingService) {
+            payload.name = existingService.name;
+            payload.icon = existingService.icon;
+            payload.description = existingService.description || config.description || 'Service Description';
+        } else {
+            // Fallback if not found in local state (unlikely)
+            payload.name = payload.name || 'Service Config';
+            payload.icon = payload.icon || '⚙️';
+            payload.description = payload.description || 'Config';
+        }
+
+        const { error } = await supabase.from('services').upsert(payload);
+
+        if (error) {
+            console.error('Update Service Config Error:', error);
+            throw error;
+        }
+        await this.fetchServiceConfig();
+    },
+
+    // Admin Management via Edge Function
+    async manageAdmins(action, payload = {}) {
+        const { supabase } = await import('./supabase.js');
+        const { data, error } = await supabase.functions.invoke('manage-admins', {
+            body: { action, ...payload }
+        });
+
+        if (error) {
+            console.error('manage-admins Error:', error);
+            // supabase-js functions.invoke returns error object if non-2xx usually, or local error.
+            // If it's a non-2xx, error is often an object with context.
+            throw new Error(`Function failed: ${error.message || JSON.stringify(error)}`);
+        }
+
+        if (data && data.error) {
+            console.error('manage-admins App Error:', data.error);
+            throw new Error(data.error);
+        }
+
+        return data;
+    },
+
+    // Closed Days (Mock)
+    async getClosedDays() {
+        return JSON.parse(localStorage.getItem('closed_days') || '[]');
+    },
+
+    async addClosedDay(date) {
+        const days = await this.getClosedDays();
+        if (days.find(d => d.date === date)) throw new Error('Dan je već zatvoren.');
+        days.push({ id: Date.now().toString(), date });
+        localStorage.setItem('closed_days', JSON.stringify(days));
+    },
+
+    async removeClosedDay(id) {
+        const days = await this.getClosedDays();
+        const filtered = days.filter(d => d.id !== id);
+        localStorage.setItem('closed_days', JSON.stringify(filtered));
     }
 };
