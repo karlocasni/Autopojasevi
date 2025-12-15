@@ -170,7 +170,6 @@ export const state = {
             prezime: bookingData.prezime,
             email: bookingData.email,
             telefon: bookingData.telefon,
-            adresa: bookingData.adresa || null,
             status: 'pending',
             is_manual_entry: bookingData.is_manual_entry || false
         };

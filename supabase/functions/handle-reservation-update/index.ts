@@ -26,39 +26,37 @@ serve(async (req) => {
         if (type === "INSERT") {
             console.log(`New booking created: ${record.id}. Sending admin notification...`);
 
-            if (ADMIN_EMAIL) {
-                await fetch("https://api.resend.com/emails", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${RESEND_API_KEY}`,
-                    },
-                    body: JSON.stringify({
-                        from: "Autopojasevi System <system@autopojasevi.hr>",
-                        to: ["info@autopojasevi.hr"], // Hardcoded as per request "info@autopojasevi.hr"
-                        cc: [ADMIN_EMAIL], // Keep admin in loop if different
-                        subject: "Nova Rezervacija - Autopojasevi",
-                        html: `
-                          <div style="font-family: sans-serif; color: #333; max-width: 600px;">
-                            <h2 style="color: #0098FF;">Nova Rezervacija Zaprimljena</h2>
-                            <p><strong>Klijent:</strong> ${record.ime} ${record.prezime}</p>
-                            <p><strong>Email:</strong> ${record.email}</p>
-                            <p><strong>Telefon:</strong> ${record.telefon}</p>
-                            <hr style="border: 1px solid #eee;">
-                            <p><strong>Usluga:</strong> ${record.service_name}</p>
-                            <p><strong>Vozilo:</strong> ${record.marka} ${record.model} (${record.godina})</p>
-                            ${record.vin ? `<p><strong>VIN:</strong> ${record.vin}</p>` : ''}
-                            <p><strong>Datum:</strong> ${record.appointment_date}</p>
-                            <p><strong>Vrijeme:</strong> ${record.appointment_time}</p>
-                            ${record.napomena ? `<p><strong>Napomena:</strong> ${record.napomena}</p>` : ''}
-                            ${record.software_version_image_url ? `<p><strong>Slika softvera:</strong> <a href="${record.software_version_image_url}">Pogledaj sliku</a></p>` : ''}
-                            <hr style="border: 1px solid #eee;">
-                            <p style="font-size: 0.8em; color: #888;">Ovaj email je automatski generiran.</p>
-                          </div>
-                        `,
-                    }),
-                });
-            }
+            // Use onboarding@resend.dev to ensure delivery if domain not verified
+            await fetch("https://api.resend.com/emails", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${RESEND_API_KEY}`,
+                },
+                body: JSON.stringify({
+                    from: "Autopojasevi System <onboarding@resend.dev>",
+                    to: ["info@autopojasevi.hr"],
+                    subject: "Nova Rezervacija - Autopojasevi",
+                    html: `
+                        <div style="font-family: sans-serif; color: #333; max-width: 600px;">
+                        <h2 style="color: #0098FF;">Nova Rezervacija Zaprimljena</h2>
+                        <p><strong>Klijent:</strong> ${record.ime} ${record.prezime}</p>
+                        <p><strong>Email:</strong> ${record.email}</p>
+                        <p><strong>Telefon:</strong> ${record.telefon}</p>
+                        <hr style="border: 1px solid #eee;">
+                        <p><strong>Usluga:</strong> ${record.service_name}</p>
+                        <p><strong>Vozilo:</strong> ${record.marka} ${record.model} (${record.godina})</p>
+                        ${record.vin ? `<p><strong>VIN:</strong> ${record.vin}</p>` : ''}
+                        <p><strong>Datum:</strong> ${record.appointment_date}</p>
+                        <p><strong>Vrijeme:</strong> ${record.appointment_time}</p>
+                        ${record.napomena ? `<p><strong>Napomena:</strong> ${record.napomena}</p>` : ''}
+                        ${record.software_version_image_url ? `<p><strong>Slika softvera:</strong> <a href="${record.software_version_image_url}">Pogledaj sliku</a></p>` : ''}
+                        <hr style="border: 1px solid #eee;">
+                        <p style="font-size: 0.8em; color: #888;">Ovaj email je automatski generiran.</p>
+                        </div>
+                    `,
+                }),
+            });
 
             return new Response(JSON.stringify({ success: true, type: 'INSERT' }), {
                 headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -79,7 +77,7 @@ serve(async (req) => {
                         Authorization: `Bearer ${RESEND_API_KEY}`,
                     },
                     body: JSON.stringify({
-                        from: "Autopojasevi <info@autopojasevi.hr>",
+                        from: "Autopojasevi.hr <info@autopojasevi.hr>",
                         to: [record.email],
                         subject: "Hvala na povjerenju - Autopojasevi.hr",
                         html: `
@@ -110,8 +108,8 @@ serve(async (req) => {
                             Authorization: `Bearer ${RESEND_API_KEY}`,
                         },
                         body: JSON.stringify({
-                            from: "Autopojasevi System <system@autopojasevi.hr>",
-                            to: [ADMIN_EMAIL],
+                            from: "Autopojasevi System <onboarding@resend.dev>",
+                            to: ["info@autopojasevi.hr"],
                             subject: "Alert: Rezervacija završena",
                             html: `
                   <p>Rezervacija #${record.id} je označena kao završena.</p>
