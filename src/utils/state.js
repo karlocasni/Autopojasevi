@@ -15,7 +15,7 @@ export const state = {
                 'Brza i precizna usluga',
                 'Podrška za sve modele'
             ],
-            images: ['/images/service-seatbelt-1.jpg', '/images/service-seatbelt-2.jpg']
+            images: ['/images/pojas1.png', '/images/pojas2.png']
         },
         {
             id: 'zvjezdano-nebo',
@@ -28,7 +28,7 @@ export const state = {
                 'Dugotrajnost',
                 'Spektakularan efekt'
             ],
-            images: ['/images/service-stars-1.jpg', '/images/service-stars-2.jpg']
+            images: ['/images/zvjezde1.png', '/images/zvjezde2.png']
         },
         {
             id: 'zatamnjivanje',
@@ -41,7 +41,7 @@ export const state = {
                 'Estetski izgled',
                 'Povećana privatnost'
             ],
-            images: ['/images/service-tint-1.jpg', '/images/service-tint-2.jpg']
+            images: ['/images/stakla1.png', '/images/stakla2.png']
         },
         {
             id: 'mapiranje',
@@ -54,7 +54,79 @@ export const state = {
                 'Sigurno kodiranje',
                 'Garancija na uslugu'
             ],
-            images: ['/images/service-mapping-1.jpg', '/images/service-mapping-2.jpg']
+            images: ['/images/kodiranje1.png', '/images/kodiranje2.png']
+        },
+        {
+            id: 'kocnice',
+            name: 'Promjena boje kočnica',
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M14.5 9.5 12 12"/></svg>`,
+            price: 199,
+            description: 'Profesionalno lakiranje kočionih čeljusti u boju po želji.',
+            sellingPoints: [
+                'Visoka otpornost na toplinu',
+                'Dugotrajna boja',
+                'Zaštita od korozije',
+                'Sportski izgled'
+            ],
+            images: ['/images/kocnica1.png', '/images/kocnica2.png']
+        },
+        {
+            id: 'chrome-delete',
+            name: 'Chrome delete',
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>`,
+            is_request_price: true,
+            description: 'Presvlačenje kromiranih dijelova u crnu sjajnu ili mat foliju.',
+            sellingPoints: [
+                'Moderniji izgled',
+                'Zaštita kroma',
+                'Crna sjaj ili mat',
+                'Reverzibilan proces'
+            ],
+            images: ['/images/chrome1.png', '/images/chrome2.png']
+        }
+    ],
+
+    bundles: [
+        {
+            id: 'silver-paket',
+            name: 'Silver Paket',
+            price: 490,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 7l2 5h-4l2-5"/></svg>`,
+            description: 'Ugradnja pojaseva, promjena boje čeljusti, kodiranje.',
+            includes: ['pojasevi', 'kocnice', 'mapiranje'],
+            sellingPoints: [
+                'Ugradnja pojaseva u boji po želji',
+                'Profesionalno lakiranje čeljusti',
+                'Softversko kodiranje'
+            ],
+            images: ['/images/pojas1.png', '/images/kodiranje1.png']
+        },
+        {
+            id: 'gold-paket',
+            name: 'Gold Paket',
+            price: 690,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 7l2 5h-4l2-5"/><path d="M8 12h8"/></svg>`,
+            description: 'Ugradnja pojaseva, promjena boje čeljusti, kodiranje, zatamnjivanje stakala.',
+            includes: ['pojasevi', 'kocnice', 'mapiranje', 'zatamnjivanje'],
+            sellingPoints: [
+                'Sve iz Silver paketa',
+                'Zatamnjivanje stakala (premium folija)'
+            ],
+            images: ['/images/pojas1.png', '/images/kodiranje1.png']
+        },
+        {
+            id: 'platinum-paket',
+            name: 'Platinum Paket',
+            price: 990,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 7l2 5h-4l2-5"/><path d="M12 2v20"/></svg>`,
+            description: 'Ugradnja pojaseva, promjena boje čeljusti, kodiranje, zvjezadno nebo (500 zvjezdica).',
+            includes: ['pojasevi', 'kocnice', 'mapiranje', 'zvjezdano-nebo'],
+            sellingPoints: [
+                'Sve iz Silver paketa',
+                'Zvjezdano nebo (500 zvjezdica)',
+                'Potpuna transformacija vozila'
+            ],
+            images: ['/images/pojas1.png', '/images/kodiranje1.png']
         }
     ],
 
@@ -154,7 +226,7 @@ export const state = {
 
         const newReservation = {
             service_id: bookingData.service_id,
-            service_name: bookingData.service_name || this.services.find(s => s.id === bookingData.service_id)?.name,
+            service_name: bookingData.service_name || this.services.find(s => s.id === bookingData.service_id)?.name || this.bundles?.find(b => b.id === bookingData.service_id)?.name,
             marka: bookingData.marka,
             model: bookingData.model,
             godina: bookingData.godina,
@@ -404,7 +476,7 @@ export const state = {
         // Fetch all reservations for this month
         const { data: reservations, error } = await supabase
             .from('bookings')
-            .select('appointment_date, status')
+            .select('appointment_date, service_id, status')
             .gte('appointment_date', startStr)
             .lte('appointment_date', endStr)
             .neq('status', 'cancelled'); // Don't count cancelled
@@ -418,7 +490,14 @@ export const state = {
         if (reservations) {
             reservations.forEach(r => {
                 const date = r.appointment_date;
-                counts[date] = (counts[date] || 0) + 1;
+                let weight = 1;
+                // Weighted capacity logic
+                if (r.service_id === 'platinum-paket' || r.service_id === 'zvjezdano-nebo') {
+                    weight = this.maxReservations || 4;
+                } else if (r.service_id === 'gold-paket' || r.service_id === 'silver-paket') {
+                    weight = 2;
+                }
+                counts[date] = (counts[date] || 0) + weight;
             });
         }
 

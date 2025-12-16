@@ -126,7 +126,7 @@ export function BookingFlow(data = {}) {
                             // Map bookingData to the shape expected by state.saveBooking
                             const payload = {
                                 service_id: bookingData.serviceId,
-                                service_name: bookingData.serviceName || state.services.find(s => s.id === bookingData.serviceId)?.name,
+                                service_name: bookingData.serviceName || state.services.find(s => s.id === bookingData.serviceId)?.name || state.bundles?.find(b => b.id === bookingData.serviceId)?.name,
                                 marka: bookingData.marka,
                                 model: bookingData.model,
                                 godina: bookingData.godina,

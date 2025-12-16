@@ -107,7 +107,11 @@ export function Step3Calendar({ onNext, onBack, initialData = {} }) {
 
     const cutOff = new Date();
     cutOff.setHours(cutOff.getHours() + 24);
+
+    // Check if service requires full day (Zvjezdano nebo or Platinum Bundle)
     const isZvjezdano = initialData.serviceId === 'zvjezdano-nebo';
+    const isPlatinum = initialData.serviceId === 'platinum-paket';
+    const requiresEmptyDay = isZvjezdano || isPlatinum;
 
     // Days
     for (let day = 1; day <= daysInMonth; day++) {
@@ -123,8 +127,8 @@ export function Step3Calendar({ onNext, onBack, initialData = {} }) {
       const dayEl = document.createElement('button');
 
       let isUnavailable = status === 'unavailable';
-      // For Zvjezdano Nebo, day must be empty (count === 0)
-      if (isZvjezdano && dayData.count > 0) {
+      // For Zvjezdano Nebo or Bundles, day must be empty (count === 0)
+      if (requiresEmptyDay && dayData.count > 0) {
         isUnavailable = true;
         status = 'unavailable';
       }

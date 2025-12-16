@@ -1,12 +1,19 @@
 import { carBrands, searchBrands, getYearsForModel } from '../../data/carBrands.js';
+import { state as globalState } from '../../utils/state.js';
 
 export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }) {
     const container = document.createElement('div');
     container.className = 'booking-step step-vehicle-info';
 
-    const isPojasevi = serviceId === 'pojasevi';
-    const isZvjezdano = serviceId === 'zvjezdano-nebo';
-    const isMapiranje = serviceId === 'mapiranje';
+    // Identify service or bundle
+    const service = globalState.services.find(s => s.id === serviceId) || globalState.bundles?.find(b => b.id === serviceId);
+
+    // Helper to check inclusions
+    const includes = (id) => service?.id === id || (service?.includes && service.includes.includes(id));
+
+    const isPojasevi = service?.id === 'pojasevi';
+    const isZvjezdano = service?.id === 'zvjezdano-nebo';
+    const isMapiranje = includes('mapiranje');
 
     // State management
     let state = {

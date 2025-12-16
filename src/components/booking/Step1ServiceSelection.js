@@ -6,13 +6,22 @@ export function Step1ServiceSelection({ onNext, selectedServiceId }) {
 
   let selected = selectedServiceId || null;
 
+  // Determine initial view: if selected ID is a standard service, show services. Otherwise (bundle or null) show bundles.
+  let showBundles = true;
+  if (selected && state.services.find(s => s.id === selected)) {
+    showBundles = false;
+  }
+
   const render = () => {
-    const servicesHTML = state.services.map(service => `
-        <div class="service-selection-card card ${service.id === selected ? 'selected' : ''}" data-service-id="${service.id}">
-        <div class="service-icon-large">${service.icon}</div>
-        <h3 class="service-name">${service.name}</h3>
-        ${service.is_request_price ? '<div style="font-weight: bold; color: var(--color-accent); margin-top: 5px;">Cijena na upit</div>' : (service.price ? `<div style="font-weight: bold; color: var(--color-accent); margin-top: 5px;">
-             ${service.is_from ? '<span style="font-size: 0.9em; opacity: 0.8; font-weight: normal;">od</span> ' : ''}${service.price.toFixed(2)} ${service.is_from && service.price_to ? `<span style="font-size: 0.9em; opacity: 0.8; font-weight: normal;">do</span> ${service.price_to.toFixed(2)}` : ''} EUR
+    const items = showBundles ? state.bundles : state.services;
+    const titleText = showBundles ? 'ODABERI PAKET' : 'ODABERI USLUGU';
+
+    const itemsHTML = items.map(item => `
+        <div class="service-selection-card card ${item.id === selected ? 'selected' : ''}" data-id="${item.id}">
+        <div class="service-icon-large">${item.icon}</div>
+        <h3 class="service-name">${item.name}</h3>
+        ${item.is_request_price ? '<div style="font-weight: bold; color: var(--color-accent); margin-top: 5px;">Cijena na upit</div>' : (item.price ? `<div style="font-weight: bold; color: var(--color-accent); margin-top: 5px;">
+             ${item.is_from ? '<span style="font-size: 0.9em; opacity: 0.8; font-weight: normal;">od</span> ' : ''}${item.price.toFixed(2)} ${item.is_from && item.price_to ? `<span style="font-size: 0.9em; opacity: 0.8; font-weight: normal;">do</span> ${item.price_to.toFixed(2)}` : ''} EUR
         </div>` : '')}
         </div>
     `).join('');
@@ -20,20 +29,24 @@ export function Step1ServiceSelection({ onNext, selectedServiceId }) {
     container.innerHTML = `
         <h2 class="step-title">
         <span class="heading-top">KORAK 1</span>
-        <span class="heading-bottom">Odaberi Uslugu</span>
+        <span class="heading-bottom">${titleText}</span>
         </h2>
         
         <div class="service-selection-grid">
-        ${servicesHTML}
+        ${itemsHTML}
         </div>
         
-        <div class="step-actions" style="display: flex; justify-content: center;">
-        <button class="btn btn-cta" id="next-btn" ${!selected ? 'disabled' : ''}>
-            Nastavi
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-        </button>
+        <div class="step-actions" style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+            <button type="button" class="btn btn-secondary" id="toggle-view-btn">
+                ${showBundles ? 'Pojedinačne usluge' : 'Pogledaj pakete'}
+            </button>
+            
+            <button class="btn btn-cta" id="next-btn" ${!selected ? 'disabled' : ''}>
+                Nastavi
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </button>
         </div>
     `;
 
@@ -43,7 +56,7 @@ export function Step1ServiceSelection({ onNext, selectedServiceId }) {
 
     cards.forEach(card => {
       card.addEventListener('click', () => {
-        const selectedId = card.dataset.serviceId;
+        const selectedId = card.dataset.id;
         selected = selectedId;
 
         // Update UI
@@ -51,6 +64,12 @@ export function Step1ServiceSelection({ onNext, selectedServiceId }) {
         card.classList.add('selected');
         nextBtn.disabled = false;
       });
+    });
+
+    // Toggle View
+    container.querySelector('#toggle-view-btn').addEventListener('click', () => {
+      showBundles = !showBundles;
+      render();
     });
 
     nextBtn.addEventListener('click', () => {
@@ -63,7 +82,7 @@ export function Step1ServiceSelection({ onNext, selectedServiceId }) {
   render();
 
   state.loadServices().then(() => {
-    render();
+    if (!showBundles) render();
   });
 
   return container;
@@ -87,7 +106,7 @@ style.textContent = `
 
   .service-selection-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-lg);
   }
 
@@ -177,8 +196,8 @@ style.textContent = `
     }
     
     .step-actions {
-        flex-direction: column;
         width: 100%;
+        flex-direction: column;
     }
     
     .step-actions .btn {

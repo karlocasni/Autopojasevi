@@ -4,7 +4,7 @@ export function Step5Review({ bookingData, onNext, onBack }) {
   const container = document.createElement('div');
   container.className = 'booking-step step-review';
 
-  const service = state.services.find(s => s.id === bookingData.serviceId);
+  const service = state.services.find(s => s.id === bookingData.serviceId) || state.bundles?.find(b => b.id === bookingData.serviceId);
   // Calculate Price
   let calculatedPrice = null;
   if (service.id === 'pojasevi' && bookingData.brojPojaseva) {

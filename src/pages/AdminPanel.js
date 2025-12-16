@@ -592,7 +592,32 @@ export function AdminPanel() {
       }
 
       // Find service detail, handle case where service might be deleted or loaded via config
-      const service = state.services.find(s => s.id === reservation.service_id);
+      const service = state.services.find(s => s.id === reservation.service_id) || state.bundles?.find(b => b.id === reservation.service_id);
+
+      // Calculate Price & Details
+      let finalPrice = service?.price || 0;
+      let detailsHtml = '';
+
+      if (reservation.service_id === 'pojasevi') {
+        const count = reservation.broj_pojaseva || 0;
+        const isDisassembled = reservation.vlastiti_pojasevi;
+        // Use config prices or fallbacks (69/39)
+        const basePrice = isDisassembled ? (service?.price_disassembled ?? 39) : (service?.price ?? 69);
+        finalPrice = basePrice * count;
+
+        detailsHtml += `<p><strong>Broj pojaseva:</strong> ${count}</p>`;
+        detailsHtml += `<p><strong>Izvađeni mehanizam:</strong> ${isDisassembled ? 'DA' : 'NE'}</p>`;
+      } else if (reservation.service_id === 'zvjezdano-nebo') {
+        const stars = reservation.broj_zvjezdica || 0;
+        // Use config price or fallback (1.19)
+        const starPrice = service?.price_per_star ?? 1.19;
+        finalPrice = stars * starPrice;
+
+        detailsHtml += `<p><strong>Broj zvjezdica:</strong> ${stars}</p>`;
+      }
+
+      // If manual entry or legacy, allow override if stored (optional, but let's stick to calc for consistency unless 0)
+      if (finalPrice === 0 && reservation.cijena) finalPrice = reservation.cijena;
 
       modalContent.innerHTML = `
         <p><strong>Klijent:</strong> ${reservation.ime} ${reservation.prezime}</p>
@@ -601,8 +626,10 @@ export function AdminPanel() {
         <p><strong>Vozilo:</strong> ${reservation.marka} ${reservation.model}</p>
         <p><strong>Godina:</strong> ${reservation.godina}</p>
         ${reservation.vin ? `<p><strong>VIN:</strong> ${reservation.vin}</p>` : ''}
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0;">
         <p><strong>Usluga:</strong> ${service?.name || reservation.service_name}</p>
-        <p><strong>Cijena:</strong> ${(service?.price || reservation.cijena || 0).toFixed(2)} EUR</p>
+        ${detailsHtml}
+        <p><strong>Cijena:</strong> <span style="font-size: 1.2em; color: var(--color-accent); font-weight: bold;">${finalPrice.toFixed(2)} EUR</span></p>
         <p><strong>Datum:</strong> ${new Date(reservation.appointment_date).toLocaleDateString('hr-HR')} u ${reservation.appointment_time}</p>
         <p><strong>Status:</strong> <span class="status-badge ${reservation.status === 'confirmed' ? 'status-confirmed' : (reservation.status === 'completed' ? 'status-completed' : (reservation.status === 'cancelled' ? 'status-cancelled' : 'status-pending'))}">${reservation.status}</span></p>
         <p><strong>Napomene:</strong> ${reservation.napomena || '-'}</p>

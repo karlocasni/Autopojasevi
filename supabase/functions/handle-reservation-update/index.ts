@@ -24,6 +24,22 @@ serve(async (req) => {
 
         // HANDLE NEW RESERVATION (INSERT)
         if (type === "INSERT") {
+            const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+
+            // IDEMPOTENCY CHECK
+            const { data: currentRecord } = await supabase
+                .from("bookings")
+                .select("sms_tag")
+                .eq("id", record.id)
+                .single();
+
+            if (currentRecord?.sms_tag === "ADMIN_NOTIFIED") {
+                console.log("Admin notification already sent. Skipping.");
+                return new Response(JSON.stringify({ message: "Already processed" }), {
+                    headers: { ...corsHeaders, "Content-Type": "application/json" },
+                });
+            }
+
             console.log(`New booking created: ${record.id}. Sending admin notification...`);
 
             // Use onboarding@resend.dev to ensure delivery if domain not verified
@@ -58,6 +74,12 @@ serve(async (req) => {
                 }),
             });
 
+            // Mark as notified to prevent duplicates
+            await supabase
+                .from("bookings")
+                .update({ sms_tag: "ADMIN_NOTIFIED" })
+                .eq("id", record.id);
+
             return new Response(JSON.stringify({ success: true, type: 'INSERT' }), {
                 headers: { ...corsHeaders, "Content-Type": "application/json" },
             });
@@ -65,9 +87,32 @@ serve(async (req) => {
 
         // HANDLE UPDATE (CONFIRMATION / COMPLETION)
         if (type === "UPDATE") {
-            // Check if status changed to 'completed'
+            const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+
+            // Check if status changed to 'confirmed'
             if (record.status === "confirmed" && old_record.status !== "confirmed") {
-                console.log(`Booking ${record.id} completed. Sending notifications...`);
+                console.log(`Booking ${record.id} confirmed. Checking idempotency...`);
+
+                // IDEMPOTENCY CHECK: Fetch current state from DB
+                const { data: currentRecord, error: fetchError } = await supabase
+                    .from("bookings")
+                    .select("sms_tag")
+                    .eq("id", record.id)
+                    .single();
+
+                if (fetchError) {
+                    console.error("Error fetching current record for idempotency:", fetchError);
+                }
+
+                // If we already marked it as sent, skip
+                if (currentRecord?.sms_tag === "CONFIRMATION_SENT") {
+                    console.log("Email already sent for this booking (idempotency check). Skipping.");
+                    return new Response(JSON.stringify({ message: "Already processed" }), {
+                        headers: { ...corsHeaders, "Content-Type": "application/json" },
+                    });
+                }
+
+                console.log(`Sending notifications for ${record.id}...`);
 
                 // 1. Send Client Email (Confirmation)
                 await fetch("https://api.resend.com/emails", {
@@ -260,32 +305,12 @@ a[x-apple-data-detectors],
                     }),
                 });
 
-                // 2. Send Admin Alert (Completion)
-                if (ADMIN_EMAIL) {
-                    await fetch("https://api.resend.com/emails", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${RESEND_API_KEY}`,
-                        },
-                        body: JSON.stringify({
-                            from: "Autopojasevi System <info@autopojasevi.hr>",
-                            to: ["info@autopojasevi.hr"],
-                            subject: "Alert: Rezervacija završena",
-                            html: `
-                  <p>Rezervacija #${record.id} je označena kao završena.</p>
-                  <p>Klijent: ${record.ime} ${record.prezime}</p>
-                `,
-                        }),
-                    });
-                }
+                // 2. Send Admin Alert (Completion) - Removed as per user request
 
-                // 3. Update SMS Tag in Database
-                const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
-
+                // 3. Update SMS Tag to mark as SENT (Idempotency)
                 const { error } = await supabase
                     .from("bookings")
-                    .update({ sms_tag: "CONFIRMATION_READY" })
+                    .update({ sms_tag: "CONFIRMATION_SENT" })
                     .eq("id", record.id);
 
                 if (error) {

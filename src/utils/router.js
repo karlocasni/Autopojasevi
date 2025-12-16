@@ -71,7 +71,7 @@ export class Router {
 
     // Navigate to current path or default to home
     const currentPath = window.location.pathname;
-    const route = this.routes[currentPath] ? currentPath : '/';
+    const route = this.routes[currentPath] ? currentPath : '/404';
     this.navigate(route);
   }
 }

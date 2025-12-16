@@ -4,7 +4,7 @@ export function Step1bServiceDetails({ serviceId, onNext, onBack }) {
   const container = document.createElement('div');
   container.className = 'booking-step step-service-details';
 
-  const service = state.services.find(s => s.id === serviceId);
+  const service = state.services.find(s => s.id === serviceId) || state.bundles?.find(b => b.id === serviceId);
 
   if (!service) {
     container.innerHTML = '<p>Service not found</p>';
@@ -63,14 +63,21 @@ export function Step1bServiceDetails({ serviceId, onNext, onBack }) {
       </div>
       
       <div class="service-details-right">
+        ${service.images && service.images[0] ? `
+        <div class="service-image-container glass">
+          <img src="${service.images[0]}" alt="${service.name} 1" class="service-image" />
+        </div>
+        ` : `
         <div class="service-image-placeholder glass">
           <div class="placeholder-icon">${service.icon}</div>
-          <p>Slika usluge 1</p>
+          <p>Slika nije dostupna</p>
         </div>
-        <div class="service-image-placeholder glass">
-          <div class="placeholder-icon">${service.icon}</div>
-          <p>Slika usluge 2</p>
+        `}
+        ${service.images && service.images[1] ? `
+        <div class="service-image-container glass">
+           <img src="${service.images[1]}" alt="${service.name} 2" class="service-image" />
         </div>
+        ` : ''}
       </div>
     </div>
   `;
@@ -136,6 +143,25 @@ style.textContent = `
     display: flex;
     flex-direction: column;
     gap: var(--spacing-lg);
+  }
+
+  .service-image-container {
+    aspect-ratio: 16/9;
+    width: 100%;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .service-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+  
+  .service-image:hover {
+    transform: scale(1.03);
   }
 
   .service-image-placeholder {

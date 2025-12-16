@@ -7,6 +7,7 @@ import { HomePage } from './pages/HomePage.js';
 import { BookingFlow } from './pages/BookingFlow.js';
 import { AdminPanel } from './pages/AdminPanel.js';
 import { AdminLogin } from './pages/AdminLogin.js';
+import { NotFound } from './pages/NotFound.js';
 import { auth } from './utils/auth.js';
 
 // Set up authentication check
@@ -19,6 +20,7 @@ router.register('/', HomePage);
 router.register('/booking', BookingFlow);
 router.register('/admin/login', AdminLogin);
 router.register('/admin', AdminPanel, { protected: true });
+router.register('/404', NotFound);
 
 // Initialize app
 router.init();
