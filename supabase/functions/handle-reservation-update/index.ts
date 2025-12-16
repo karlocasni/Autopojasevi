@@ -66,7 +66,7 @@ serve(async (req) => {
         // HANDLE UPDATE (CONFIRMATION / COMPLETION)
         if (type === "UPDATE") {
             // Check if status changed to 'completed'
-            if (record.status === "completed" && old_record.status !== "completed") {
+            if (record.status === "confirmed" && old_record.status !== "confirmed") {
                 console.log(`Booking ${record.id} completed. Sending notifications...`);
 
                 // 1. Send Client Email (Confirmation)
@@ -79,7 +79,7 @@ serve(async (req) => {
                     body: JSON.stringify({
                         from: "Autopojasevi.hr <info@autopojasevi.hr>",
                         to: [record.email],
-                        subject: "Hvala na povjerenju - Autopojasevi.hr",
+                        subject: "Rezervacija potvrđena - Autopojasevi.hr",
                         html: `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="HR">
@@ -169,14 +169,12 @@ a[x-apple-data-detectors],
          <tr>
           <td align="center" style="padding:0;Margin:0">
            <table cellspacing="0" cellpadding="0" bgcolor="#ffffff" align="center" class="es-header-body" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:#FFFFFF;width:600px">
-             <tr></tr>
-             <tr></tr>
              <tr>
               <td align="left" bgcolor="#cc0000" style="padding:10px;Margin:0;background-color:#cc0000" data-custom-paddings-d-l="true" data-custom-paddings-d-t="true" data-custom-paddings-d-r="true" data-custom-paddings-d-b="true">
-               <table cellpadding="0" cellspacing="0" align="left" class="es-left" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;float:left">
+               <table cellspacing="0" align="left" cellpadding="0" class="es-left" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;float:left">
                  <tr>
                   <td align="left" style="padding:0;Margin:0;width:580px">
-                   <table cellpadding="0" cellspacing="0" role="presentation" width="100%" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
+                   <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
                      <tr>
                       <td align="center" style="padding:0;Margin:0;font-size:0"><a target="_blank" href="https://autopojasevi.hr" style="mso-line-height-rule:exactly;text-decoration:underline;color:#1376C8;font-size:14px"><img src="https://eybvgup.stripocdn.email/content/guids/CABINET_cfbae24ef22ea9146e7f3a13b3f7c1aa52624ad0449b43f4a283090c76f524b5/images/logo.png" alt="autopojasevi_logo" height="150" title="autopojasevi_logo" class="img-1670" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0"></a></td>
                      </tr>
@@ -185,11 +183,11 @@ a[x-apple-data-detectors],
                </table></td>
              </tr>
              <tr>
-              <td align="left" style="padding:0;Margin:0;padding-top:20px;padding-right:20px;padding-left:20px">
-               <table width="100%" cellpadding="0" cellspacing="0" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
+              <td align="left" bgcolor="#ffffff" style="padding:0;Margin:0;padding-top:20px;padding-right:20px;padding-left:20px;background-color:#ffffff">
+               <table cellspacing="0" width="100%" cellpadding="0" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
                  <tr>
                   <td align="left" style="padding:0;Margin:0;width:560px">
-                   <table cellpadding="0" cellspacing="0" role="presentation" width="100%" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
+                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
                      <tr>
                       <td align="center" class="es-m-txt-c" style="padding:0;Margin:0"><h3 style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:28px;font-style:normal;font-weight:normal;line-height:33.6px;color:#333333"><strong>Hvala Vam na povjerenju!</strong></h3></td>
                      </tr>
@@ -203,16 +201,13 @@ a[x-apple-data-detectors],
        <table cellspacing="0" cellpadding="0" align="center" background class="es-header" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;width:100%;table-layout:fixed !important;background-color:transparent">
          <tr>
           <td align="center" style="padding:0;Margin:0">
-           <table cellspacing="0" cellpadding="0" bgcolor="#ffffff" align="center" class="es-header-body" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:#FFFFFF;width:600px">
-             <tr></tr>
-             <tr></tr>
-             <tr></tr>
+           <table bgcolor="#ffffff" align="center" cellspacing="0" cellpadding="0" class="es-header-body" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:#FFFFFF;width:600px">
              <tr>
-              <td align="left" data-custom-paddings-d-b="true" style="padding:0;Margin:0;padding-top:20px;padding-right:20px;padding-left:20px">
-               <table width="100%" cellpadding="0" cellspacing="0" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
+              <td align="left" bgcolor="#ffffff" style="padding:0;Margin:0;padding-top:20px;padding-right:20px;padding-left:20px;background-color:#ffffff" data-custom-paddings-d-b="true">
+               <table cellpadding="0" cellspacing="0" width="100%" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
                  <tr>
                   <td align="left" style="padding:0;Margin:0;width:560px">
-                   <table cellpadding="0" cellspacing="0" role="presentation" width="100%" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
+                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
                      <tr>
                       <td align="left" style="padding:0;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Poštovani/a&nbsp;<strong>${record.ime} ${record.prezime}</strong>,</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Vaša rezervacija za uslugu&nbsp;<strong>${record.service_name}</strong>&nbsp;je uspješno završena.</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"><br></p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Vozilo dostavite <strong>${record.appointment_date}</strong>, oko <strong>${record.appointment_time}</strong>.</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"><br>Hvala Vam i vidimo se!</p></td>
                      </tr>
@@ -227,14 +222,12 @@ a[x-apple-data-detectors],
          <tr>
           <td align="center" style="padding:0;Margin:0">
            <table cellspacing="0" cellpadding="0" bgcolor="#ffffff" align="center" class="es-footer-body" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:#FFFFFF;width:600px">
-             <tr></tr>
-             <tr></tr>
              <tr>
-              <td align="left" data-custom-paddings-d-b="true" style="padding:20px;Margin:0">
-               <table cellpadding="0" cellspacing="0" align="right" class="es-right" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;float:right">
+              <td align="left" bgcolor="#ffffff" style="padding:20px;Margin:0;background-color:#ffffff" data-custom-paddings-d-b="true">
+               <table cellspacing="0" align="right" cellpadding="0" class="es-right" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;float:right">
                  <tr>
                   <td align="left" style="padding:0;Margin:0;width:560px">
-                   <table cellpadding="0" cellspacing="0" role="presentation" width="100%" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
+                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
                      <tr>
                       <td align="left" style="padding:0;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"><strong>Autopojasevi.hr tim</strong></p></td>
                      </tr>
@@ -244,10 +237,10 @@ a[x-apple-data-detectors],
              </tr>
              <tr>
               <td align="left" bgcolor="#333333" style="padding:20px;Margin:0;background-color:#333333" data-custom-paddings-d-l="true" data-custom-paddings-d-t="true" data-custom-paddings-d-r="true" data-custom-paddings-d-b="true">
-               <table cellpadding="0" cellspacing="0" align="left" class="es-left" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;float:left">
+               <table cellspacing="0" align="left" cellpadding="0" class="es-left" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;float:left">
                  <tr>
                   <td align="left" style="padding:0;Margin:0;width:560px">
-                   <table cellpadding="0" cellspacing="0" role="presentation" width="100%" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
+                   <table cellspacing="0" role="presentation" width="100%" cellpadding="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
                      <tr>
                       <td align="left" style="padding:0;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#ffffff;font-size:14px;text-align:center"><strong>Vranplaninska ulica 1, 10040 Zagreb</strong></p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#ffffff;font-size:14px;text-align:center"><strong>https://autopojasevi.hr</strong></p></td>
                      </tr>
