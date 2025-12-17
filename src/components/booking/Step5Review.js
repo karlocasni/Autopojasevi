@@ -143,9 +143,14 @@ export function Step5Review({ bookingData, onNext, onBack }) {
         </div>
       </div>
 
-      <p class="review-terms">
-        Slanjem potvrđuješ uvjete usluge.
-      </p>
+      <div class="review-terms-wrapper" style="text-align: center; margin-bottom: var(--spacing-lg);">
+        <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: var(--color-text-muted);">
+            <input type="checkbox" id="terms-check" style="width: 18px; height: 18px; accent-color: var(--color-accent);">
+            <span>
+                Slanjem potvrđuješ <a href="/uvjeti-poslovanja" target="_blank" style="color: var(--color-accent); text-decoration: underline;">uvjete usluge</a>.
+            </span>
+        </label>
+      </div>
 
       <div class="step-actions">
         <button type="button" class="btn btn-secondary" id="back-btn">
@@ -165,7 +170,14 @@ export function Step5Review({ bookingData, onNext, onBack }) {
   `;
 
   container.querySelector('#back-btn').addEventListener('click', onBack);
-  container.querySelector('#confirm-btn').addEventListener('click', () => onNext());
+  const termsCheck = container.querySelector('#terms-check');
+  container.querySelector('#confirm-btn').addEventListener('click', () => {
+    if (!termsCheck.checked) {
+      alert('Molimo potvrdite uvjete usluge prije nastavka.');
+      return;
+    }
+    onNext();
+  });
 
   return container;
 }

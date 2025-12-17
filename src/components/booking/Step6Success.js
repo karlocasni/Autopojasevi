@@ -25,7 +25,7 @@ export function Step6Success({ bookingData }) {
       
       <h1 class="success-title">
         <span class="heading-top">rezervirano!</span>
-        <span class="heading-bottom">Rezervacija Potvrđena</span>
+        <span class="heading-bottom">Rezervacija Zaprimljena</span>
       </h1>
       
       <div class="success-message glass">
@@ -33,7 +33,10 @@ export function Step6Success({ bookingData }) {
           Hvala! Vaš termin je rezerviran za <strong>${formattedDate}</strong> u <strong>${period}</strong>.
         </p>
         <p class="success-text">
-          Poslali smo vam potvrdu na <strong>Email</strong> i <strong>SMS</strong>.
+          Poslat ćemo vam potvrdu na <strong>Email</strong> i <strong>SMS</strong> čim odobrimo rezervaciju.
+        </p>
+        <p class="success-text" style="font-size: 0.9rem; color: var(--color-text-muted);">
+          Ako nešto ne bude u redu, kontaktirat ćemo vas.
         </p>
         ${bookingData.totalPrice ? `
         <p class="success-text" style="font-size: 1.4rem; margin-top: 15px;">

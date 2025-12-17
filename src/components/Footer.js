@@ -12,6 +12,7 @@ export function Footer() {
           <li><a href="#" class="footer-link" id="footer-rezervacija">Rezervacija</a></li>
           <li><a href="#" class="footer-link" id="footer-kontakt">Kontakt</a></li>
           <li><a href="#" class="footer-link" id="footer-admin">Admin panel</a></li>
+          <li><a href="/uvjeti-poslovanja" class="footer-link" id="footer-terms">Uvjeti poslovanja</a></li>
         </ul>
         <p class="footer-disclaimer">
           Svi podaci su zaštićeni u skladu s GDPR propisima.
@@ -75,6 +76,11 @@ export function Footer() {
   footer.querySelector('#footer-admin').addEventListener('click', (e) => {
     e.preventDefault();
     router.navigate('/admin');
+  });
+
+  footer.querySelector('#footer-terms').addEventListener('click', (e) => {
+    e.preventDefault();
+    router.navigate('/uvjeti-poslovanja');
   });
 
   return footer;

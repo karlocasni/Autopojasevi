@@ -20,8 +20,8 @@ export function Step4CustomerInfo({ onNext, onBack, initialData = {} }) {
       </div>
 
       <div class="form-group">
-        <label class="form-label">Telefon (WhatsApp)</label>
-        <input type="tel" class="input" name="telefon" required placeholder="+385 xx xxx xxxx" value="${initialData.telefon || ''}">
+        <label class="form-label">Telefon</label>
+        <input type="tel" class="input" name="telefon" required placeholder="+385 91 123 4567" pattern="^\\+[0-9\\s]{9,}$" title="Unesite broj u formatu +385..." value="${initialData.telefon || ''}">
       </div>
 
       <div class="form-group">
@@ -52,6 +52,15 @@ export function Step4CustomerInfo({ onNext, onBack, initialData = {} }) {
     e.preventDefault();
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
+
+    // Clean phone number (remove spaces)
+    data.telefon = data.telefon.replace(/\s/g, '');
+
+    if (!data.telefon.startsWith('+')) {
+      alert('Molimo unesite broj telefona s pozivnim brojem (npr. +385...)');
+      return;
+    }
+
     // Default to true as we send reminders no matter what
     data.whatsappPodsjetnik = true;
     data.emailPodsjetnik = true;
