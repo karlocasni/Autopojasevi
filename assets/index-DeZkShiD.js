@@ -1711,19 +1711,19 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
       min-height: 300px;
     }
   }
-`;document.head.appendChild(na);function Yi(){const r=document.createElement("div");r.className="page-home",r.appendChild(Dt());const e=document.createElement("main");return e.appendChild(Bi()),e.appendChild(Di()),e.appendChild(Hi()),e.appendChild(Vi()),e.appendChild(Ki()),e.appendChild(Fi()),e.appendChild(Gi()),e.appendChild(Wi()),e.appendChild(Ji()),r.appendChild(e),r.appendChild(Ht()),r}function Zi({currentStep:r,totalSteps:e=6}){const t=document.createElement("div");t.className="progress-bar-container";const s=r/e*100;return t.innerHTML=`
+`;document.head.appendChild(na);function Yi(){const r=document.createElement("div");r.className="page-home",r.appendChild(Dt());const e=document.createElement("main");return e.appendChild(Bi()),e.appendChild(Di()),e.appendChild(Hi()),e.appendChild(Vi()),e.appendChild(Ki()),e.appendChild(Fi()),e.appendChild(Gi()),e.appendChild(Wi()),e.appendChild(Ji()),r.appendChild(e),r.appendChild(Ht()),r}function Zi({currentStep:r,totalSteps:e=6,onStepClick:t}){const s=document.createElement("div");s.className="progress-bar-container";const a=r/e*100;return s.innerHTML=`
     <div class="progress-steps">
-      ${Array(e).fill(0).map((a,n)=>`
-        <div class="progress-step ${n<r?"completed":""} ${n===r-1?"active":""}">
-          <div class="step-number">${n+1}</div>
-          <div class="step-label">${Qi(n+1)}</div>
+      ${Array(e).fill(0).map((n,i)=>`
+        <div class="progress-step ${i<r?"completed clickable":""} ${i===r-1?"active":""}" data-step="${i+1}">
+          <div class="step-number">${i+1}</div>
+          <div class="step-label">${Qi(i+1)}</div>
         </div>
       `).join("")}
     </div>
     <div class="progress-bar">
-      <div class="progress-fill" style="width: ${s}%"></div>
+      <div class="progress-fill" style="width: ${a}%"></div>
     </div>
-  `,t}function Qi(r){return{1:"Usluga",2:"Vozilo",3:"Termin",4:"Podaci",5:"Pregled",6:"Gotovo"}[r]||""}const ia=document.createElement("style");ia.textContent=`
+  `,t&&s.querySelectorAll(".progress-step.clickable").forEach(n=>{n.addEventListener("click",()=>{const i=parseInt(n.dataset.step);i<r&&t(i)})}),s}function Qi(r){return{1:"Usluga",2:"Vozilo",3:"Termin",4:"Podaci",5:"Pregled",6:"Gotovo"}[r]||""}const ia=document.createElement("style");ia.textContent=`
   .progress-bar-container {
     margin-bottom: var(--spacing-2xl);
   }
@@ -1781,6 +1781,19 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
 
   .progress-step.active .step-label {
     color: var(--color-accent);
+  }
+
+  .progress-step.clickable {
+      cursor: pointer;
+  }
+  
+  .progress-step.clickable:hover .step-number {
+      border-color: var(--color-accent);
+      background: rgba(254, 0, 2, 0.5);
+  }
+
+  .progress-step.clickable:hover .step-label {
+      color: var(--color-accent);
   }
 
   .progress-bar {
@@ -3482,7 +3495,7 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
         height: 48px;
     }
   }
-`;document.head.appendChild(pa);function lo(r={}){const e=document.createElement("div");e.className="page-booking",e.appendChild(Dt());const t=document.createElement("main");t.className="booking-main";const s=document.createElement("div");s.className="booking-container";let a=1,n={serviceId:r.serviceId||null,...r};const i=()=>{s.innerHTML="",a<6&&s.appendChild(Zi({currentStep:a,totalSteps:6}));const o=document.createElement("div");o.className=a===6?"":"booking-card glass";let l;switch(a){case 1:n.serviceId?l=eo({serviceId:n.serviceId,onNext:d=>{Object.assign(n,d),a=2,i()},onBack:()=>{n.serviceId=null,i()}}):l=Xi({onNext:d=>{Object.assign(n,d),i()},selectedServiceId:n.serviceId});break;case 2:l=so({serviceId:n.serviceId,onNext:d=>{Object.assign(n,d),a=3,i()},onBack:()=>{a=1,i()},initialData:n});break;case 3:l=ao({onNext:d=>{Object.assign(n,d),a=4,i()},onBack:()=>{a=2,i()},initialData:n});break;case 4:l=no({onNext:d=>{Object.assign(n,d),a=5,i()},onBack:()=>{a=3,i()},initialData:n});break;case 5:l=io({bookingData:n,onNext:async()=>{var d,c,u;try{const g={service_id:n.serviceId,service_name:n.serviceName||((d=O.services.find(h=>h.id===n.serviceId))==null?void 0:d.name)||((u=(c=O.bundles)==null?void 0:c.find(h=>h.id===n.serviceId))==null?void 0:u.name),marka:n.marka,model:n.model,godina:n.godina,broj_pojaseva:n.brojPojaseva,vlastiti_pojasevi:n.vlastitiPojasevi,broj_zvjezdica:n.brojZvjezdica,vinBroj:n.vinBroj,softverSlika:n.softverSlika,napomena:n.napomena,appointment_date:n.date,appointment_time:n.time,ime:n.imePrezime?n.imePrezime.trim().split(" ")[0]:"",prezime:n.imePrezime&&n.imePrezime.trim().indexOf(" ")>-1?n.imePrezime.trim().split(" ").slice(1).join(" "):n.imePrezime||"",email:n.email,telefon:n.telefon,adresa:n.adresa,is_manual_entry:n.isManualEntry||!1},p=await O.saveBooking(g);n.date=p.appointment_date,n.time=p.appointment_time,a=6,i()}catch(g){console.error("Failed to save booking:",g),alert("Došlo je do greške pri spremanju rezervacije. Molimo pokušajte ponovno.")}},onBack:()=>{a=4,i()}});break;case 6:l=oo({bookingData:n});break}l&&(o.appendChild(l),s.appendChild(o))};return i(),t.appendChild(s),e.appendChild(t),e.appendChild(Ht()),e}const ga=document.createElement("style");ga.textContent=`
+`;document.head.appendChild(pa);function lo(r={}){const e=document.createElement("div");e.className="page-booking",e.appendChild(Dt());const t=document.createElement("main");t.className="booking-main";const s=document.createElement("div");s.className="booking-container";let a=1,n={serviceId:r.serviceId||null,...r};const i=()=>{s.innerHTML="",a<6&&s.appendChild(Zi({currentStep:a,totalSteps:6,onStepClick:d=>{a=d,i()}}));const o=document.createElement("div");o.className=a===6?"":"booking-card glass";let l;switch(a){case 1:n.serviceId?l=eo({serviceId:n.serviceId,onNext:d=>{Object.assign(n,d),a=2,i()},onBack:()=>{n.serviceId=null,i()}}):l=Xi({onNext:d=>{Object.assign(n,d),i()},selectedServiceId:n.serviceId});break;case 2:l=so({serviceId:n.serviceId,onNext:d=>{Object.assign(n,d),a=3,i()},onBack:()=>{a=1,i()},initialData:n});break;case 3:l=ao({onNext:d=>{Object.assign(n,d),a=4,i()},onBack:()=>{a=2,i()},initialData:n});break;case 4:l=no({onNext:d=>{Object.assign(n,d),a=5,i()},onBack:()=>{a=3,i()},initialData:n});break;case 5:l=io({bookingData:n,onNext:async()=>{var d,c,u;try{const g={service_id:n.serviceId,service_name:n.serviceName||((d=O.services.find(h=>h.id===n.serviceId))==null?void 0:d.name)||((u=(c=O.bundles)==null?void 0:c.find(h=>h.id===n.serviceId))==null?void 0:u.name),marka:n.marka,model:n.model,godina:n.godina,broj_pojaseva:n.brojPojaseva,vlastiti_pojasevi:n.vlastitiPojasevi,broj_zvjezdica:n.brojZvjezdica,vinBroj:n.vinBroj,softverSlika:n.softverSlika,napomena:n.napomena,appointment_date:n.date,appointment_time:n.time,ime:n.imePrezime?n.imePrezime.trim().split(" ")[0]:"",prezime:n.imePrezime&&n.imePrezime.trim().indexOf(" ")>-1?n.imePrezime.trim().split(" ").slice(1).join(" "):n.imePrezime||"",email:n.email,telefon:n.telefon,adresa:n.adresa,is_manual_entry:n.isManualEntry||!1},p=await O.saveBooking(g);n.date=p.appointment_date,n.time=p.appointment_time,a=6,i()}catch(g){console.error("Failed to save booking:",g),alert("Došlo je do greške pri spremanju rezervacije. Molimo pokušajte ponovno.")}},onBack:()=>{a=4,i()}});break;case 6:l=oo({bookingData:n});break}l&&(o.appendChild(l),s.appendChild(o))};return i(),t.appendChild(s),e.appendChild(t),e.appendChild(Ht()),e}const ga=document.createElement("style");ga.textContent=`
   .page-booking {
     min-height: 100vh;
     display: flex;
