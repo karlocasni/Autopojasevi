@@ -61,8 +61,7 @@ export function Step3Calendar({ onNext, onBack, initialData = {} }) {
     
     <div class="time-slots-container hidden" id="time-slots">
       <h3 class="time-slots-title">Odaberi vrijeme</h3>
-      <p style="text-align: center; color: var(--color-text-muted); margin-bottom: var(--spacing-md); font-size: 0.9rem;">
-        Napomena: Vozilo je potrebno dovesti u jutarnjem (10-12h) ili popodnevnom (14-16h) terminu.
+        Napomena: Vozilo je potrebno dovesti u odabranom terminu (09-14h).
       </p>
       <div class="time-slots-grid" id="time-slots-grid"></div>
     </div>
@@ -94,60 +93,78 @@ export function Step3Calendar({ onNext, onBack, initialData = {} }) {
     const daysInMonth = lastDay.getDate();
     const startingDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Monday = 0
 
-    const availability = await state.getCalendarAvailability(currentYear, currentMonth);
     const daysContainer = container.querySelector('#calendar-days');
-    daysContainer.innerHTML = '';
+    // Show loading
+    daysContainer.innerHTML = '<div class="calendar-loading" style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--color-text-muted);">Učitavanje...</div>';
 
-    // Empty cells before first day
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      const emptyDay = document.createElement('div');
-      emptyDay.className = 'calendar-day empty';
-      daysContainer.appendChild(emptyDay);
-    }
+    // Disable nav
+    const prevBtn = container.querySelector('#prev-month');
+    const nextBtn = container.querySelector('#next-month');
+    if (prevBtn) prevBtn.disabled = true;
+    if (nextBtn) nextBtn.disabled = true;
 
-    const cutOff = new Date();
-    cutOff.setHours(cutOff.getHours() + 24);
+    try {
+      const availability = await state.getCalendarAvailability(currentYear, currentMonth);
+      daysContainer.innerHTML = '';
 
-    // Check if service requires full day (Zvjezdano nebo or Platinum Bundle)
-    const isZvjezdano = initialData.serviceId === 'zvjezdano-nebo';
-    const isPlatinum = initialData.serviceId === 'platinum-paket';
-    const requiresEmptyDay = isZvjezdano || isPlatinum;
-
-    // Days
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(currentYear, currentMonth, day);
-      const dayEnd = new Date(date);
-      dayEnd.setHours(23, 59, 59);
-
-      const isRestricted = dayEnd < cutOff;
-
-      const dayData = availability[day] || { status: 'unavailable', count: 0 };
-      let status = dayData.status;
-
-      const dayEl = document.createElement('button');
-
-      let isUnavailable = status === 'unavailable';
-      // For Zvjezdano Nebo or Bundles, day must be empty (count === 0)
-      if (requiresEmptyDay && dayData.count > 0) {
-        isUnavailable = true;
-        status = 'unavailable';
+      // Empty cells before first day
+      for (let i = 0; i < startingDayOfWeek; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day empty';
+        daysContainer.appendChild(emptyDay);
       }
 
-      dayEl.className = `calendar-day ${status} ${isRestricted ? 'past' : ''}`;
-      dayEl.textContent = day;
-      dayEl.disabled = isRestricted || isUnavailable;
 
-      if (!dayEl.disabled) {
-        dayEl.addEventListener('click', () => {
-          selectedDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-          // Visual selection
-          daysContainer.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
-          dayEl.classList.add('selected');
-          showTimeSlots(selectedDate);
-        });
+      const cutOff = new Date();
+      cutOff.setHours(cutOff.getHours() + 24);
+
+      // Check if service requires full day (Zvjezdano nebo or Platinum Bundle)
+      const isZvjezdano = initialData.serviceId === 'zvjezdano-nebo';
+      const isPlatinum = initialData.serviceId === 'platinum-paket';
+      const requiresEmptyDay = isZvjezdano || isPlatinum;
+
+      // Days
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(currentYear, currentMonth, day);
+        const dayEnd = new Date(date);
+        dayEnd.setHours(23, 59, 59);
+
+        const isRestricted = dayEnd < cutOff;
+
+        const dayData = availability[day] || { status: 'unavailable', count: 0 };
+        let status = dayData.status;
+
+        const dayEl = document.createElement('button');
+
+        let isUnavailable = status === 'unavailable';
+        // For Zvjezdano Nebo or Bundles, day must be empty (count === 0)
+        if (requiresEmptyDay && dayData.count > 0) {
+          isUnavailable = true;
+          status = 'unavailable';
+        }
+
+        dayEl.className = `calendar-day ${status} ${isRestricted ? 'past' : ''}`;
+        dayEl.textContent = day;
+        dayEl.disabled = isRestricted || isUnavailable;
+
+        if (!dayEl.disabled) {
+          dayEl.addEventListener('click', () => {
+            selectedDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            // Visual selection
+            daysContainer.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+            dayEl.classList.add('selected');
+            showTimeSlots(selectedDate);
+          });
+        }
+
+        daysContainer.appendChild(dayEl);
       }
-
-      daysContainer.appendChild(dayEl);
+    } catch (error) {
+      console.error('Error rendering calendar:', error);
+      daysContainer.innerHTML = '<div style="grid-column: 1/-1; color: var(--color-unavailable); text-align: center;">Greška pri učitavanju kalendara.</div>';
+    } finally {
+      if (prevBtn) prevBtn.disabled = false;
+      if (nextBtn) nextBtn.disabled = false;
     }
   };
 

@@ -18,14 +18,13 @@ export function HeroSection() {
         
         <div class="hero-search">
           <div class="search-box glass">
-            <svg class="search-icon icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
+            <svg class="search-icon icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M15.44 13.91c-.48-.55-1.12-1.01-1.94-1.39V4.5a3.5 3.5 0 1 0-7 0v8.02c-.82.38-1.46.84-1.94 1.39a3.48 3.48 0 0 0 .58 4.88l3.64 2.73c.53.4 1.19.62 1.86.62h2.72c.67 0 1.33-.22 1.86-.62l3.64-2.73a3.48 3.48 0 0 0 .58-4.88z" />
             </svg>
             <input 
               type="text" 
               class="search-input" 
-              placeholder="Rezerviraj Termin - Pretraži uslugu..."
+              placeholder="Rezerviraj termin - pretraži uslugu..."
               id="hero-search-input"
             >
           </div>
@@ -184,7 +183,7 @@ style.textContent = `
   }
 
   .search-input::placeholder {
-    color: var(--color-text-muted);
+    color: rgba(255, 255, 255, 0.5);
   }
 
   .search-results {

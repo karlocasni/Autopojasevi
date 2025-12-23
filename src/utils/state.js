@@ -516,7 +516,7 @@ export const state = {
                 const count = counts[dateStr] || 0;
                 let status = 'available';
 
-                const closedDays = JSON.parse(localStorage.getItem('closed_days') || '[]');
+                const closedDays = await this.getClosedDays();
                 if (closedDays.some(d => d.date === dateStr)) {
                     status = 'unavailable';
                 } else if (count >= state.maxReservations) {
@@ -578,16 +578,19 @@ export const state = {
         const maxReservations = this.maxReservations || 4;
         const isDayFull = error ? false : (count >= maxReservations);
 
-        // Standard fixed slots as requested
+        // Standard fixed slots 09:00 - 14:00
         return [
+            { time: '09:00', available: !isDayFull },
+            { time: '09:30', available: !isDayFull },
             { time: '10:00', available: !isDayFull },
             { time: '10:30', available: !isDayFull },
             { time: '11:00', available: !isDayFull },
             { time: '11:30', available: !isDayFull },
-            { time: '14:00', available: !isDayFull },
-            { time: '14:30', available: !isDayFull },
-            { time: '15:00', available: !isDayFull },
-            { time: '15:30', available: !isDayFull }
+            { time: '12:00', available: !isDayFull },
+            { time: '12:30', available: !isDayFull },
+            { time: '13:00', available: !isDayFull },
+            { time: '13:30', available: !isDayFull },
+            { time: '14:00', available: !isDayFull }
         ];
     },
 
@@ -693,23 +696,45 @@ export const state = {
         return data;
     },
 
-    // Closed Days (Mock)
+    // Closed Days (Supabase)
     async getClosedDays() {
-        return JSON.parse(localStorage.getItem('closed_days') || '[]');
+        const { supabase } = await import('./supabase.js');
+        const { data, error } = await supabase.from('closed_days').select('*');
+        if (error) {
+            console.error('Error fetching closed days:', error);
+            // Fallback to empty array if table doesn't exist or other error, 
+            // but log it clearly so it can be fixed.
+            return [];
+        }
+        return data || [];
     },
 
     async addClosedDay(date) {
+        const { supabase } = await import('./supabase.js');
+
+        // Check if already exists in DB
         const days = await this.getClosedDays();
         if (days.find(d => d.date === date)) throw new Error('Dan je već zatvoren.');
-        days.push({ id: Date.now().toString(), date });
-        localStorage.setItem('closed_days', JSON.stringify(days));
+
+        const { error } = await supabase.from('closed_days').insert([{ date }]);
+
+        if (error) {
+            console.error('Error adding closed day:', error);
+            throw error;
+        }
     },
 
     async removeClosedDay(id) {
-        const days = await this.getClosedDays();
-        const filtered = days.filter(d => d.id !== id);
-        localStorage.setItem('closed_days', JSON.stringify(filtered));
+        const { supabase } = await import('./supabase.js');
+        const { error } = await supabase.from('closed_days').delete().eq('id', id);
+
+        if (error) {
+            console.error('Error removing closed day:', error);
+            throw error;
+        }
     },
+
+
 
     // Coupons
     async buyCoupon(data) {

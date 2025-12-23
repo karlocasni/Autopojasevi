@@ -46,20 +46,20 @@ export function TermsPage() {
 
                 <h4>2. Politika nedolaska i otkazivanja (No-Show Policy)</h4>
                 <p>Slanjem rezervacije Klijent pristaje na sljedeće stroge uvjete otkazivanja:</p>
-                <p><strong>Bezuvjetna naplata:</strong> U slučaju da Klijent ne dođe na dogovoreni termin ili otkaže termin, bez obzira na vremenski trenutak otkazivanja (bilo odmah nakon rezervacije, danima ranije ili na dan termina), Klijent je dužan platiti naknadu za rezervaciju termina.</p>
-                <p><strong>Iznos naknade:</strong> Naknada za otkazivanje ili nedolazak iznosi 50,00 EUR (slovima: pedeset eura).</p>
+                <p><strong>Bezuvjetna naplata:</strong> U slučaju da Klijent ne dođe na dogovoreni termin ili otkaže termin unutar 5 dana prije rezerviranog datuma, Klijent je dužan platiti naknadu.</p>
+                <p><strong>Iznos naknade:</strong> Naknada za otkazivanje ili nedolazak iznosi 50% ukupne cijene rezervirane usluge.</p>
 
                 <h4>3. Izdavanje računa i rok plaćanja</h4>
-                <p>U slučaju nastupa okolnosti iz točke 2. (otkazivanje ili nedolazak), Klijentu će na ostavljenu e-mail adresu biti poslan račun na iznos od 50,00 EUR.</p>
+                <p>U slučaju nastupa okolnosti iz točke 2. (otkazivanje ili nedolazak), Klijentu će na ostavljenu e-mail adresu biti poslan račun na iznos od 50% vrijednosti usluge.</p>
                 <p>Klijent je dužan podmiriti navedeni iznos u roku od 3 (tri) radna dana od primitka računa putem e-maila.</p>
 
                 <h4>4. Prisilna naplata i sudski postupak</h4>
                 <p>Ukoliko Klijent ne podmiri račun u navedenom roku, pokreće se postupak prisilne naplate sukladno važećim zakonima Republike Hrvatske.</p>
                 <p>Slučaj se prosljeđuje na rješavanje nadležnim tijelima radi pokretanja ovršnog postupka ili sudske tužbe.</p>
-                <p>U slučaju prisilne naplate, Klijent se obvezuje, pored osnovnog duga od 50,00 EUR, podmiriti i sve nastale troškove postupka (troškove odvjetnika, javnobilježničke pristojbe) te zakonske zatezne kamate.</p>
+                <p>U slučaju prisilne naplate, Klijent se obvezuje, pored osnovnog duga, podmiriti i sve nastale troškove postupka (troškove odvjetnika, javnobilježničke pristojbe) te zakonske zatezne kamate.</p>
 
                 <h4>5. Izjava o prihvaćanju</h4>
-                <p>Zaključenjem procesa rezervacije Klijent potvrđuje da je pročitao ove Uvjete, da ih razumije te da je suglasan s naplatom iznosa od 50,00 EUR u slučaju da rezervirani termin ne iskoristi, neovisno o razlogu ili vremenu otkazivanja.</p>
+                <p>Zaključenjem procesa rezervacije Klijent potvrđuje da je pročitao ove Uvjete, da ih razumije te da je suglasan s naplatom iznosa od 50% vrijednosti usluge u slučaju da rezervirani termin ne iskoristi ili ne otkaže najmanje 5 dana ranije.</p>
             </div>
         </div>
     </div>

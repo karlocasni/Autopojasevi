@@ -164,7 +164,7 @@ export function Step5Review({ bookingData, onNext, onBack }) {
         <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: var(--color-text-muted);">
             <input type="checkbox" id="terms-check" style="width: 18px; height: 18px; accent-color: var(--color-accent);">
             <span>
-                Slanjem potvrđuješ <a href="/uvjeti-poslovanja" target="_blank" style="color: var(--color-accent); text-decoration: underline;">uvjete usluge</a>.
+                Slanjem potvrđuješ <button type="button" id="terms-open-btn" style="background: none; border: none; padding: 0; color: var(--color-accent); text-decoration: underline; cursor: pointer; font-size: inherit; font-family: inherit;">uvjete usluge</button>.
             </span>
         </label>
       </div>
@@ -185,6 +185,62 @@ export function Step5Review({ bookingData, onNext, onBack }) {
       </div>
     </div>
   `;
+
+  // === MODAL LOGIC ===
+  const modalId = 'terms-modal';
+  let modal = document.getElementById(modalId);
+  const termsContentHTML = `
+    <div style="font-family: var(--font-body); color: var(--color-text); line-height: 1.6;">
+        <h3 style="color: var(--color-accent); margin-bottom: 1rem; text-align:center;">UVJETI POSLOVANJA</h3>
+        <p><strong>Autopojasevi.hr</strong></p>
+        <p>Korištenjem web stranice autopojasevi.hr i slanjem zahtjeva za rezervaciju termina, korisnik (u daljnjem tekstu: Klijent) u potpunosti prihvaća dolje navedene uvjete poslovanja, pravila o prikupljanju podataka i politiku otkazivanja.</p>
+
+        <h4 style="color:var(--color-text); margin-top:1.5rem; margin-bottom:0.5rem;">I. POLITIKA PRIVATNOSTI I ZAŠTITA PODATAKA</h4>
+        <p><strong>1. Kontakt i pitanja</strong><br>Poštujemo vašu privatnost. Za sva pitanja vezana uz obradu vaših podataka ili ove uvjete, možete nas kontaktirati na e-mail adresu: info@autopojasevi.hr.</p>
+        <p><strong>2. Prikupljanje podataka</strong><br>Prilikom rezervacije termina za usluge auto detailinga, prikupljamo sljedeće osobne podatke: ime i prezime, adresu e-pošte, broj telefona te podatke o vozilu.</p>
+        <p><strong>3. Svrha obrade</strong><br>Vaši podaci nužni su za: dogovaranje i realizaciju termina, izdavanje računa za usluge ili naknadu štete, te zakonske obveze.</p>
+
+        <h4 style="color:var(--color-text); margin-top:1.5rem; margin-bottom:0.5rem;">II. UVJETI REZERVACIJE, OTKAZIVANJA I NAPLATE (Obavezno pročitati)</h4>
+        <p><strong>1. Obvezujuća rezervacija</strong><br>Rezervacija termina putem sustava autopojasevi.hr smatra se sklapanjem obvezujućeg ugovora o pružanju usluge.</p>
+        <p><strong>2. Politika nedolaska i otkazivanja (No-Show Policy)</strong><br>Slanjem rezervacije Klijent pristaje na sljedeće stroge uvjete otkazivanja:</p>
+        <ul style="padding-left:20px; list-style:disc; margin-bottom:1rem;">
+            <li><strong>Bezuvjetna naplata:</strong> U slučaju da Klijent ne dođe na dogovoreni termin ili otkaže termin unutar 5 dana prije rezerviranog datuma, Klijent je dužan platiti naknadu.</li>
+            <li><strong>Iznos naknade:</strong> Naknada za otkazivanje ili nedolazak iznosi 50% ukupne cijene rezervirane usluge.</li>
+        </ul>
+        <p><strong>3. Izdavanje računa i rok plaćanja</strong><br>U slučaju otkazivanja ili nedolaska, Klijentu će biti poslan račun na iznos od 50% vrijednosti usluge koji je dužan podmiriti u roku od 3 radna dana.</p>
+        <p><strong>4. Prisilna naplata</strong><br>Ukoliko se račun ne podmiri, pokreće se postupak prisilne naplate, a Klijent snosi sve troškove postupka.</p>
+        <p><strong>5. Izjava o prihvaćanju</strong><br>Zaključenjem procesa rezervacije Klijent potvrđuje da je pročitao i razumio ove Uvjete.</p>
+    </div>
+  `;
+
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = modalId;
+    modal.className = 'glass modal-overlay';
+    // Reuse existing modal styles or inline logic
+    modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;';
+
+    const content = document.createElement('div');
+    content.className = 'glass modal-content';
+    content.style.cssText = 'background: #1a1a1a; border: 1px solid var(--glass-border); padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative; border-radius: 12px;';
+
+    content.innerHTML = `
+          <button class="close-modal-btn" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+          ${termsContentHTML}
+      `;
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+
+    // Close logic
+    const close = () => { modal.style.display = 'none'; };
+    modal.querySelector('.close-modal-btn').onclick = close;
+    modal.onclick = (e) => { if (e.target === modal) close(); };
+  }
+
+  container.querySelector('#terms-open-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    modal.style.display = 'flex'; // Use flex to center
+  });
 
   container.querySelector('#back-btn').addEventListener('click', onBack);
   const termsCheck = container.querySelector('#terms-check');
