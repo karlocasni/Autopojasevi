@@ -1,4 +1,4 @@
-export function ProgressBar({ currentStep, totalSteps = 6 }) {
+export function ProgressBar({ currentStep, totalSteps = 6, onStepClick }) {
   const container = document.createElement('div');
   container.className = 'progress-bar-container';
 
@@ -7,7 +7,7 @@ export function ProgressBar({ currentStep, totalSteps = 6 }) {
   container.innerHTML = `
     <div class="progress-steps">
       ${Array(totalSteps).fill(0).map((_, i) => `
-        <div class="progress-step ${i < currentStep ? 'completed' : ''} ${i === currentStep - 1 ? 'active' : ''}">
+        <div class="progress-step ${i < currentStep ? 'completed clickable' : ''} ${i === currentStep - 1 ? 'active' : ''}" data-step="${i + 1}">
           <div class="step-number">${i + 1}</div>
           <div class="step-label">${getStepLabel(i + 1)}</div>
         </div>
@@ -17,6 +17,20 @@ export function ProgressBar({ currentStep, totalSteps = 6 }) {
       <div class="progress-fill" style="width: ${percentage}%"></div>
     </div>
   `;
+
+  // Add click handlers
+  if (onStepClick) {
+    container.querySelectorAll('.progress-step.clickable').forEach(stepEl => {
+      stepEl.addEventListener('click', () => {
+        const step = parseInt(stepEl.dataset.step);
+        // Prevent clicking current step if already active (though styling handles visual cue)
+        // Only allow going back to completed steps
+        if (step < currentStep) {
+          onStepClick(step);
+        }
+      });
+    });
+  }
 
   return container;
 }
@@ -93,6 +107,19 @@ style.textContent = `
 
   .progress-step.active .step-label {
     color: var(--color-accent);
+  }
+
+  .progress-step.clickable {
+      cursor: pointer;
+  }
+  
+  .progress-step.clickable:hover .step-number {
+      border-color: var(--color-accent);
+      background: rgba(254, 0, 2, 0.5);
+  }
+
+  .progress-step.clickable:hover .step-label {
+      color: var(--color-accent);
   }
 
   .progress-bar {

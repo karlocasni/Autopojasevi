@@ -36,7 +36,14 @@ export function BookingFlow(data = {}) {
 
         // Add progress bar (except for success step)
         if (currentStep < 6) {
-            container.appendChild(ProgressBar({ currentStep, totalSteps: 6 }));
+            container.appendChild(ProgressBar({
+                currentStep,
+                totalSteps: 6,
+                onStepClick: (step) => {
+                    currentStep = step;
+                    renderStep();
+                }
+            }));
         }
 
         // Add step content card
