@@ -51,13 +51,19 @@ export function AdminPanel() {
               <span>Rezervacije</span>
             </button>
 
+            <button class="admin-nav-item ${currentView === 'coupons' ? 'active' : ''}" data-view="coupons">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>
+              </svg>
+              <span>Poklon Bonovi</span>
+            </button>
+
             <button class="admin-nav-item ${currentView === 'services' ? 'active' : ''}" data-view="services">
               <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 11H5c-1.1 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2zm0 9H5v-7h14v7zM7 15h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2zM19 2H5c-1.1 0-2 .9-2 2v5h18V4c0-1.1-.9-2-2-2zm-7 6c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
               </svg>
               <span>Usluge</span>
             </button>
-            
             <button class="admin-nav-item ${currentView === 'reviews' ? 'active' : ''}" data-view="reviews">
               <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/>
@@ -138,6 +144,8 @@ export function AdminPanel() {
         contentArea.appendChild(renderReviews());
       } else if (viewName === 'calendar') {
         contentArea.appendChild(renderCalendarView());
+      } else if (viewName === 'coupons') {
+        contentArea.appendChild(renderCoupons());
       } else if (viewName === 'settings') {
         contentArea.appendChild(renderSettings());
       } else {
@@ -760,6 +768,20 @@ export function AdminPanel() {
                                             <span style="font-size: 0.9rem;">EUR</span>
                                         </div>
                                     </div>
+                                    <div style="margin-top: 10px;">
+                                        <label style="font-size: 0.8rem; display: block; margin-bottom: 2px;">Cijena za 500 zvjezdica:</label>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <input type="number" class="input service-price-500-input" data-id="${s.id}" value="${s.price_500_stars || ''}" placeholder="595" style="width: 100px;">
+                                            <span style="font-size: 0.9rem;">EUR</span>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 10px;">
+                                        <label style="font-size: 0.8rem; display: block; margin-bottom: 2px;">Cijena za 750 zvjezdica:</label>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <input type="number" class="input service-price-750-input" data-id="${s.id}" value="${s.price_750_stars || ''}" placeholder="750" style="width: 100px;">
+                                            <span style="font-size: 0.9rem;">EUR</span>
+                                        </div>
+                                    </div>
                                     ` : ''}
                                 </div>
                             </div>
@@ -793,23 +815,30 @@ export function AdminPanel() {
           const id = e.target.dataset.id;
           const priceInput = servicesListDiv.querySelector(`.service-price-input[data-id="${id}"]`);
           const isFromCb = servicesListDiv.querySelector(`#is_from_${id}`);
-          const isRequestCb = servicesListDiv.querySelector(`#is_request_price_${id}`); // New
+          const isRequestCb = servicesListDiv.querySelector(`#is_request_price_${id}`);
           const priceToInput = servicesListDiv.querySelector(`.service-price-to-input[data-id="${id}"]`);
 
           const isRequestPrice = isRequestCb.checked;
           const newPrice = priceInput.value ? parseFloat(priceInput.value) : 0;
-          const isFrom = isFromCb.checked;
-          const newPriceTo = isFrom && priceToInput.value ? parseFloat(priceToInput.value) : null;
-
-          const priceDisassembledInput = servicesListDiv.querySelector(`.service-price-disassembled-input[data-id="${id}"]`);
-          const priceStarInput = servicesListDiv.querySelector(`.service-price-star-input[data-id="${id}"]`);
-
-          const newPriceDisassembled = priceDisassembledInput && priceDisassembledInput.value ? parseFloat(priceDisassembledInput.value) : null;
-          const newPriceStar = priceStarInput && priceStarInput.value ? parseFloat(priceStarInput.value) : null;
 
           if (!isRequestPrice && isNaN(newPrice)) {
             alert('Molimo unesite ispravnu osnovnu cijenu.');
             return;
+          }
+
+          let additionalConfig = {};
+          if (id === 'pojasevi') {
+            const disassembledInput = servicesListDiv.querySelector(`.service-price-disassembled-input[data-id="${id}"]`);
+            if (disassembledInput) additionalConfig.price_disassembled = parseFloat(disassembledInput.value) || 0;
+          }
+          if (id === 'zvjezdano-nebo') {
+            const starInput = servicesListDiv.querySelector(`.service-price-star-input[data-id="${id}"]`);
+            const star500Input = servicesListDiv.querySelector(`.service-price-500-input[data-id="${id}"]`);
+            const star750Input = servicesListDiv.querySelector(`.service-price-750-input[data-id="${id}"]`);
+
+            if (starInput) additionalConfig.price_per_star = parseFloat(starInput.value) || 0;
+            if (star500Input) additionalConfig.price_500_stars = parseFloat(star500Input.value) || 0;
+            if (star750Input) additionalConfig.price_750_stars = parseFloat(star750Input.value) || 0;
           }
 
           const btnOriginalText = e.target.textContent;
@@ -819,19 +848,18 @@ export function AdminPanel() {
           try {
             await state.updateServiceConfig(id, {
               price: newPrice,
-              is_from: isFrom,
-              price_to: newPriceTo,
+              is_from: isFromCb.checked,
+              price_to: priceToInput && priceToInput.value ? parseFloat(priceToInput.value) : null,
               is_request_price: isRequestPrice,
-              price_disassembled: newPriceDisassembled,
-              price_per_star: newPriceStar
+              ...additionalConfig
             });
-            alert('Usluga uspješno ažurirana!');
+            alert('Spremljeno!');
           } catch (err) {
             console.error(err);
-            alert(`Greška pri spremanju: ${err.message || JSON.stringify(err)}`);
+            alert('Greška pri spremanju.');
           } finally {
             e.target.disabled = false;
-            e.target.textContent = 'Spremi';
+            e.target.textContent = btnOriginalText;
           }
         });
       });
@@ -1148,6 +1176,129 @@ export function AdminPanel() {
     loadAdmins();
 
     container.appendChild(card);
+    return container;
+  }
+
+  function renderCoupons() {
+    const container = document.createElement('div');
+    container.innerHTML = `<h1 class="admin-title">Poklon Bonovi</h1>`;
+
+    const card = document.createElement('div');
+    card.className = 'table-container glass';
+    card.style.overflowX = 'auto';
+
+    card.innerHTML = `
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Iznos</th>
+                    <th>Kupac</th>
+                    <th>Primatelj</th>
+                    <th>Datum</th>
+                    <th>Status</th>
+                    <th>Detalji</th>
+                </tr>
+            </thead>
+            <tbody id="coupons-tbody">
+                <tr><td colspan="6" style="text-align: center; padding: 20px;">Učitavanje...</td></tr>
+            </tbody>
+        </table>
+    `;
+    container.appendChild(card);
+
+    state.getCoupons().then(coupons => {
+      const tbody = card.querySelector('#coupons-tbody');
+      if (!coupons || coupons.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Nema prodanih bonova.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = coupons.map(c => `
+            <tr>
+                <td style="font-family: monospace;">${c.id.slice(0, 8)}...</td>
+                <td style="color: var(--color-accent); font-weight: bold;">${c.amount} €</td>
+                <td>
+                    <div>${c.purchaser_name}</div>
+                    <div style="font-size: 0.8rem; color: #888;">${c.purchaser_email}</div>
+                </td>
+                <td>
+                    <div>${c.recipient_name}</div>
+                    <div style="font-size: 0.8rem; color: #888;">${c.recipient_email}</div>
+                </td>
+                <td>${new Date(c.created_at).toLocaleDateString()}</td>
+                <td><span class="status-badge status-confirmed">Potvrđeno</span></td>
+                <td>
+                    <button class="btn btn-sm btn-secondary view-coupon-btn" data-id="${c.id}">Otvori</button>
+                </td>
+            </tr>
+        `).join('');
+
+      // Modal Logic
+      const modalId = 'admin-coupon-modal';
+      let modal = document.getElementById(modalId);
+
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = modalId;
+        modal.className = 'glass admin-modal';
+        modal.style.display = 'none';
+        modal.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0;">Detalji Poklon Bona</h3>
+                    <button class="close-admin-modal" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+                </div>
+                <div id="${modalId}-content" style="font-family: monospace; white-space: pre-wrap; line-height: 1.5;"></div>
+            `;
+        document.body.appendChild(modal);
+
+        // Add Overlay
+        const overlay = document.createElement('div');
+        overlay.id = `${modalId}-overlay`;
+        overlay.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999;';
+        document.body.appendChild(overlay);
+
+        // Close handlers
+        const close = () => {
+          modal.style.display = 'none';
+          overlay.style.display = 'none';
+        };
+        modal.querySelector('.close-admin-modal').onclick = close;
+        overlay.onclick = close;
+      }
+
+      const modalContent = document.getElementById(`${modalId}-content`);
+      const overlay = document.getElementById(`${modalId}-overlay`);
+
+      card.querySelectorAll('.view-coupon-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const coupon = coupons.find(c => c.id === btn.dataset.id);
+          if (coupon) {
+            modalContent.innerHTML = `
+<strong style="color: var(--color-accent);">POKLON BON DETALJI</strong>
+ID:      ${coupon.id}
+Iznos:   <span style="font-size: 1.2em; font-weight: bold;">${coupon.amount} €</span>
+Datum:   ${new Date(coupon.created_at).toLocaleString()}
+Status:  ${coupon.status}
+
+<strong style="color: var(--color-accent);">KUPAC (Račun)</strong>
+Ime:     ${coupon.purchaser_name}
+Email:   ${coupon.purchaser_email}
+Telefon: ${coupon.purchaser_phone}
+
+<strong style="color: var(--color-accent);">PRIMATELJ</strong>
+Ime:     ${coupon.recipient_name}
+Email:   ${coupon.recipient_email}
+Poruka:  ${coupon.recipient_message || '-'}
+                   `;
+            modal.style.display = 'block';
+            modal.style.cssText = 'display:block; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:90%; max-width:500px; padding:30px; z-index:10000; background: #1a1a1a; border: 1px solid #333; border-radius: 8px;';
+            overlay.style.display = 'block';
+          }
+        });
+      });
+    });
+
     return container;
   }
 

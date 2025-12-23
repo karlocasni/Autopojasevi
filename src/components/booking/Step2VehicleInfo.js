@@ -320,7 +320,7 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
 
                         <div class="checkbox-wrapper">
                             <input type="checkbox" class="checkbox" id="vlastiti-pojasevi" name="vlastitiPojasevi" ${initialData.vlastitiPojasevi ? 'checked' : ''}>
-                            <label for="vlastiti-pojasevi">Nosim vlastite pojaseve / rastavljeni sustav</label>
+                            <label for="vlastiti-pojasevi">Rastavljeni sustav</label>
                         </div>
                     ` : ''}
 
@@ -341,6 +341,29 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
                             <label class="form-label">Broj šasije (VIN)</label>
                             <input type="text" class="input" name="vinBroj" placeholder="Unesite broj šasije" required value="${initialData.vinBroj || ''}">
                         </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Vrsta usluge kodiranja</label>
+                            <select class="input" name="codingOption" id="coding-option" required>
+                                <option value="">Odaberi...</option>
+                                <option value="stage_tune">Stage tune</option>
+                                <option value="pops_bangs">Pops and bangs</option>
+                                <option value="custom_mapa">Custom mapa</option>
+                                <option value="uklanjanje_torque_limitera">Uklanjanje torque limitera</option>
+                                <option value="uklanjanje_adblue">Uklanjanje AdBlue</option>
+                                <option value="uklanjanje_aktivnih_poklopaca">Uklanjanje aktivnih poklopaca maske</option>
+                                <option value="uklanjanje_dpf_opf">Uklanjanje DPFa/OPFa</option>
+                                <option value="uklanjanje_egr">Uklanjanje EGRa</option>
+                                <option value="uklanjanje_senzora_kisika">Uklanjanje senzora kisika</option>
+                                <option value="uklanjanje_kickdowna">Uklanjanje kickdowna</option>
+                                <option value="uklanjanje_maf">Uklanjanje MAF senzora</option>
+                                <option value="uklanjanje_ventila">Uklanjanje ventila (valve)</option>
+                                <option value="uklanjanje_limitera_brzine">Uklanjanje limitera brzine</option>
+                                <option value="uklanjanje_start_stop">Uklanjanje Start/Stop</option>
+                                <option value="ostalo">Ostalo</option>
+                            </select>
+                        </div>
+
                         <div class="form-group">
                             <label class="form-label">Slika verzije softvera</label>
                             <input type="file" class="input" name="softverSlika" accept="image/*" ${initialData.softverSlika ? '' : 'required'}>
@@ -349,8 +372,8 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
                     ` : ''}
 
                     <div class="form-group">
-                        <label class="form-label">Kratka napomena (opcionalno)</label>
-                        <textarea class="input" name="napomena" rows="4" placeholder="Dodatne informacije...">${initialData.napomena || ''}</textarea>
+                        <label class="form-label">Kratka napomena <span id="napomena-optional">(opcionalno)</span></label>
+                        <textarea class="input" name="napomena" id="napomena-input" rows="4" placeholder="Dodatne informacije...">${initialData.napomena || ''}</textarea>
                     </div>
 
                     <div class="step-actions">
@@ -510,6 +533,25 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
                 brojPojasevaInput.addEventListener('change', checkWarning);
                 // Initial check
                 checkWarning();
+            }
+
+            // Coding 'Ostalo' logic
+            const codingOption = detailsForm.querySelector('#coding-option');
+            const napomenaInput = detailsForm.querySelector('#napomena-input');
+            const napomenaOptional = detailsForm.querySelector('#napomena-optional');
+
+            if (codingOption && napomenaInput) {
+                const checkCoding = () => {
+                    if (codingOption.value === 'ostalo') {
+                        napomenaInput.required = true;
+                        if (napomenaOptional) napomenaOptional.textContent = '*';
+                    } else {
+                        napomenaInput.required = false;
+                        if (napomenaOptional) napomenaOptional.textContent = '(opcionalno)';
+                    }
+                };
+                codingOption.addEventListener('change', checkCoding);
+                checkCoding(); // Initial check
             }
 
             detailsForm.addEventListener('submit', (e) => {

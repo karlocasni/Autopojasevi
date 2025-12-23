@@ -14,11 +14,30 @@ export function Step5Review({ bookingData, onNext, onBack }) {
     const perBelt = bookingData.vlastitiPojasevi ? priceDisassembled : priceStandard;
     calculatedPrice = parseInt(bookingData.brojPojaseva) * perBelt;
   } else if (service.id === 'zvjezdano-nebo' && bookingData.brojZvjezdica) {
-    // Default 1.19 per star
-    const pricePerStar = service.price_per_star || 1.19;
-    calculatedPrice = parseInt(bookingData.brojZvjezdica) * pricePerStar;
+    const stars = parseInt(bookingData.brojZvjezdica);
+    if (stars === 500) {
+      calculatedPrice = service.price_500_stars || 595;
+    } else if (stars === 750) {
+      calculatedPrice = service.price_750_stars || 750;
+    } else {
+      // Default 1.19 per star
+      const pricePerStar = service.price_per_star || 1.19;
+      calculatedPrice = stars * pricePerStar;
+    }
   } else if (service.price) {
     calculatedPrice = service.price;
+  }
+
+  // Check for Cabrio/Targa
+  const modelName = (bookingData.model || '').toLowerCase();
+  const isCabrio = modelName.includes('cabrio') ||
+    modelName.includes('targa') ||
+    modelName.includes('convertible') ||
+    modelName.includes('spider') ||
+    modelName.includes('roadster');
+
+  if (isCabrio) {
+    calculatedPrice = null; // Forces "na upit"
   }
 
   // Save for Step 6
@@ -49,14 +68,12 @@ export function Step5Review({ bookingData, onNext, onBack }) {
           <span class="review-icon">${service.icon}</span>
           <span class="review-value">${service.name}</span>
         </div>
-        ${calculatedPrice !== null ? `
         <div class="review-item" style="margin-top: 10px;">
           <span class="review-label">Cijena:</span>
           <span class="review-value" style="font-size: 1.2rem; font-weight: bold; color: var(--color-accent);">
-            ${calculatedPrice.toFixed(2)} €
+            ${calculatedPrice !== null ? calculatedPrice.toFixed(2) + ' €' : 'Na upit'}
           </span>
         </div>
-        ` : ''}
       </div>
 
       <div class="review-section">

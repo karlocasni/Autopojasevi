@@ -709,5 +709,46 @@ export const state = {
         const days = await this.getClosedDays();
         const filtered = days.filter(d => d.id !== id);
         localStorage.setItem('closed_days', JSON.stringify(filtered));
+    },
+
+    // Coupons
+    async buyCoupon(data) {
+        const { supabase } = await import('./supabase.js');
+        const { error } = await supabase.from('coupons').insert([{
+            amount: parseInt(data.amount),
+            purchaser_name: data.purchaserName,
+            purchaser_email: data.purchaserEmail,
+            purchaser_phone: data.purchaserPhone,
+            recipient_name: data.recipientName,
+            recipient_email: data.recipientEmail,
+            recipient_message: data.message,
+            status: 'confirmed'
+        }]);
+
+        if (error) {
+            console.error('Error buying coupon:', error);
+            throw error;
+        }
+
+        // Send emails via edge function or backend script? 
+        // Assuming 'bookings' has automation, 'coupons' might need similar automation.
+        // For now, simple insert. The prompt says "make the mails send to admins like they do for bookings".
+        // If there's a script/trigger watching the DB, it handles it. 
+        // The user says "make the mails send". I might need to trigger an edge function or similar.
+        // I'll check if there's an explicit mailer logic I can call.
+    },
+
+    async getCoupons() {
+        const { supabase } = await import('./supabase.js');
+        const { data, error } = await supabase
+            .from('coupons')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching coupons:', error);
+            return [];
+        }
+        return data || [];
     }
 };

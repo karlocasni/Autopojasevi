@@ -5,6 +5,7 @@ import { HowItWorks } from '../components/home/HowItWorks.js';
 import { ServicesWidget } from '../components/home/ServicesWidget.js';
 import { CTABanner } from '../components/home/CTABanner.js';
 import { AboutSection } from '../components/home/AboutSection.js';
+import { CouponsSection } from '../components/home/CouponsSection.js';
 import { ReviewsSlider } from '../components/home/ReviewsSlider.js';
 import { FAQSection } from '../components/home/FAQSection.js';
 import { ContactSection } from '../components/home/ContactSection.js';
@@ -22,6 +23,7 @@ export function HomePage() {
     main.appendChild(HowItWorks());
     main.appendChild(ServicesWidget());
     main.appendChild(CTABanner());
+    main.appendChild(CouponsSection()); // Coupons before About
     main.appendChild(AboutSection());
     main.appendChild(ReviewsSlider());
     main.appendChild(FAQSection());
