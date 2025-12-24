@@ -509,8 +509,8 @@ export const state = {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const dayOfWeek = date.getDay();
 
-            // Weekend = unavailable
-            if (dayOfWeek === 0 || dayOfWeek === 6) {
+            // Sunday = unavailable
+            if (dayOfWeek === 0) {
                 availability[day] = { status: 'unavailable', count: 0 };
             } else {
                 const count = counts[dateStr] || 0;
