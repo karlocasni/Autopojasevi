@@ -2851,6 +2851,7 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: var(--spacing-xs);
+    min-height: 400px;
   }
 
   .calendar-day {
@@ -2978,25 +2979,27 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
 
   @media (max-width: 768px) {
     .calendar-container {
-        padding: var(--spacing-sm);
+        padding: 4px !important;
         max-width: 100%;
+        box-sizing: border-box;
     }
     
     .calendar-weekdays {
-        font-size: 0.65rem;
-        gap: 1px;
+        font-size: 0.7rem;
+        gap: 0;
         margin-bottom: var(--spacing-sm);
     }
     
     .calendar-days {
-        gap: 2px;
+        gap: 1px !important;
+        min-height: 250px;
     }
     
     .calendar-day {
-        font-size: 0.75rem;
-        border-width: 1px;
-        aspect-ratio: 1; /* Keep square */
-        height: auto;
+        padding: 0;
+        border-width: 1px !important;
+        font-size: clamp(0.7rem, 4vw, 0.9rem);
+        aspect-ratio: 1;
     }
     
     .calendar-legend {
@@ -3009,13 +3012,14 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
     }
     
     .time-slots-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: var(--spacing-sm);
     }
     
     .time-slot {
         font-size: 0.85rem;
-        padding: 6px 10px;
+        padding: 8px 4px;
+        text-align: center;
     }
     
     .time-slots-title {
