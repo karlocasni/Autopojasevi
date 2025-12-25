@@ -119,9 +119,8 @@ export function Step3Calendar({ onNext, onBack, initialData = {} }) {
       cutOff.setHours(cutOff.getHours() + 24);
 
       // Check if service requires full day (Zvjezdano nebo or Platinum Bundle)
-      const isZvjezdano = initialData.serviceId === 'zvjezdano-nebo';
-      const isPlatinum = initialData.serviceId === 'platinum-paket';
-      const requiresEmptyDay = isZvjezdano || isPlatinum;
+      // Check if service requires full day (No longer required)
+      const requiresEmptyDay = false;
 
       // Days
       for (let day = 1; day <= daysInMonth; day++) {

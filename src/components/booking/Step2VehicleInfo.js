@@ -346,21 +346,44 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
                             <label class="form-label">Vrsta usluge kodiranja</label>
                             <select class="input" name="codingOption" id="coding-option" required>
                                 <option value="">Odaberi...</option>
-                                <option value="stage_tune">Stage tune</option>
-                                <option value="pops_bangs">Pops and bangs</option>
-                                <option value="custom_mapa">Custom mapa</option>
-                                <option value="uklanjanje_torque_limitera">Uklanjanje torque limitera</option>
-                                <option value="uklanjanje_adblue">Uklanjanje AdBlue</option>
-                                <option value="uklanjanje_aktivnih_poklopaca">Uklanjanje aktivnih poklopaca maske</option>
-                                <option value="uklanjanje_dpf_opf">Uklanjanje DPFa/OPFa</option>
-                                <option value="uklanjanje_egr">Uklanjanje EGRa</option>
-                                <option value="uklanjanje_senzora_kisika">Uklanjanje senzora kisika</option>
-                                <option value="uklanjanje_kickdowna">Uklanjanje kickdowna</option>
-                                <option value="uklanjanje_maf">Uklanjanje MAF senzora</option>
-                                <option value="uklanjanje_ventila">Uklanjanje ventila (valve)</option>
-                                <option value="uklanjanje_limitera_brzine">Uklanjanje limitera brzine</option>
-                                <option value="uklanjanje_start_stop">Uklanjanje Start/Stop</option>
-                                <option value="ostalo">Ostalo</option>
+                                ${(() => {
+                    // Check if current service is a bundle
+                    const isBundle = globalState.bundles?.some(b => b.id === serviceId);
+
+                    // Full list of advanced tuning/removal options (Restricted for bundles)
+                    const advancedOptions = `
+                                        <option value="stage_tune">Stage tune</option>
+                                        <option value="pops_bangs">Pops and bangs</option>
+                                        <option value="custom_mapa">Custom mapa</option>
+                                        <option value="uklanjanje_torque_limitera">Uklanjanje torque limitera</option>
+                                        <option value="uklanjanje_adblue">Uklanjanje AdBlue</option>
+                                        <option value="uklanjanje_aktivnih_poklopaca">Uklanjanje aktivnih poklopaca maske</option>
+                                        <option value="uklanjanje_dpf_opf">Uklanjanje DPFa/OPFa</option>
+                                        <option value="uklanjanje_egr">Uklanjanje EGRa</option>
+                                        <option value="uklanjanje_senzora_kisika">Uklanjanje senzora kisika</option>
+                                        <option value="uklanjanje_kickdowna">Uklanjanje kickdowna</option>
+                                        <option value="uklanjanje_maf">Uklanjanje MAF senzora</option>
+                                        <option value="uklanjanje_ventila">Uklanjanje ventila (valve)</option>
+                                        <option value="uklanjanje_limitera_brzine">Uklanjanje limitera brzine</option>
+                                        <option value="uklanjanje_start_stop">Uklanjanje Start/Stop</option>
+                                    `;
+
+                    // Basic/Comfort options (Available for everyone)
+                    const basicOptions = `
+                                        <option value="video_u_voznji">Video u vožnji</option>
+                                        <option value="carplay_android_auto">Carplay/Android Auto</option>
+                                        <option value="azuriranje_navigacije">Ažuriranje navigacije</option>
+                                        <option value="needle_sweep">Needle sweep</option>
+                                        <option value="ostalo">Ostalo</option>
+                                    `;
+
+                    // If it's a bundle, return only basic options. If singular, return both.
+                    if (isBundle) {
+                        return basicOptions;
+                    } else {
+                        return advancedOptions + basicOptions;
+                    }
+                })()}
                             </select>
                         </div>
 
