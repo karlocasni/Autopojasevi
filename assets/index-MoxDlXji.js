@@ -2814,6 +2814,7 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
       </button>
     `}).join(""),g.classList.remove("hidden"),p.querySelectorAll(".time-slot").forEach(f=>{f.addEventListener("click",()=>{l=f.dataset.time,p.querySelectorAll(".time-slot").forEach(v=>v.classList.remove("selected")),f.classList.add("selected"),s.querySelector("#next-btn").disabled=!1})})};return s.querySelector("#prev-month").addEventListener("click",()=>{n--,n<0&&(n=11,i--),d()}),s.querySelector("#next-month").addEventListener("click",()=>{n++,n>11&&(n=0,i++),d()}),s.querySelector("#back-btn").addEventListener("click",e),s.querySelector("#next-btn").addEventListener("click",()=>{o&&l&&r({date:o,time:l})}),d(),s}const da=document.createElement("style");da.textContent=`
   .calendar-container {
+    width: 100%;
     max-width: 700px;
     margin: 0 auto;
     padding: var(--spacing-xl);
@@ -2863,6 +2864,10 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
     cursor: pointer;
     transition: all var(--transition-fast);
     font-family: var(--font-body);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .calendar-day.empty {
@@ -2979,40 +2984,35 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
 
   @media (max-width: 768px) {
     .calendar-container {
-        padding: 0 !important;
+        padding: 8px;
         width: 100%;
-        box-sizing: border-box;
-        overflow-x: hidden;
+    }
+    
+    .calendar-header {
+        margin-bottom: 8px;
+    }
+    
+    .calendar-month {
+        font-size: 1rem;
+    }
+    
+    .calendar-nav {
+        padding: 4px;
     }
     
     .calendar-weekdays {
-        font-size: 0.7rem;
-        gap: 0;
-        margin-bottom: var(--spacing-sm);
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
+        font-size: 0.65rem;
+        gap: 1px;
+        margin-bottom: 4px;
     }
     
     .calendar-days {
-        gap: 0 !important;
-        min-height: auto;
-        width: 100%;
-        box-sizing: border-box;
-        border: 1px solid var(--glass-border);
-        border-radius: 4px;
-        overflow: hidden;
+        gap: 1px;
     }
     
     .calendar-day {
-        padding: 0;
-        border: 1px solid rgba(255,255,255,0.05) !important;
-        font-size: clamp(0.7rem, 3.5vw, 0.85rem);
-        aspect-ratio: 1;
-        width: 100%;
-        height: auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        font-size: 0.7rem;
+        padding: 4px 2px;
     }
     
     .calendar-legend {
@@ -3020,26 +3020,29 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
         flex-wrap: wrap;
         justify-content: center;
         gap: 8px;
-        font-size: 0.7rem;
-        padding-top: var(--spacing-md);
+        font-size: 0.65rem;
+        padding-top: 12px;
+        margin-top: 8px;
+    }
+    
+    .legend-color {
+        width: 16px;
+        height: 16px;
     }
     
     .time-slots-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
     }
     
     .time-slot {
         font-size: 0.8rem;
-        padding: 8px 2px;
-        text-align: center;
-        width: 100%;
-        box-sizing: border-box;
+        padding: 8px 4px;
     }
     
     .time-slots-title {
-        font-size: 1.1rem;
-        margin-bottom: var(--spacing-md);
+        font-size: 1rem;
+        margin-bottom: 12px;
     }
   }
 `;document.head.appendChild(da);function no({onNext:r,onBack:e,initialData:t={}}){const s=document.createElement("div");s.className="booking-step step-customer-info",s.innerHTML=`
