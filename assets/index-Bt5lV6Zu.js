@@ -2979,47 +2979,62 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
 
   @media (max-width: 768px) {
     .calendar-container {
-        padding: 4px !important;
-        max-width: 100%;
+        padding: 0 !important;
+        width: 100%;
         box-sizing: border-box;
+        overflow-x: hidden;
     }
     
     .calendar-weekdays {
         font-size: 0.7rem;
         gap: 0;
         margin-bottom: var(--spacing-sm);
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
     }
     
     .calendar-days {
-        gap: 1px !important;
-        min-height: 250px;
+        gap: 0 !important;
+        min-height: auto;
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid var(--glass-border);
+        border-radius: 4px;
+        overflow: hidden;
     }
     
     .calendar-day {
         padding: 0;
-        border-width: 1px !important;
-        font-size: clamp(0.7rem, 4vw, 0.9rem);
+        border: 1px solid rgba(255,255,255,0.05) !important;
+        font-size: clamp(0.7rem, 3.5vw, 0.85rem);
         aspect-ratio: 1;
+        width: 100%;
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .calendar-legend {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
-        gap: var(--spacing-sm);
+        gap: 8px;
         font-size: 0.7rem;
         padding-top: var(--spacing-md);
     }
     
     .time-slots-grid {
         grid-template-columns: repeat(3, 1fr);
-        gap: var(--spacing-sm);
+        gap: 8px;
     }
     
     .time-slot {
-        font-size: 0.85rem;
-        padding: 8px 4px;
+        font-size: 0.8rem;
+        padding: 8px 2px;
         text-align: center;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .time-slots-title {
@@ -3531,7 +3546,7 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
 
   @media (max-width: 768px) {
     .booking-card {
-      padding: var(--spacing-lg);
+      padding: var(--spacing-sm);
     }
   }
 `;document.head.appendChild(ga);const Oe={async login(r,e){var t,s;try{const{data:a,error:n}=await X.auth.signInWithPassword({email:r,password:e});if(n)throw n;if(!(((s=(t=a.user)==null?void 0:t.user_metadata)==null?void 0:s.role)==="admin"))throw await this.logout(),new Error("Unauthorized: Admin access required");return{user:a.user,session:a.session,error:null}}catch(a){return console.error("Login error:",a),{user:null,session:null,error:a}}},async logout(){try{const{error:r}=await X.auth.signOut();if(r)throw r;return{error:null}}catch(r){return console.error("Logout error:",r),{error:r}}},async resetPassword(r){try{const{error:e}=await X.auth.resetPasswordForEmail(r,{redirectTo:`${window.location.origin}/admin/reset-password`});if(e)throw e;return{error:null}}catch(e){return console.error("Password reset error:",e),{error:e}}},async updatePassword(r){try{const{error:e}=await X.auth.updateUser({password:r});if(e)throw e;return{error:null}}catch(e){return console.error("Update password error:",e),{error:e}}},async getCurrentUser(){try{const{data:{user:r},error:e}=await X.auth.getUser();if(e)throw e;return{user:r,error:null}}catch(r){return console.error("Get user error:",r),{user:null,error:r}}},async isAuthenticated(){var r;try{const{data:{session:e}}=await X.auth.getSession();if(!e)return!1;const{user:t}=await this.getCurrentUser();return((r=t==null?void 0:t.user_metadata)==null?void 0:r.role)==="admin"}catch(e){return console.error("Auth check error:",e),!1}},async createAdmin(r,e){try{const{data:t,error:s}=await X.rpc("create_admin_user",{new_email:r,new_password:e});if(s)throw s;return{user:t,error:null}}catch(t){return console.error("Create admin error:",t),{user:null,error:t}}},async listAdmins(){try{const{data:r,error:e}=await X.rpc("get_admins");if(e)throw e;return{admins:r,error:null}}catch(r){return console.error("List admins error:",r),{admins:[],error:r}}},async deleteAdmin(r){try{const{error:e}=await X.rpc("delete_admin_user",{target_user_id:r});if(e)throw e;return{success:!0,error:null}}catch(e){return console.error("Delete admin error:",e),{success:!1,error:e}}},onAuthStateChange(r){return X.auth.onAuthStateChange(r)}};function co(){const r=document.createElement("div");r.className="page-admin";let e="dashboard";const t=()=>{r.innerHTML="",r.innerHTML=`
