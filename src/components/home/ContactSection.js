@@ -48,7 +48,7 @@ export function ContactSection() {
             </svg>
             <div class="contact-details">
               <h4>Radno vrijeme</h4>
-              <p>Ponedjeljak - Subota<br>09:00 - 17:00</p>
+              <p>Ponedjeljak - Nedjelja<br>09:00 - 17:00</p>
             </div>
           </div>
         </div>

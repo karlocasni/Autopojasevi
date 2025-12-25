@@ -30,7 +30,7 @@ export function Footer() {
           </p>
           <p class="footer-hours">
             <strong>Radno vrijeme:</strong><br>
-            Pon - Sub: 09:00 - 17:00
+            Pon - Ned: 09:00 - 17:00
           </p>
         </div>
         <p class="footer-copyright">

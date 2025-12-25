@@ -492,10 +492,10 @@ export const state = {
                 const date = r.appointment_date;
                 let weight = 1;
                 // Weighted capacity logic
-                if (r.service_id === 'platinum-paket' || r.service_id === 'zvjezdano-nebo') {
-                    weight = this.maxReservations || 4;
-                } else if (r.service_id === 'gold-paket' || r.service_id === 'silver-paket') {
+                if (r.service_id === 'platinum-paket' || r.service_id === 'gold-paket' || r.service_id === 'silver-paket') {
                     weight = 2;
+                } else {
+                    weight = 1;
                 }
                 counts[date] = (counts[date] || 0) + weight;
             });
@@ -509,10 +509,7 @@ export const state = {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const dayOfWeek = date.getDay();
 
-            // Sunday = unavailable
-            if (dayOfWeek === 0) {
-                availability[day] = { status: 'unavailable', count: 0 };
-            } else {
+            {
                 const count = counts[dateStr] || 0;
                 let status = 'available';
 
