@@ -3659,23 +3659,36 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
   `,O.getReservations().then(u=>{const g=new Date().toISOString().split("T")[0],p=u.filter(h=>h.appointment_date===g).length;c.querySelector("#today-count").textContent=p,c.querySelector("#total-count").textContent=u.length}).catch(u=>{console.error("Error loading dashboard data:",u),c.querySelector("#today-count").textContent="0",c.querySelector("#total-count").textContent="0"}),c.querySelector("#reviews-count").textContent=O.reviews.length,c}function a(){const c=document.createElement("div"),u=new Date;let g=u.getMonth(),p=u.getFullYear();c.innerHTML=`
     <style>
       @media (max-width: 768px) {
+        .admin-calendar-card {
+            padding: var(--spacing-sm) !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
         #calendar-days {
-          min-height: 250px !important; /* Smaller min-height for mobile */
+          min-height: 250px !important;
           gap: 2px !important;
         }
-        .calendar-day span:first-child {
-          font-size: 0.9rem !important;
+        .calendar-day {
+            padding: 1px !important;
         }
-        .calendar-day span:last-child { /* The count span */
+        .calendar-day span:first-child {
+          font-size: 0.85rem !important;
+        }
+        .calendar-day span:last-child {
           font-size: 0.5rem !important;
+          margin-top: 2px !important;
         }
         .calendar-weekdays {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            margin-bottom: var(--spacing-sm) !important;
+        }
+        .calendar-weekdays div {
+            padding: 0 2px;
         }
       }
     </style>
     <h1 class="admin-title">Kalendar Rezervacija</h1>
-      <div class="glass" style="padding: var(--spacing-xl); max-width: 700px; margin: 0 auto;">
+      <div class="glass admin-calendar-card" style="padding: var(--spacing-xl); max-width: 700px; margin: 0 auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
           <button class="btn btn-secondary" id="prev-month">&lt;</button>
           <h2 id="calendar-month" style="margin: 0; text-transform: uppercase;"></h2>
