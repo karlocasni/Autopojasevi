@@ -3010,18 +3010,20 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
     
     .calendar-days {
         gap: 0 !important;
-        width: 100%;
-        max-width: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
     }
     
     .calendar-day {
         font-size: 0.6rem !important;
-        padding: 1px !important;
-        aspect-ratio: 1;
-        line-height: 1;
+        padding: 0 !important;
+        aspect-ratio: 1 !important;
+        line-height: 1 !important;
         border-width: 0.5px !important;
-        max-width: 14vw;
-        max-height: 14vw;
+        max-width: 12vw !important;
+        max-height: 12vw !important;
+        width: auto !important;
+        height: auto !important;
     }
     
     .calendar-legend {
