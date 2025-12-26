@@ -245,8 +245,39 @@ export function AdminPanel() {
     let currentYear = today.getFullYear();
 
     container.innerHTML = `
+    <style>
+      @media (max-width: 768px) {
+        .admin-calendar-card {
+            padding: 4px !important; /* Minimal padding */
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        #calendar-days {
+          min-height: 250px !important;
+          gap: 1px !important; /* Tighter gap */
+        }
+        .calendar-day {
+            padding: 0 !important;
+            border-width: 1px !important;
+        }
+        .calendar-day span:first-child {
+          font-size: clamp(0.7rem, 4vw, 0.9rem) !important; /* Responsive font */
+        }
+        .calendar-day span:last-child {
+          font-size: clamp(0.4rem, 2.5vw, 0.5rem) !important; /* Responsive font */
+          margin-top: 1px !important;
+        }
+        .calendar-weekdays {
+            font-size: 0.7rem;
+            margin-bottom: var(--spacing-sm) !important;
+        }
+        .calendar-weekdays div {
+            padding: 0;
+        }
+      }
+    </style>
     <h1 class="admin-title">Kalendar Rezervacija</h1>
-      <div class="glass" style="padding: var(--spacing-xl); max-width: 700px; margin: 0 auto;">
+      <div class="glass admin-calendar-card" style="padding: var(--spacing-xl); max-width: 700px; margin: 0 auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
           <button class="btn btn-secondary" id="prev-month">&lt;</button>
           <h2 id="calendar-month" style="margin: 0; text-transform: uppercase;"></h2>
@@ -257,7 +288,7 @@ export function AdminPanel() {
           <div>Pon</div><div>Uto</div><div>Sri</div><div>Čet</div><div>Pet</div><div>Sub</div><div>Ned</div>
         </div>
         
-        <div id="calendar-days" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--spacing-xs);"></div>
+        <div id="calendar-days" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--spacing-xs); min-height: 400px;"></div>
       </div>
 
       <!--Day Details Modal-->
@@ -423,6 +454,7 @@ export function AdminPanel() {
             if (confirm('Otvoriti ovaj dan?')) {
               await state.removeClosedDay(btn.dataset.id);
               renderClosedDays();
+              render(); // Refresh the main calendar
             }
           });
         });
@@ -439,6 +471,7 @@ export function AdminPanel() {
         await state.addClosedDay(date);
         dateInput.value = '';
         renderClosedDays();
+        render(); // Refresh the main calendar
       } catch (err) {
         alert(err.message);
       }

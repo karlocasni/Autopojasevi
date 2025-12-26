@@ -516,8 +516,6 @@ export const state = {
                 const closedDays = await this.getClosedDays();
                 if (closedDays.some(d => d.date === dateStr)) {
                     status = 'unavailable';
-                } else if (count >= state.maxReservations) {
-                    status = 'unavailable';
                 } else if (count >= (state.maxReservations - 1)) {
                     status = 'almost-full';
                 }
@@ -571,9 +569,9 @@ export const state = {
             .eq('appointment_date', date)
             .neq('status', 'cancelled');
 
-        // Default max is 4 if not configured
+        // Default max is 4 if not configured, but user requested to remove limit on orders per day
         const maxReservations = this.maxReservations || 4;
-        const isDayFull = error ? false : (count >= maxReservations);
+        const isDayFull = false;
 
         // Standard fixed slots 09:00 - 14:00
         return [

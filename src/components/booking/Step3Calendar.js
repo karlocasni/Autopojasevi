@@ -245,6 +245,7 @@ export function Step3Calendar({ onNext, onBack, initialData = {} }) {
 const style = document.createElement('style');
 style.textContent = `
   .calendar-container {
+    width: 100%;
     max-width: 700px;
     margin: 0 auto;
     padding: var(--spacing-xl);
@@ -293,6 +294,16 @@ style.textContent = `
     cursor: pointer;
     transition: all var(--transition-fast);
     font-family: var(--font-body);
+    padding: 0px;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
   }
 
   .calendar-day.empty {
@@ -409,49 +420,120 @@ style.textContent = `
 
   @media (max-width: 768px) {
     .calendar-container {
-        padding: var(--spacing-sm);
-        max-width: 100%;
+        padding: 4px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+    
+    .calendar-header {
+        margin-bottom: 4px;
+    }
+    
+    .calendar-month {
+        font-size: 0.9rem;
+    }
+    
+    .calendar-nav {
+        padding: 2px 4px;
     }
     
     .calendar-weekdays {
-        font-size: 0.65rem;
-        gap: 1px;
-        margin-bottom: var(--spacing-sm);
+        font-size: 0.6rem;
+        gap: 0;
+        margin-bottom: 2px;
     }
     
     .calendar-days {
-        gap: 2px;
+        gap: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        grid-template-columns: repeat(7, 1fr) !important;
+        grid-auto-rows: 1fr !important;
+        justify-items: stretch !important;
+        align-items: stretch !important;
     }
     
-    .calendar-day {
-        font-size: 0.75rem;
-        border-width: 1px;
-        aspect-ratio: 1; /* Keep square */
-        height: auto;
+    .calendar-days .calendar-day,
+    .calendar-days button.calendar-day,
+    .calendar-days button[class*="calendar-day"],
+    button.calendar-day.available,
+    button.calendar-day.almost-full,
+    button.calendar-day.unavailable,
+    .step-calendar .calendar-day {
+        font-size: 0.5rem !important;
+        padding: 0px !important;
+        padding-top: 0px !important;
+        padding-right: 0px !important;
+        padding-bottom: 0px !important;
+        padding-left: 0px !important;
+        padding-inline: 0px !important;
+        padding-block: 0px !important;
+        margin: 0 !important;
+        aspect-ratio: 1 !important;
+        line-height: 1 !important;
+        border-width: 0.5px !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        box-sizing: border-box !important;
     }
     
     .calendar-legend {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
-        gap: var(--spacing-sm);
-        font-size: 0.7rem;
-        padding-top: var(--spacing-md);
+        gap: 6px;
+        font-size: 0.6rem;
+        padding-top: 8px;
+        margin-top: 6px;
+    }
+    
+    .legend-color {
+        width: 14px;
+        height: 14px;
     }
     
     .time-slots-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: var(--spacing-sm);
+        gap: 6px;
     }
     
     .time-slot {
-        font-size: 0.85rem;
-        padding: 6px 10px;
+        font-size: 0.75rem;
+        padding: 6px 4px;
     }
     
     .time-slots-title {
-        font-size: 1.1rem;
-        margin-bottom: var(--spacing-md);
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+    }
+  }
+
+  /* Ultra-specific override for mobile calendar day padding */
+  @media (max-width: 768px) {
+    button.calendar-day,
+    .calendar-days button,
+    .booking-step.step-calendar .calendar-container .calendar-days button.calendar-day,
+    .step-calendar .calendar-days button.calendar-day.available,
+    .step-calendar .calendar-days button.calendar-day.past,
+    .step-calendar .calendar-days button.calendar-day.almost-full,
+    .step-calendar .calendar-days button.calendar-day.unavailable,
+    .calendar-container .calendar-days button {
+        padding: 0px !important;
+        padding-top: 0px !important;
+        padding-right: 0px !important;
+        padding-bottom: 0px !important;
+        padding-left: 0px !important;
+        padding-inline-start: 0px !important;
+        padding-inline-end: 0px !important;
+        padding-block-start: 0px !important;
+        padding-block-end: 0px !important;
+        font-size: 0.5rem !important;
     }
   }
 `;

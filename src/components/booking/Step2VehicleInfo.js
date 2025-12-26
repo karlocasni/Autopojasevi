@@ -329,7 +329,7 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
                             <label class="form-label">Broj zvjezdica</label>
                             <select class="input" name="brojZvjezdica" required>
                                 <option value="">Odaberi...</option>
-                                ${[500, 600, 700, 750, 800, 900, 1000].map(n => `
+                                ${[500, 750, 1000].map(n => `
                                     <option value="${n}" ${initialData.brojZvjezdica == n ? 'selected' : ''}>${n}</option>
                                 `).join('')}
                             </select>

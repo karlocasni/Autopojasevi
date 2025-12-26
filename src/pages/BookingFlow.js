@@ -220,7 +220,7 @@ style.textContent = `
 
   @media (max-width: 768px) {
     .booking-card {
-      padding: var(--spacing-lg);
+      padding: var(--spacing-sm);
     }
   }
 `;
