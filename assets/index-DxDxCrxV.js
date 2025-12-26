@@ -2984,65 +2984,74 @@ ${v}`}class q extends Error{constructor({message:e,code:t,cause:s,name:a}){var n
 
   @media (max-width: 768px) {
     .calendar-container {
-        padding: 8px;
-        width: 100%;
+        padding: 4px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
     
     .calendar-header {
-        margin-bottom: 8px;
-    }
-    
-    .calendar-month {
-        font-size: 1rem;
-    }
-    
-    .calendar-nav {
-        padding: 4px;
-    }
-    
-    .calendar-weekdays {
-        font-size: 0.65rem;
-        gap: 1px;
         margin-bottom: 4px;
     }
     
+    .calendar-month {
+        font-size: 0.9rem;
+    }
+    
+    .calendar-nav {
+        padding: 2px 4px;
+    }
+    
+    .calendar-weekdays {
+        font-size: 0.6rem;
+        gap: 0;
+        margin-bottom: 2px;
+    }
+    
     .calendar-days {
-        gap: 1px;
+        gap: 0 !important;
+        width: 100%;
+        max-width: 100%;
     }
     
     .calendar-day {
-        font-size: 0.7rem;
-        padding: 4px 2px;
+        font-size: 0.6rem !important;
+        padding: 1px !important;
+        aspect-ratio: 1;
+        line-height: 1;
+        border-width: 0.5px !important;
+        max-width: 14vw;
+        max-height: 14vw;
     }
     
     .calendar-legend {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 8px;
-        font-size: 0.65rem;
-        padding-top: 12px;
-        margin-top: 8px;
+        gap: 6px;
+        font-size: 0.6rem;
+        padding-top: 8px;
+        margin-top: 6px;
     }
     
     .legend-color {
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
     }
     
     .time-slots-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        gap: 6px;
     }
     
     .time-slot {
-        font-size: 0.8rem;
-        padding: 8px 4px;
+        font-size: 0.75rem;
+        padding: 6px 4px;
     }
     
     .time-slots-title {
-        font-size: 1rem;
-        margin-bottom: 12px;
+        font-size: 0.95rem;
+        margin-bottom: 10px;
     }
   }
 `;document.head.appendChild(da);function no({onNext:r,onBack:e,initialData:t={}}){const s=document.createElement("div");s.className="booking-step step-customer-info",s.innerHTML=`
