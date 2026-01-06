@@ -35,14 +35,14 @@ export function ServicesWidget() {
         <span class="heading-bottom">Što Nudimo</span>
       </h2>
       
-      <div class="grid services-grid">
-        ${itemsHTML}
+      <div class="text-center mb-xl">
+        <button class="btn btn-cta" id="toggle-view-btn">
+            ${showBundles ? 'KLIKNI ZA POJEDINAČNE USLUGE' : 'KLIKNI ZA PAKETE'}
+        </button>
       </div>
 
-      <div class="text-center mt-xl">
-        <button class="btn btn-secondary" id="toggle-view-btn">
-            ${showBundles ? 'Pojedinačne usluge' : 'Pogledaj pakete'}
-        </button>
+      <div class="grid services-grid">
+        ${itemsHTML}
       </div>
     </div>
   `;

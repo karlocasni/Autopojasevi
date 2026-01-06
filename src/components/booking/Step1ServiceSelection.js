@@ -32,15 +32,17 @@ export function Step1ServiceSelection({ onNext, selectedServiceId }) {
         <span class="heading-bottom">${titleText}</span>
         </h2>
         
+        <div style="text-align: center; margin-bottom: var(--spacing-xl);">
+            <button type="button" class="btn btn-cta" id="toggle-view-btn">
+                ${showBundles ? 'KLIKNI ZA POJEDINAČNE USLUGE' : 'KLIKNI ZA PAKETE'}
+            </button>
+        </div>
+        
         <div class="service-selection-grid">
         ${itemsHTML}
         </div>
         
         <div class="step-actions" style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
-            <button type="button" class="btn btn-secondary" id="toggle-view-btn">
-                ${showBundles ? 'Pojedinačne usluge' : 'Pogledaj pakete'}
-            </button>
-            
             <button class="btn btn-cta" id="next-btn" ${!selected ? 'disabled' : ''}>
                 Nastavi
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
