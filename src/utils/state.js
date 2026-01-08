@@ -165,7 +165,7 @@ export const state = {
         },
         {
             question: 'Koliko zvjezdica mogu odabrati za zvjezdano nebo?',
-            answer: 'Možete odabrati između 100 i 1000 zvjezdica, ovisno o vašim preferencijama i veličini stropa vozila.'
+            answer: 'Možete odabrati između 500, 750 i 1000 zvjezdica, ovisno o vašim preferencijama.'
         },
         {
             question: 'Je li zatamnjivanje stakala zakonito?',

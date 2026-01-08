@@ -184,6 +184,15 @@
   border: 1px solid var(--glass-border);
 }
 
+.btn-white {
+  background: #eeeeee;
+  color: #111111;
+  font-weight: 900;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1.1rem;
+  box-shadow: var(--shadow-md);
+}
+
 @media (hover: hover) {
   .btn-primary:hover {
     background: rgba(255, 255, 255, 0.1);
@@ -199,6 +208,12 @@
   .btn-secondary:hover {
     background: var(--glass-bg);
     border-color: var(--color-text);
+  }
+
+  .btn-white:hover {
+    background: #ffffff;
+    box-shadow: 0 0 20px rgba(238, 238, 238, 0.3);
+    transform: translateY(-2px);
   }
 }
 

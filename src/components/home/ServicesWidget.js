@@ -36,7 +36,7 @@ export function ServicesWidget() {
       </h2>
       
       <div class="text-center mb-xl">
-        <button class="btn btn-cta" id="toggle-view-btn">
+        <button class="btn btn-white" id="toggle-view-btn">
             ${showBundles ? 'KLIKNI ZA POJEDINAČNE USLUGE' : 'KLIKNI ZA PAKETE'}
         </button>
       </div>

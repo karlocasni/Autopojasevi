@@ -33,7 +33,7 @@ export function Step1ServiceSelection({ onNext, selectedServiceId }) {
         </h2>
         
         <div style="text-align: center; margin-bottom: var(--spacing-xl);">
-            <button type="button" class="btn btn-cta" id="toggle-view-btn">
+            <button type="button" class="btn btn-white" id="toggle-view-btn">
                 ${showBundles ? 'KLIKNI ZA POJEDINAČNE USLUGE' : 'KLIKNI ZA PAKETE'}
             </button>
         </div>

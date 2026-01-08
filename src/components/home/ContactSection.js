@@ -28,7 +28,7 @@ export function ContactSection() {
             </svg>
             <div class="contact-details">
               <h4>Telefon</h4>
-              <a href="tel:+385123456789">+385 12 345 6789</a>
+              <a href="tel:+385995323122">+385 99 532 3122</a>
             </div>
           </div>
 
