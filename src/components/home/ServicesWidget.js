@@ -11,22 +11,26 @@ export function ServicesWidget() {
     const items = showBundles ? state.bundles : state.services;
     const titleTop = showBundles ? 'PAKETI' : 'USLUGE';
 
-    const itemsHTML = items.map(item => `
-    <div class="card service-card" data-id="${item.id}" data-type="${showBundles ? 'bundle' : 'service'}">
-      <div class="service-icon">${item.icon}</div>
-      <h3 class="service-title">${item.name}</h3>
-      <p class="service-description">${item.description}</p>
-      ${item.is_request_price ? '<p class="service-price" style="font-weight: bold; color: var(--color-accent); margin-bottom: 10px; font-size: 1.1rem;">Cijena na upit</p>' : (item.price ? `<p class="service-price" style="font-weight: bold; color: var(--color-accent); margin-bottom: 10px; font-size: 1.1rem;">
-          ${item.is_from ? '<span style="font-size: 0.9em; opacity: 0.8; font-weight: normal;">od</span> ' : ''}${item.price.toFixed(2)} EUR
-      </p>` : '')}
-      <button class="btn btn-primary service-btn">
-        Rezerviraj
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
-      </button>
-    </div>
-  `).join('');
+    const itemsHTML = items.map(item => {
+      const isBestDeal = item.id === 'best-deal';
+      return `
+      <div class="card service-card ${isBestDeal ? 'best-deal-card' : ''}" data-id="${item.id}" data-type="${showBundles ? 'bundle' : 'service'}">
+        ${isBestDeal ? '<div class="best-deal-badge">NAJBOLJA PONUDA</div>' : ''}
+        <div class="service-icon">${item.icon}</div>
+        <h3 class="service-title">${item.name}</h3>
+        <p class="service-description">${item.description}</p>
+        ${item.is_request_price ? '<p class="service-price" style="font-weight: bold; color: var(--color-accent); margin-bottom: 10px; font-size: 1.1rem;">Cijena na upit</p>' : (item.price ? `<div class="service-price" style="font-weight: bold; color: var(--color-accent); margin-bottom: 10px; font-size: 1.1rem; display: flex; flex-direction: column; align-items: center;">
+            ${(item.original_price && item.original_price > item.price) ? `<span style="text-decoration: line-through; color: var(--text-secondary); font-size: 0.8em;">${item.original_price} EUR</span>` : ''}
+            <span>${item.is_from ? '<span style="font-size: 0.9em; opacity: 0.8; font-weight: normal;">od</span> ' : ''}${item.price.toFixed(2)} EUR</span>
+        </div>` : '')}
+        <button class="btn btn-primary service-btn">
+          Rezerviraj
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+  `}).join('');
 
     section.innerHTML = `
     <div class="container">
@@ -86,12 +90,14 @@ style.textContent = `
   }
 
   .services-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: var(--spacing-xl);
   }
 
   .service-card {
+    width: calc(33.333% - var(--spacing-xl));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -158,14 +164,14 @@ style.textContent = `
   }
 
   @media (max-width: 1024px) {
-    .services-grid {
-      grid-template-columns: repeat(2, 1fr);
+    .service-card {
+      width: calc(50% - var(--spacing-xl));
     }
   }
 
   @media (max-width: 640px) {
-    .services-grid {
-      grid-template-columns: 1fr;
+    .service-card {
+      width: 100%;
     }
     
     .service-card {
@@ -186,6 +192,28 @@ style.textContent = `
         font-size: 1.1rem;
         min-height: auto;
     }
+  }
+
+  .best-deal-card {
+      border: 1px solid #eab308 !important; /* Yellow border */
+      box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);
+      position: relative;
+  }
+  
+  .best-deal-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #eab308;
+      color: black;
+      font-weight: bold;
+      font-size: 0.75rem;
+      padding: 4px 12px;
+      border-radius: 12px;
+      white-space: nowrap;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 10;
   }
 `;
 document.head.appendChild(style);

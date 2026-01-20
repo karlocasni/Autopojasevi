@@ -16,15 +16,21 @@ export function Step1ServiceSelection({ onNext, selectedServiceId }) {
     const items = showBundles ? state.bundles : state.services;
     const titleText = showBundles ? 'ODABERI PAKET' : 'ODABERI USLUGU';
 
-    const itemsHTML = items.map(item => `
-        <div class="service-selection-card card ${item.id === selected ? 'selected' : ''}" data-id="${item.id}">
+    const itemsHTML = items.map(item => {
+      const hasDiscount = item.original_price && item.price && item.original_price > item.price;
+      const isBestDeal = item.id === 'best-deal';
+
+      return `
+        <div class="service-selection-card card ${item.id === selected ? 'selected' : ''} ${isBestDeal ? 'best-deal-card' : ''}" data-id="${item.id}">
+        ${isBestDeal ? '<div class="best-deal-badge">NAJBOLJA PONUDA</div>' : ''}
         <div class="service-icon-large">${item.icon}</div>
         <h3 class="service-name">${item.name}</h3>
-        ${item.is_request_price ? '<div style="font-weight: bold; color: var(--color-accent); margin-top: 5px;">Cijena na upit</div>' : (item.price ? `<div style="font-weight: bold; color: var(--color-accent); margin-top: 5px;">
-             ${item.is_from ? '<span style="font-size: 0.9em; opacity: 0.8; font-weight: normal;">od</span> ' : ''}${item.price.toFixed(2)} ${item.is_from && item.price_to ? `<span style="font-size: 0.9em; opacity: 0.8; font-weight: normal;">do</span> ${item.price_to.toFixed(2)}` : ''} EUR
+        ${item.is_request_price ? '<div style="font-weight: bold; color: var(--color-accent); margin-top: 5px;">Cijena na upit</div>' : (item.price ? `<div style="font-weight: bold; color: var(--color-accent); margin-top: 5px; display: flex; flex-direction: column; align-items: center;">
+             ${hasDiscount ? `<span style="text-decoration: line-through; color: var(--text-secondary); font-size: 0.9em;">${item.original_price} EUR</span>` : ''}
+             <span>${item.is_from ? '<span style="font-size: 0.9em; opacity: 0.8; font-weight: normal;">od</span> ' : ''}${item.price.toFixed(2)} ${item.is_from && item.price_to ? `<span style="font-size: 0.9em; opacity: 0.8; font-weight: normal;">do</span> ${item.price_to.toFixed(2)}` : ''} EUR</span>
         </div>` : '')}
         </div>
-    `).join('');
+    `}).join('');
 
     container.innerHTML = `
         <h2 class="step-title">
@@ -107,20 +113,25 @@ style.textContent = `
   }
 
   .service-selection-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: var(--spacing-lg);
+  }
+  
+  .service-selection-card {
+      width: calc(33.333% - var(--spacing-lg));
   }
 
   @media (max-width: 1024px) {
-    .service-selection-grid {
-      grid-template-columns: repeat(2, 1fr);
+    .service-selection-card {
+      width: calc(50% - var(--spacing-lg));
     }
   }
 
   @media (max-width: 640px) {
-    .service-selection-grid {
-      grid-template-columns: 1fr;
+    .service-selection-card {
+      width: 100%;
     }
   }
 
@@ -143,6 +154,27 @@ style.textContent = `
     border-color: var(--color-accent);
     box-shadow: var(--shadow-glow-red);
     background: rgba(254, 0, 2, 0.05);
+  }
+  
+  .best-deal-card {
+      border: 1px solid #eab308 !important; /* Yellow border */
+      box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);
+      position: relative;
+  }
+  
+  .best-deal-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #eab308;
+      color: black;
+      font-weight: bold;
+      font-size: 0.75rem;
+      padding: 4px 12px;
+      border-radius: 12px;
+      white-space: nowrap;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
 
   .service-icon-large {

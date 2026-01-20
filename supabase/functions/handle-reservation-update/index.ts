@@ -7,53 +7,53 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL");
 
 const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
-    if (req.method === "OPTIONS") {
-        return new Response("ok", { headers: corsHeaders });
-    }
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
 
-    try {
-        const payload = await req.json();
-        console.log("Webhook payload:", JSON.stringify(payload));
+  try {
+    const payload = await req.json();
+    console.log("Webhook payload:", JSON.stringify(payload));
 
-        const { record, old_record, type } = payload;
+    const { record, old_record, type } = payload;
 
-        // HANDLE NEW RESERVATION (INSERT)
-        if (type === "INSERT") {
-            const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+    // HANDLE NEW RESERVATION (INSERT)
+    if (type === "INSERT") {
+      const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
 
-            // IDEMPOTENCY CHECK
-            const { data: currentRecord } = await supabase
-                .from("bookings")
-                .select("sms_tag")
-                .eq("id", record.id)
-                .single();
+      // IDEMPOTENCY CHECK
+      const { data: currentRecord } = await supabase
+        .from("bookings")
+        .select("sms_tag")
+        .eq("id", record.id)
+        .single();
 
-            if (currentRecord?.sms_tag === "ADMIN_NOTIFIED") {
-                console.log("Admin notification already sent. Skipping.");
-                return new Response(JSON.stringify({ message: "Already processed" }), {
-                    headers: { ...corsHeaders, "Content-Type": "application/json" },
-                });
-            }
+      if (currentRecord?.sms_tag === "ADMIN_NOTIFIED") {
+        console.log("Admin notification already sent. Skipping.");
+        return new Response(JSON.stringify({ message: "Already processed" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
-            console.log(`New booking created: ${record.id}. Sending admin notification...`);
+      console.log(`New booking created: ${record.id}. Sending admin notification...`);
 
-            // Use onboarding@resend.dev to ensure delivery if domain not verified
-            await fetch("https://api.resend.com/emails", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${RESEND_API_KEY}`,
-                },
-                body: JSON.stringify({
-                    from: "Autopojasevi System <info@autopojasevi.hr>",
-                    to: ["info@autopojasevi.hr"],
-                    subject: "Nova Rezervacija - Autopojasevi",
-                    html: `
+      // Use onboarding@resend.dev to ensure delivery if domain not verified
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: "Autopojasevi System <info@autopojasevi.hr>",
+          to: ["info@autopojasevi.hr"],
+          subject: "Nova Rezervacija - Autopojasevi",
+          html: `
                         <div style="font-family: sans-serif; color: #333; max-width: 600px;">
                         <h2 style="color: #0098FF;">Nova Rezervacija Zaprimljena</h2>
                         <p><strong>Klijent:</strong> ${record.ime} ${record.prezime}</p>
@@ -71,61 +71,61 @@ serve(async (req) => {
                         <p style="font-size: 0.8em; color: #888;">Ovaj email je automatski generiran.</p>
                         </div>
                     `,
-                }),
-            });
+        }),
+      });
 
-            // Mark as notified to prevent duplicates
-            await supabase
-                .from("bookings")
-                .update({ sms_tag: "ADMIN_NOTIFIED" })
-                .eq("id", record.id);
+      // Mark as notified to prevent duplicates
+      await supabase
+        .from("bookings")
+        .update({ sms_tag: "ADMIN_NOTIFIED" })
+        .eq("id", record.id);
 
-            return new Response(JSON.stringify({ success: true, type: 'INSERT' }), {
-                headers: { ...corsHeaders, "Content-Type": "application/json" },
-            });
+      return new Response(JSON.stringify({ success: true, type: 'INSERT' }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // HANDLE UPDATE (CONFIRMATION / COMPLETION)
+    if (type === "UPDATE") {
+      const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+
+      // Check if status changed to 'confirmed'
+      if (record.status === "confirmed" && old_record.status !== "confirmed") {
+        console.log(`Booking ${record.id} confirmed. Checking idempotency...`);
+
+        // IDEMPOTENCY CHECK: Fetch current state from DB
+        const { data: currentRecord, error: fetchError } = await supabase
+          .from("bookings")
+          .select("sms_tag")
+          .eq("id", record.id)
+          .single();
+
+        if (fetchError) {
+          console.error("Error fetching current record for idempotency:", fetchError);
         }
 
-        // HANDLE UPDATE (CONFIRMATION / COMPLETION)
-        if (type === "UPDATE") {
-            const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+        // If we already marked it as sent, skip
+        if (currentRecord?.sms_tag === "CONFIRMATION_SENT") {
+          console.log("Email already sent for this booking (idempotency check). Skipping.");
+          return new Response(JSON.stringify({ message: "Already processed" }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
 
-            // Check if status changed to 'confirmed'
-            if (record.status === "confirmed" && old_record.status !== "confirmed") {
-                console.log(`Booking ${record.id} confirmed. Checking idempotency...`);
+        console.log(`Sending notifications for ${record.id}...`);
 
-                // IDEMPOTENCY CHECK: Fetch current state from DB
-                const { data: currentRecord, error: fetchError } = await supabase
-                    .from("bookings")
-                    .select("sms_tag")
-                    .eq("id", record.id)
-                    .single();
-
-                if (fetchError) {
-                    console.error("Error fetching current record for idempotency:", fetchError);
-                }
-
-                // If we already marked it as sent, skip
-                if (currentRecord?.sms_tag === "CONFIRMATION_SENT") {
-                    console.log("Email already sent for this booking (idempotency check). Skipping.");
-                    return new Response(JSON.stringify({ message: "Already processed" }), {
-                        headers: { ...corsHeaders, "Content-Type": "application/json" },
-                    });
-                }
-
-                console.log(`Sending notifications for ${record.id}...`);
-
-                // 1. Send Client Email (Confirmation)
-                await fetch("https://api.resend.com/emails", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${RESEND_API_KEY}`,
-                    },
-                    body: JSON.stringify({
-                        from: "Autopojasevi.hr <info@autopojasevi.hr>",
-                        to: [record.email],
-                        subject: "Rezervacija potvrđena - Autopojasevi.hr",
-                        html: `
+        // 1. Send Client Email (Confirmation)
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${RESEND_API_KEY}`,
+          },
+          body: JSON.stringify({
+            from: "Autopojasevi.hr <info@autopojasevi.hr>",
+            to: [record.email],
+            subject: "Rezervacija potvrđena - Autopojasevi.hr",
+            html: `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="HR">
  <head>
@@ -254,7 +254,7 @@ a[x-apple-data-detectors],
                   <td align="left" style="padding:0;Margin:0;width:560px">
                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
                      <tr>
-                      <td align="left" style="padding:0;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Poštovani/a&nbsp;<strong>${record.ime} ${record.prezime}</strong>,</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Vaša rezervacija za uslugu&nbsp;<strong>${record.service_name}</strong>&nbsp;je uspješno završena.</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"><br></p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Vozilo dostavite <strong>${record.appointment_date}</strong>, oko <strong>${record.appointment_time}</strong>.</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"><br>Hvala Vam i vidimo se!</p></td>
+                      <td align="left" style="padding:0;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Poštovani/a&nbsp;<strong>${record.ime} ${record.prezime}</strong>,</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Vaša rezervacija za uslugu&nbsp;<strong>${record.service_name}</strong>&nbsp;je uspješno završena.</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"><br></p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Cijena usluge je <strong>${record.price || 'Na upit'} €</strong>. Ako imate dodatnih pitanja ili želite otkazati narudžbu, kontaktirajte naš tim putem mobitela na našoj stranici.</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"><br></p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Vozilo dostavite <strong>${record.appointment_date}</strong>, oko <strong>${record.appointment_time}</strong>.</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"><br>Hvala Vam i vidimo se!</p></td>
                      </tr>
                    </table></td>
                  </tr>
@@ -302,36 +302,36 @@ a[x-apple-data-detectors],
  </body>
 </html>
 `,
-                    }),
-                });
+          }),
+        });
 
-                // 2. Send Admin Alert (Completion) - Removed as per user request
+        // 2. Send Admin Alert (Completion) - Removed as per user request
 
-                // 3. Update SMS Tag to mark as SENT (Idempotency)
-                const { error } = await supabase
-                    .from("bookings")
-                    .update({ sms_tag: "CONFIRMATION_SENT" })
-                    .eq("id", record.id);
+        // 3. Update SMS Tag to mark as SENT (Idempotency)
+        const { error } = await supabase
+          .from("bookings")
+          .update({ sms_tag: "CONFIRMATION_SENT" })
+          .eq("id", record.id);
 
-                if (error) {
-                    console.error("Error updating SMS tag:", error);
-                }
-
-                return new Response(JSON.stringify({ success: true }), {
-                    headers: { ...corsHeaders, "Content-Type": "application/json" },
-                });
-            }
+        if (error) {
+          console.error("Error updating SMS tag:", error);
         }
 
-        return new Response(JSON.stringify({ message: "No action needed" }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
-
-    } catch (error) {
-        console.error("Error processing webhook:", error);
-        return new Response(JSON.stringify({ error: error.message }), {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+      }
     }
+
+    return new Response(JSON.stringify({ message: "No action needed" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
+  } catch (error) {
+    console.error("Error processing webhook:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 });

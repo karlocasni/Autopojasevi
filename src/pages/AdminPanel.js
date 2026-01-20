@@ -7,6 +7,7 @@ export function AdminPanel() {
   page.className = 'page-admin';
 
   let currentView = 'dashboard';
+  let pendingReservationId = null; // Shared state for linking calendar to reservations
 
   const render = () => {
     page.innerHTML = '';
@@ -49,6 +50,13 @@ export function AdminPanel() {
                 <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
               </svg>
               <span>Rezervacije</span>
+            </button>
+
+            <button class="admin-nav-item ${currentView === 'add-reservation' ? 'active' : ''}" data-view="add-reservation">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              </svg>
+              <span>Nova Rezervacija</span>
             </button>
 
             <button class="admin-nav-item ${currentView === 'coupons' ? 'active' : ''}" data-view="coupons">
@@ -137,7 +145,10 @@ export function AdminPanel() {
       if (viewName === 'dashboard') {
         contentArea.appendChild(renderDashboard());
       } else if (viewName === 'reservations') {
-        contentArea.appendChild(renderReservations());
+        contentArea.appendChild(renderReservations(pendingReservationId));
+        pendingReservationId = null; // Reset after usage
+      } else if (viewName === 'add-reservation') {
+        contentArea.appendChild(renderAddReservation());
       } else if (viewName === 'services') {
         contentArea.appendChild(renderServices());
       } else if (viewName === 'reviews') {
@@ -223,7 +234,7 @@ export function AdminPanel() {
     // Load data asynchronously
     state.getReservations().then(reservations => {
       const today = new Date().toISOString().split('T')[0];
-      const todayCount = reservations.filter(r => r.appointment_date === today).length;
+      const todayCount = reservations.filter(r => r.appointment_date === today && r.status !== 'cancelled').length;
 
       container.querySelector('#today-count').textContent = todayCount;
       container.querySelector('#total-count').textContent = reservations.length;
@@ -379,12 +390,22 @@ export function AdminPanel() {
             list.innerHTML = '<p>Nema rezervacija za ovaj dan.</p>';
           } else {
             list.innerHTML = reservations.map(r => `
-    <div style="background: rgba(255,255,255,0.05); padding: 10px; margin-bottom: 10px; border-radius: 4px; border-left: 3px solid ${r.status === 'confirmed' ? '#10b981' : (r.status === 'cancelled' ? '#ef4444' : '#fbbf24')}">
+    <div style="background: rgba(255,255,255,0.05); padding: 10px; margin-bottom: 10px; border-radius: 4px; border-left: 3px solid ${r.status === 'confirmed' ? '#10b981' : (r.status === 'cancelled' ? '#ef4444' : '#fbbf24')}; cursor: pointer;"
+         class="calendar-reservation-item" data-id="${r.id}">
                             <div style="font-weight: bold;">${r.appointment_time} - ${r.ime} ${r.prezime}</div>
                             <div style="font-size: 0.9rem; color: #aaa;">${r.service_name}</div>
                             <div style="font-size: 0.8rem;">Status: ${r.status}</div>
                         </div>
     `).join('');
+
+            list.querySelectorAll('.calendar-reservation-item').forEach(item => {
+              item.addEventListener('click', () => {
+                pendingReservationId = item.dataset.id;
+                closeModal();
+                currentView = 'reservations'; // Switch state
+                updateView('reservations'); // Trigger render
+              });
+            });
           }
 
           dayModal.style.display = 'block';
@@ -482,10 +503,15 @@ export function AdminPanel() {
     return container;
   }
 
-  function renderReservations() {
+  function renderReservations(openId = null) {
     const container = document.createElement('div');
 
     let currentFilter = 'all';
+
+    // Auto-open if ID passed
+    if (openId) {
+      setTimeout(() => openReservationModal(openId), 100);
+    }
 
     container.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg); flex-wrap: wrap; gap: 10px;">
@@ -606,7 +632,7 @@ export function AdminPanel() {
             <td>${date}</td>
             <td><span class="status-badge ${statusClass}">${r.status}</span></td>
             <td>
-              <button class="btn btn-secondary btn-sm btn-open-reservation" data-id="${r.id}">Otvori</button>
+              <button class="btn btn-secondary btn-sm btn-open-reservation" data-id="${r.id}" id="btn-open-res-${r.id}">Otvori</button>
             </td>
           </tr>
     `;
@@ -615,6 +641,13 @@ export function AdminPanel() {
         container.querySelectorAll('.btn-open-reservation').forEach(btn => {
           btn.addEventListener('click', (e) => openReservationModal(e.target.dataset.id));
         });
+
+        // Auto-open if ID passed (Must be done after render)
+        if (openId) {
+          const btn = container.querySelector(`#btn-open-res-${openId}`);
+          if (btn) btn.click();
+          else setTimeout(() => openReservationModal(openId), 100);
+        }
 
       } catch (error) {
         console.error("Error loading reservations table:", error);
@@ -635,30 +668,37 @@ export function AdminPanel() {
       // Find service detail, handle case where service might be deleted or loaded via config
       const service = state.services.find(s => s.id === reservation.service_id) || state.bundles?.find(b => b.id === reservation.service_id);
 
+      // check if we need to input price
+      const isRequestPrice = service?.is_request_price;
+      const needsPriceInput = reservation.status === 'pending' && (isRequestPrice || reservation.price === 0 || reservation.price === null) && service.id !== 'pojasevi';
+      // Note: Pojasevi usually calculated, but if explicitly 0 ??
+      // Actually standard logic: if price is 0 and status is pending, we probably want to set it.
+
+      // ... existing price calculation ...
+
       // Calculate Price & Details
-      let finalPrice = service?.price || 0;
+      let finalPrice = reservation.price || service?.price || 0;
       let detailsHtml = '';
 
       if (reservation.service_id === 'pojasevi') {
         const count = reservation.broj_pojaseva || 0;
         const isDisassembled = reservation.vlastiti_pojasevi;
-        // Use config prices or fallbacks (69/39)
-        const basePrice = isDisassembled ? (service?.price_disassembled ?? 39) : (service?.price ?? 69);
-        finalPrice = basePrice * count;
+        // Calculation if not set
+        if (!reservation.cijena) {
+          const basePrice = isDisassembled ? (service?.price_disassembled ?? 39) : (service?.price ?? 69);
+          finalPrice = basePrice * count;
+        }
 
         detailsHtml += `<p><strong>Broj pojaseva:</strong> ${count}</p>`;
         detailsHtml += `<p><strong>Izvađeni mehanizam:</strong> ${isDisassembled ? 'DA' : 'NE'}</p>`;
       } else if (reservation.service_id === 'zvjezdano-nebo') {
         const stars = reservation.broj_zvjezdica || 0;
-        // Use config price or fallback (1.19)
-        const starPrice = service?.price_per_star ?? 1.19;
-        finalPrice = stars * starPrice;
-
+        if (!reservation.cijena) {
+          const starPrice = service?.price_per_star ?? 1.19;
+          finalPrice = stars * starPrice;
+        }
         detailsHtml += `<p><strong>Broj zvjezdica:</strong> ${stars}</p>`;
       }
-
-      // If manual entry or legacy, allow override if stored (optional, but let's stick to calc for consistency unless 0)
-      if (finalPrice === 0 && reservation.cijena) finalPrice = reservation.cijena;
 
       modalContent.innerHTML = `
         <p><strong>Klijent:</strong> ${reservation.ime} ${reservation.prezime}</p>
@@ -670,7 +710,7 @@ export function AdminPanel() {
         <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0;">
         <p><strong>Usluga:</strong> ${service?.name || reservation.service_name}</p>
         ${detailsHtml}
-        <p><strong>Cijena:</strong> <span style="font-size: 1.2em; color: var(--color-accent); font-weight: bold;">${finalPrice.toFixed(2)} EUR</span></p>
+        <p><strong>Cijena:</strong> <span style="font-size: 1.2em; color: var(--color-accent); font-weight: bold;">${(reservation.price || finalPrice) ? (reservation.price || finalPrice).toFixed(2) + ' EUR' : 'Na upit'}</span></p>
         <p><strong>Datum:</strong> ${new Date(reservation.appointment_date).toLocaleDateString('hr-HR')} u ${reservation.appointment_time}</p>
         <p><strong>Status:</strong> <span class="status-badge ${reservation.status === 'confirmed' ? 'status-confirmed' : (reservation.status === 'completed' ? 'status-completed' : (reservation.status === 'cancelled' ? 'status-cancelled' : 'status-pending'))}">${reservation.status}</span></p>
         <p><strong>Napomene:</strong> ${reservation.napomena || '-'}</p>
@@ -682,23 +722,41 @@ export function AdminPanel() {
                 </a>
             </div>
         ` : ''}
+        
+        ${(reservation.status === 'pending' && needsPriceInput) ? `
+             <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Unesi cijenu za klijenta (€): </label>
+                <input type="number" id="confirm-price-input" class="input" style="width: 100%; padding: 10px;" value="${finalPrice || ''}" placeholder="0.00">
+                <p style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">Klijent će primiti email s ovom cijenom nakon potvrde.</p>
+             </div>` : ''}
         `;
 
       modalActions.innerHTML = '';
       if (reservation.status === 'pending') {
+        // Moved input form to content area
         modalActions.innerHTML += `<button class="btn btn-secondary" id="cancel">Otkaži</button>`
         modalActions.innerHTML += `<button class="btn btn-cta" id="confirm">Potvrdi</button>`
       } else if (reservation.status === 'confirmed') {
         modalActions.innerHTML += `<button class="btn btn-secondary" id="cancel">Otkaži</button>`
-        modalActions.innerHTML += `<button class="btn btn-primary" id="complete">Završi</button>`
+        modalActions.innerHTML += `<button class="btn btn-primary" id="completed">Završi</button>`
       }
 
       const confirmBtn = modalActions.querySelector('#confirm');
       const cancelBtn = modalActions.querySelector('#cancel');
-      const completeBtn = modalActions.querySelector('#complete');
+      const completeBtn = modalActions.querySelector('#completed');
 
-      // Use closures for ID
-      if (confirmBtn) confirmBtn.onclick = () => updateStatus(id, 'confirmed');
+      if (confirmBtn) {
+        confirmBtn.onclick = () => {
+          // Look in modalContent now, not modalActions
+          const priceInput = modalContent.querySelector('#confirm-price-input');
+          const price = priceInput ? parseFloat(priceInput.value) : null;
+
+          if (needsPriceInput && (price === null || isNaN(price))) {
+            return alert('Molimo unesite cijenu prije potvrde.');
+          }
+          updateStatus(id, 'confirmed', price);
+        }
+      }
       if (cancelBtn) cancelBtn.onclick = () => updateStatus(id, 'cancelled');
       if (completeBtn) completeBtn.onclick = () => updateStatus(id, 'completed');
 
@@ -706,10 +764,18 @@ export function AdminPanel() {
       overlay.style.display = 'block';
     }
 
-    async function updateStatus(id, newStatus) {
-      await state.updateReservationStatus(id, newStatus);
-      closeModal();
-      loadReservations();
+    async function updateStatus(id, newStatus, price = null) {
+      try {
+        // Ensure price is a number if provided
+        if (price !== null) price = parseFloat(price);
+
+        await state.updateReservationStatus(id, newStatus, price);
+        closeModal();
+        loadReservations();
+      } catch (error) {
+        console.error("Failed to update status:", error);
+        alert("Greška pri ažuriranju statusa: " + (error.message || error));
+      }
     }
 
     loadReservations();
@@ -1330,6 +1396,132 @@ Poruka:  ${coupon.recipient_message || '-'}
           }
         });
       });
+    });
+
+    return container;
+  }
+
+  function renderAddReservation() {
+    const container = document.createElement('div');
+    container.innerHTML = `<h1 class="admin-title">Nova Rezervacija (Admin)</h1>`;
+
+    const formCard = document.createElement('div');
+    formCard.className = 'glass';
+    formCard.style.padding = 'var(--spacing-xl)';
+    formCard.style.maxWidth = '600px';
+    formCard.style.margin = '0 auto';
+
+    const formHtml = `
+        <form id="add-manual-reservation-form" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+            <div class="form-group">
+                <label>Tip Usluge</label>
+                <select name="type" class="input" id="type-select">
+                    <option value="service">Pojedinačna Usluga</option>
+                    <option value="bundle">Paket</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Odaberi Uslugu/Paket</label>
+                <select name="service_id" class="input" id="service-select" required>
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Marka Vozila</label>
+                <input type="text" name="marka" class="input" required placeholder="npr. BMW">
+            </div>
+             <div class="form-group">
+                <label>Model Vozila</label>
+                <input type="text" name="model" class="input" required placeholder="npr. Serija 3">
+            </div>
+             <div class="form-group">
+                <label>Godina</label>
+                <input type="text" name="godina" class="input" required placeholder="npr. 2020">
+            </div>
+            
+            <div class="form-group">
+                <label>Datum Termina</label>
+                <input type="date" name="appointment_date" class="input" required>
+            </div>
+            
+             <div class="form-group">
+                <label>Vrijeme</label>
+                <select name="appointment_time" class="input" required>
+                    <option value="09:00">09:00</option>
+                    <option value="09:30">09:30</option>
+                    <option value="10:00">10:00</option>
+                    <option value="10:30">10:30</option>
+                    <option value="11:00">11:00</option>
+                    <option value="11:30">11:30</option>
+                    <option value="12:00">12:00</option>
+                    <option value="12:30">12:30</option>
+                    <option value="13:00">13:00</option>
+                    <option value="13:30">13:30</option>
+                    <option value="14:00">14:00</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Napomena</label>
+                <textarea name="napomena" class="input" rows="3"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-cta">Kreiraj Rezervaciju</button>
+        </form>
+      `;
+
+    formCard.innerHTML = formHtml;
+    container.appendChild(formCard);
+
+    // Logic
+    const typeSelect = formCard.querySelector('#type-select');
+    const serviceSelect = formCard.querySelector('#service-select');
+    const form = formCard.querySelector('#add-manual-reservation-form');
+
+    const populateServices = () => {
+      const isBundle = typeSelect.value === 'bundle';
+      const items = isBundle ? state.bundles : state.services;
+      serviceSelect.innerHTML = items.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
+    };
+
+    typeSelect.addEventListener('change', populateServices);
+    populateServices(); // init
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      // Add defaults for Booking Schema
+      const bookingData = {
+        service_id: data.service_id,
+        marka: data.marka,
+        model: data.model,
+        godina: data.godina,
+        appointment_date: data.appointment_date,
+        appointment_time: data.appointment_time,
+        napomena: data.napomena,
+        // Placeholders
+        ime: 'Ručni',
+        prezime: 'Unos',
+        email: '-', // Should be allowed if no validation strictness
+        telefon: '-',
+        is_manual_entry: true
+      };
+
+      try {
+        await state.saveBooking(bookingData);
+        alert('Rezervacija kreirana!');
+        // Redirect to reservations
+        currentView = 'reservations';
+        updateView('reservations');
+      } catch (err) {
+        console.error(err);
+        alert('Greška pri kreiranju rezervacije.');
+      }
     });
 
     return container;

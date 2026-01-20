@@ -15,15 +15,12 @@ export function Step5Review({ bookingData, onNext, onBack }) {
     calculatedPrice = parseInt(bookingData.brojPojaseva) * perBelt;
   } else if (service.id === 'zvjezdano-nebo' && bookingData.brojZvjezdica) {
     const stars = parseInt(bookingData.brojZvjezdica);
-    if (stars === 500) {
-      calculatedPrice = service.price_500_stars || 595;
-    } else if (stars === 750) {
-      calculatedPrice = service.price_750_stars || 750;
-    } else {
-      // Default 1.19 per star
-      const pricePerStar = service.price_per_star || 1.19;
-      calculatedPrice = stars * pricePerStar;
-    }
+    // Explicit pricing can be added via service config, or default formula
+    // Default 1.19 per star (~595 for 500)
+    const pricePerStar = service.price_per_star || 1.19;
+    calculatedPrice = stars * pricePerStar;
+  } else if (service.is_request_price) {
+    calculatedPrice = null;
   } else if (service.price) {
     calculatedPrice = service.price;
   }

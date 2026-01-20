@@ -11,9 +11,13 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
     // Helper to check inclusions
     const includes = (id) => service?.id === id || (service?.includes && service.includes.includes(id));
 
-    const isPojasevi = service?.id === 'pojasevi';
-    const isZvjezdano = service?.id === 'zvjezdano-nebo';
+    const isPojasevi = includes('pojasevi');
+    const isZvjezdano = includes('zvjezdano-nebo');
+    const isKodiranje = includes('kodiranje');
     const isMapiranje = includes('mapiranje');
+
+    // Special check for Platinum bundle (fixed stars)
+    const isPlatinum = service?.id === 'platinum-paket';
 
     // State management
     let state = {
@@ -320,77 +324,69 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
 
                         <div class="checkbox-wrapper">
                             <input type="checkbox" class="checkbox" id="vlastiti-pojasevi" name="vlastitiPojasevi" ${initialData.vlastitiPojasevi ? 'checked' : ''}>
-                            <label for="vlastiti-pojasevi">Rastavljeni sustav</label>
+                            <label for="vlastiti-pojasevi">Rastavljeni sustav (mehanizam)</label>
                         </div>
                     ` : ''}
 
                     ${isZvjezdano ? `
                         <div class="form-group">
                             <label class="form-label">Broj zvjezdica</label>
-                            <select class="input" name="brojZvjezdica" required>
+                            ${isPlatinum ? `
+                                <input type="hidden" name="brojZvjezdica" value="650">
+                                <input type="text" class="input" value="650 (Platinum Standard)" disabled>
+                            ` : `
+                                <select class="input" name="brojZvjezdica" required>
+                                    <option value="">Odaberi...</option>
+                                    ${[500, 600, 750, 850, 1000].map(n => `
+                                        <option value="${n}" ${initialData.brojZvjezdica == n ? 'selected' : ''}>${n}</option>
+                                    `).join('')}
+                                </select>
+                            `}
+                        </div>
+                    ` : ''}
+
+                    ${isKodiranje ? `
+                        <div class="form-group">
+                            <label class="form-label">Opcija kodiranja</label>
+                            <select class="input" name="codingOption" id="coding-option" required>
                                 <option value="">Odaberi...</option>
-                                ${[500, 750, 1000].map(n => `
-                                    <option value="${n}" ${initialData.brojZvjezdica == n ? 'selected' : ''}>${n}</option>
-                                `).join('')}
+                                <option value="video_u_voznji">Video u vožnji</option>
+                                <option value="carplay_android_auto">Carplay/Android Auto</option>
+                                <option value="azuriranje_navigacije">Ažuriranje navigacije</option>
+                                <option value="needle_sweep">Needle sweep</option>
+                                <option value="uklanjanje_start_stop">Uklanjanje Start/Stop</option>
+                                <option value="ostalo">Ostalo</option>
                             </select>
                         </div>
                     ` : ''}
 
                     ${isMapiranje ? `
                         <div class="form-group">
-                            <label class="form-label">Broj šasije (VIN)</label>
-                            <input type="text" class="input" name="vinBroj" placeholder="Unesite broj šasije" required value="${initialData.vinBroj || ''}">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Vrsta usluge kodiranja</label>
-                            <select class="input" name="codingOption" id="coding-option" required>
+                            <label class="form-label">Opcija mapiranja</label>
+                            <select class="input" name="mappingOption" id="mapping-option" required>
                                 <option value="">Odaberi...</option>
-                                ${(() => {
-                    // Check if current service is a bundle
-                    const isBundle = globalState.bundles?.some(b => b.id === serviceId);
-
-                    // Full list of advanced tuning/removal options (Restricted for bundles)
-                    const advancedOptions = `
-                                        <option value="stage_tune">Stage tune</option>
-                                        <option value="pops_bangs">Pops and bangs</option>
-                                        <option value="custom_mapa">Custom mapa</option>
-                                        <option value="uklanjanje_torque_limitera">Uklanjanje torque limitera</option>
-                                        <option value="uklanjanje_adblue">Uklanjanje AdBlue</option>
-                                        <option value="uklanjanje_aktivnih_poklopaca">Uklanjanje aktivnih poklopaca maske</option>
-                                        <option value="uklanjanje_dpf_opf">Uklanjanje DPFa/OPFa</option>
-                                        <option value="uklanjanje_egr">Uklanjanje EGRa</option>
-                                        <option value="uklanjanje_senzora_kisika">Uklanjanje senzora kisika</option>
-                                        <option value="uklanjanje_kickdowna">Uklanjanje kickdowna</option>
-                                        <option value="uklanjanje_maf">Uklanjanje MAF senzora</option>
-                                        <option value="uklanjanje_ventila">Uklanjanje ventila (valve)</option>
-                                        <option value="uklanjanje_limitera_brzine">Uklanjanje limitera brzine</option>
-                                        <option value="uklanjanje_start_stop">Uklanjanje Start/Stop</option>
-                                    `;
-
-                    // Basic/Comfort options (Available for everyone)
-                    const basicOptions = `
-                                        <option value="video_u_voznji">Video u vožnji</option>
-                                        <option value="carplay_android_auto">Carplay/Android Auto</option>
-                                        <option value="azuriranje_navigacije">Ažuriranje navigacije</option>
-                                        <option value="needle_sweep">Needle sweep</option>
-                                        <option value="ostalo">Ostalo</option>
-                                    `;
-
-                    // If it's a bundle, return only basic options. If singular, return both.
-                    if (isBundle) {
-                        return basicOptions;
-                    } else {
-                        return advancedOptions + basicOptions;
-                    }
-                })()}
+                                <option value="stage_tune">Stage tune</option>
+                                <option value="pops_bangs">Pops and bangs</option>
+                                <option value="custom_mapa">Custom mapa</option>
+                                <option value="uklanjanje_torque_limitera">Uklanjanje torque limitera</option>
+                                <option value="uklanjanje_adblue">Uklanjanje AdBlue</option>
+                                <option value="uklanjanje_aktivnih_poklopaca">Uklanjanje aktivnih poklopaca maske</option>
+                                <option value="uklanjanje_dpf_opf">Uklanjanje DPFa/OPFa</option>
+                                <option value="uklanjanje_egr">Uklanjanje EGRa</option>
+                                <option value="uklanjanje_senzora_kisika">Uklanjanje senzora kisika</option>
+                                <option value="uklanjanje_kickdowna">Uklanjanje kickdowna</option>
+                                <option value="uklanjanje_maf">Uklanjanje MAF senzora</option>
+                                <option value="uklanjanje_ventila">Uklanjanje ventila (valve)</option>
+                                <option value="uklanjanje_limitera_brzine">Uklanjanje limitera brzine</option>
                             </select>
                         </div>
+                    ` : ''}
 
+                    ${(isKodiranje || isMapiranje) ? `
                         <div class="form-group">
                             <label class="form-label">Slika verzije softvera</label>
                             <input type="file" class="input" name="softverSlika" accept="image/*" ${initialData.softverSlika ? '' : 'required'}>
-                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:5px;">Molimo učitajte sliku trenutne verzije softvera.</p>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:5px;">Molimo učitajte sliku trenutne verzije softvera. Ako ne znate kako ju pronaći, preskočite ovaj dio i nazovite naš tim.</p>
                         </div>
                     ` : ''}
 

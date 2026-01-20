@@ -8,6 +8,7 @@ import { Step3Calendar } from '../components/booking/Step3Calendar.js';
 import { Step4CustomerInfo } from '../components/booking/Step4CustomerInfo.js';
 import { Step5Review } from '../components/booking/Step5Review.js';
 import { Step6Success } from '../components/booking/Step6Success.js';
+import { StepUpsell } from '../components/booking/StepUpsell.js';
 import { state } from '../utils/state.js';
 
 export function BookingFlow(data = {}) {
@@ -28,7 +29,44 @@ export function BookingFlow(data = {}) {
     let currentStep = 1;
     let bookingData = {
         serviceId: data.serviceId || null,
+        isUpgrade: false,
         ...data
+    };
+
+    const submitBooking = async () => {
+        try {
+            // Map bookingData to the shape expected by state.saveBooking
+            const payload = {
+                service_id: bookingData.serviceId,
+                service_name: bookingData.serviceName || state.services.find(s => s.id === bookingData.serviceId)?.name || state.bundles?.find(b => b.id === bookingData.serviceId)?.name,
+                marka: bookingData.marka,
+                model: bookingData.model,
+                godina: bookingData.godina,
+                broj_pojaseva: bookingData.brojPojaseva,
+                vlastiti_pojasevi: bookingData.vlastitiPojasevi,
+                broj_zvjezdica: bookingData.brojZvjezdica,
+                vinBroj: bookingData.vinBroj,
+                softverSlika: bookingData.softverSlika,
+                napomena: bookingData.napomena,
+                appointment_date: bookingData.date,
+                appointment_time: bookingData.time,
+                ime: bookingData.imePrezime ? bookingData.imePrezime.trim().split(' ')[0] : '',
+                prezime: bookingData.imePrezime && bookingData.imePrezime.trim().indexOf(' ') > -1 ? bookingData.imePrezime.trim().split(' ').slice(1).join(' ') : (bookingData.imePrezime || ''),
+                email: bookingData.email,
+                telefon: bookingData.telefon,
+                adresa: bookingData.adresa,
+                is_manual_entry: bookingData.isManualEntry || false
+            };
+            const saved = await state.saveBooking(payload);
+            // Update bookingData with fields expected by success step
+            bookingData.date = saved.appointment_date;
+            bookingData.time = saved.appointment_time;
+            currentStep = 6;
+            renderStep();
+        } catch (error) {
+            console.error('Failed to save booking:', error);
+            alert('Došlo je do greške pri spremanju rezervacije. Molimo pokušajte ponovno.');
+        }
     };
 
     const renderStep = () => {
@@ -84,7 +122,14 @@ export function BookingFlow(data = {}) {
                     serviceId: bookingData.serviceId,
                     onNext: (data) => {
                         Object.assign(bookingData, data);
-                        currentStep = 3;
+                        if (bookingData.isUpgrade) {
+                            // Skip to Review if upgrading, as user info and calendar are likely set
+                            // But we might want to check if they are actually set?
+                            // Assuming yes for now per instruction.
+                            currentStep = 5;
+                        } else {
+                            currentStep = 3;
+                        }
                         renderStep();
                     },
                     onBack: () => {
@@ -128,44 +173,37 @@ export function BookingFlow(data = {}) {
             case 5:
                 stepComponent = Step5Review({
                     bookingData,
-                    onNext: async () => {
-                        try {
-                            // Map bookingData to the shape expected by state.saveBooking
-                            const payload = {
-                                service_id: bookingData.serviceId,
-                                service_name: bookingData.serviceName || state.services.find(s => s.id === bookingData.serviceId)?.name || state.bundles?.find(b => b.id === bookingData.serviceId)?.name,
-                                marka: bookingData.marka,
-                                model: bookingData.model,
-                                godina: bookingData.godina,
-                                broj_pojaseva: bookingData.brojPojaseva,
-                                vlastiti_pojasevi: bookingData.vlastitiPojasevi,
-                                broj_zvjezdica: bookingData.brojZvjezdica,
-                                vinBroj: bookingData.vinBroj,
-                                softverSlika: bookingData.softverSlika,
-                                napomena: bookingData.napomena,
-                                appointment_date: bookingData.date,
-                                appointment_time: bookingData.time,
-                                ime: bookingData.imePrezime ? bookingData.imePrezime.trim().split(' ')[0] : '',
-                                prezime: bookingData.imePrezime && bookingData.imePrezime.trim().indexOf(' ') > -1 ? bookingData.imePrezime.trim().split(' ').slice(1).join(' ') : (bookingData.imePrezime || ''),
-                                email: bookingData.email,
-                                telefon: bookingData.telefon,
-                                adresa: bookingData.adresa,
-                                is_manual_entry: bookingData.isManualEntry || false
-                            };
-                            const saved = await state.saveBooking(payload);
-                            // Update bookingData with fields expected by success step
-                            bookingData.date = saved.appointment_date;
-                            bookingData.time = saved.appointment_time;
-                            currentStep = 6;
+                    onNext: () => {
+                        // Check for Upsell
+                        const isBundle = state.bundles?.some(b => b.id === bookingData.serviceId);
+                        const hasUpgrades = !isBundle && state.bundles?.some(b => b.includes && b.includes.includes(bookingData.serviceId));
+
+                        if (hasUpgrades) {
+                            currentStep = 55; // Upsell Step
                             renderStep();
-                        } catch (error) {
-                            console.error('Failed to save booking:', error);
-                            alert('Došlo je do greške pri spremanju rezervacije. Molimo pokušajte ponovno.');
+                        } else {
+                            submitBooking();
                         }
                     },
                     onBack: () => {
                         currentStep = 4;
                         renderStep();
+                    }
+                });
+                break;
+
+            case 55: // Upsell Step
+                stepComponent = StepUpsell({
+                    currentServiceId: bookingData.serviceId,
+                    onUpgrade: (bundleId) => {
+                        bookingData.serviceId = bundleId;
+                        bookingData.isUpgrade = true;
+                        // Go back to Vehicle Info (Step 2) to confirm details for the new bundle
+                        currentStep = 2;
+                        renderStep();
+                    },
+                    onSkip: () => {
+                        submitBooking();
                     }
                 });
                 break;

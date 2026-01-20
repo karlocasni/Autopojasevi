@@ -42,7 +42,11 @@ export function Step6Success({ bookingData }) {
         <p class="success-text" style="font-size: 1.4rem; margin-top: 15px;">
             Ukupna cijena: <strong>${bookingData.totalPrice.toFixed(2)} €</strong>
         </p>
-        ` : ''}
+        ` : `
+        <p class="success-text" style="font-size: 1.1rem; margins-top: 15px; color: var(--color-accent);">
+           Cijena je na upit. Nakon pregleda rezervacije, poslat ćemo vam ponudu s točnom cijenom na email prije potvrde termina.
+        </p>
+        `}
       </div>
       
       <div class="success-details">

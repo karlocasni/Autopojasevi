@@ -34,6 +34,7 @@ export const state = {
             id: 'zatamnjivanje',
             name: 'Zatamnjivanje zadnjih stakala',
             icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM21 9H3M21 15H3M12 3v18"/></svg>`,
+            is_request_price: true,
             description: 'Profesionalno zatamnjivanje stakala prema zakonskim propisima.',
             sellingPoints: [
                 'Zakonski propisi',
@@ -44,32 +45,34 @@ export const state = {
             images: ['/images/stakla1.png', '/images/stakla2.png']
         },
         {
-            id: 'mapiranje',
+            id: 'kodiranje',
             name: 'Kodiranje vozila',
             icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
-            description: 'Profesionalno kodiranje i optimizacija softvera vašeg vozila.',
+            is_request_price: true,
+            description: 'Otključavanje dodatnih funkcija i personalizacija vozila.',
             sellingPoints: [
-                'Povećane performanse',
-                'Bolja ekonomičnost',
-                'Sigurno kodiranje',
-                'Garancija na uslugu'
+                'Video u vožnji',
+                'Carplay/Android Auto',
+                'Ažuriranje navigacije',
+                'Needle sweep'
             ],
             images: ['/images/kodiranje1.png', '/images/kodiranje2.png']
         },
         {
-            id: 'kocnice',
-            name: 'Promjena boje kočnica',
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M14.5 9.5 12 12"/></svg>`,
-            price: 199,
-            description: 'Profesionalno lakiranje kočionih čeljusti u boju po želji.',
+            id: 'mapiranje',
+            name: 'Mapiranje vozila',
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`,
+            is_request_price: true,
+            description: 'Optimizacija softvera motora za bolje performanse (Stage 1, EGR, DPF...).',
             sellingPoints: [
-                'Visoka otpornost na toplinu',
-                'Dugotrajna boja',
-                'Zaštita od korozije',
-                'Sportski izgled'
+                'Povećanje snage',
+                'Manja potrošnja',
+                'Optimizacija rada',
+                'Isključivanje sustava'
             ],
-            images: ['/images/kocnica1.png', '/images/kocnica2.png']
+            images: ['/images/kodiranje1.png', '/images/kodiranje2.png']
         },
+
         {
             id: 'chrome-delete',
             name: 'Chrome delete',
@@ -88,42 +91,74 @@ export const state = {
 
     bundles: [
         {
+            id: 'bronze-paket',
+            name: 'Bronze Paket',
+            price: 490,
+            original_price: 615,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h0M2 9h20M7 4v5"/></svg>`,
+            description: 'Ugradnja pojaseva, promjena boje čeljusti, kodiranje vozila.',
+            includes: ['pojasevi', 'kocnice', 'kodiranje'],
+            sellingPoints: [
+                'Ugradnja pojaseva',
+                'Lakiranje čeljusti',
+                'Kodiranje vozila'
+            ],
+            images: ['/images/pojas1.png', '/images/kocnica1.png']
+        },
+        {
             id: 'silver-paket',
             name: 'Silver Paket',
-            price: 490,
+            price: 690,
+            original_price: 815,
             icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 7l2 5h-4l2-5"/></svg>`,
-            description: 'Ugradnja pojaseva, promjena boje čeljusti, kodiranje.',
-            includes: ['pojasevi', 'kocnice', 'mapiranje'],
+            description: 'Ugradnja pojaseva, promjena boje čeljusti, zatamnjivanje stakala, kodiranje vozila.',
+            includes: ['pojasevi', 'kocnice', 'zatamnjivanje', 'kodiranje'],
             sellingPoints: [
-                'Ugradnja pojaseva u boji po želji',
-                'Profesionalno lakiranje čeljusti',
-                'Softversko kodiranje'
+                'Sve iz Bronze paketa',
+                'Zatamnjivanje stakala'
             ],
             images: ['/images/pojas1.png', '/images/kodiranje1.png']
         },
         {
             id: 'gold-paket',
             name: 'Gold Paket',
-            price: 690,
+            price: 790,
+            original_price: 965,
             icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 7l2 5h-4l2-5"/><path d="M8 12h8"/></svg>`,
-            description: 'Ugradnja pojaseva, promjena boje čeljusti, kodiranje, zatamnjivanje stakala.',
-            includes: ['pojasevi', 'kocnice', 'mapiranje', 'zatamnjivanje'],
+            description: 'Ugradnja pojaseva, promjena boje čeljusti, kodiranje vozila, mapiranje vozila.',
+            includes: ['pojasevi', 'kocnice', 'kodiranje', 'mapiranje'],
             sellingPoints: [
-                'Sve iz Silver paketa',
-                'Zatamnjivanje stakala (premium folija)'
+                'Ugradnja pojaseva & Lakiranje čeljusti',
+                'Kodiranje & Mapiranje vozila'
+            ],
+            images: ['/images/pojas1.png', '/images/kodiranje1.png']
+        },
+        {
+            id: 'best-deal',
+            name: 'Best Deal',
+            price: 490,
+            original_price: 695,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
+            description: 'Ugradnja pojaseva i mapiranje vozila.',
+            includes: ['pojasevi', 'mapiranje'],
+            sellingPoints: [
+                'Ugradnja pojaseva',
+                'Mapiranje vozila'
             ],
             images: ['/images/pojas1.png', '/images/kodiranje1.png']
         },
         {
             id: 'platinum-paket',
             name: 'Platinum Paket',
-            price: 990,
+            price: 1490,
+            original_price: 1950,
             icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 7l2 5h-4l2-5"/><path d="M12 2v20"/></svg>`,
-            description: 'Ugradnja pojaseva, promjena boje čeljusti, kodiranje, zvjezadno nebo (500 zvjezdica).',
-            includes: ['pojasevi', 'kocnice', 'mapiranje', 'zvjezdano-nebo'],
+            // 650 stars note
+            description: 'Ugradnja pojaseva, promjena boje čeljusti, kodiranje, ugradnja zvjezdanog neba (650 zvjezdica), mapiranje, zatamnjivanje.',
+            includes: ['pojasevi', 'kocnice', 'kodiranje', 'zvjezdano-nebo', 'mapiranje', 'zatamnjivanje'],
             sellingPoints: [
-                'Sve iz Silver paketa',
-                'Zvjezdano nebo (500 zvjezdica)',
+                'Sve usluge uključene',
+                'Zvjezdano nebo (650 zvjezdica)',
                 'Potpuna transformacija vozila'
             ],
             images: ['/images/pojas1.png', '/images/kodiranje1.png']
@@ -165,7 +200,7 @@ export const state = {
         },
         {
             question: 'Koliko zvjezdica mogu odabrati za zvjezdano nebo?',
-            answer: 'Možete odabrati između 500, 750 i 1000 zvjezdica, ovisno o vašim preferencijama.'
+            answer: 'Nudimo širok raspon opcija zvjezdica, prilagođen vašim željama i vozilu. Kontaktirajte nas za detalje.'
         },
         {
             question: 'Je li zatamnjivanje stakala zakonito?',
@@ -294,12 +329,15 @@ export const state = {
         return data || [];
     },
 
-    async updateReservationStatus(id, status) {
+    async updateReservationStatus(id, status, price = null) {
         const { supabase } = await import('./supabase.js');
+
+        const updates = { status };
+        if (price !== null) updates.price = price;
 
         const { error } = await supabase
             .from('bookings')
-            .update({ status })
+            .update(updates)
             .eq('id', id);
 
         if (error) {
