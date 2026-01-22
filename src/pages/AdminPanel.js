@@ -9,6 +9,52 @@ export function AdminPanel() {
   let currentView = 'dashboard';
   let pendingReservationId = null; // Shared state for linking calendar to reservations
 
+  function updateView(viewName) {
+    const navItems = page.querySelectorAll('.admin-nav-item');
+    const contentArea = page.querySelector('.admin-content');
+
+    // Update Nav
+    navItems.forEach(item => {
+      if (item.dataset.view === viewName) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+
+    // Update Content
+    if (contentArea) {
+      contentArea.innerHTML = '';
+      if (viewName === 'dashboard') {
+        contentArea.appendChild(renderDashboard());
+      } else if (viewName === 'reservations') {
+        contentArea.appendChild(renderReservations(pendingReservationId));
+        pendingReservationId = null; // Reset after usage
+      } else if (viewName === 'add-reservation') {
+        contentArea.appendChild(renderAddReservation());
+      } else if (viewName === 'services') {
+        contentArea.appendChild(renderServices());
+      } else if (viewName === 'reviews') {
+        contentArea.appendChild(renderReviews());
+      } else if (viewName === 'calendar') {
+        contentArea.appendChild(renderCalendarView());
+      } else if (viewName === 'coupons') {
+        contentArea.appendChild(renderCoupons());
+      } else if (viewName === 'settings') {
+        contentArea.appendChild(renderSettings());
+      } else {
+        contentArea.innerHTML = `
+    <div class="glass" style="padding: var(--spacing-2xl); text-align: center;">
+            <h2>${viewName.charAt(0).toUpperCase() + viewName.slice(1)}</h2>
+            <p style="margin-top: var(--spacing-md); color: var(--color-text-muted);">
+            Ova sekcija je u razvoju.
+            </p>
+        </div>
+    `;
+      }
+    }
+  }
+
   const render = () => {
     page.innerHTML = '';
 
@@ -130,46 +176,7 @@ export function AdminPanel() {
       });
     });
 
-    function updateView(viewName) {
-      // Update Nav
-      navItems.forEach(item => {
-        if (item.dataset.view === viewName) {
-          item.classList.add('active');
-        } else {
-          item.classList.remove('active');
-        }
-      });
 
-      // Update Content
-      contentArea.innerHTML = '';
-      if (viewName === 'dashboard') {
-        contentArea.appendChild(renderDashboard());
-      } else if (viewName === 'reservations') {
-        contentArea.appendChild(renderReservations(pendingReservationId));
-        pendingReservationId = null; // Reset after usage
-      } else if (viewName === 'add-reservation') {
-        contentArea.appendChild(renderAddReservation());
-      } else if (viewName === 'services') {
-        contentArea.appendChild(renderServices());
-      } else if (viewName === 'reviews') {
-        contentArea.appendChild(renderReviews());
-      } else if (viewName === 'calendar') {
-        contentArea.appendChild(renderCalendarView());
-      } else if (viewName === 'coupons') {
-        contentArea.appendChild(renderCoupons());
-      } else if (viewName === 'settings') {
-        contentArea.appendChild(renderSettings());
-      } else {
-        contentArea.innerHTML = `
-    <div class="glass" style="padding: var(--spacing-2xl); text-align: center;">
-          <h2>${viewName.charAt(0).toUpperCase() + viewName.slice(1)}</h2>
-          <p style="margin-top: var(--spacing-md); color: var(--color-text-muted);">
-            Ova sekcija je u razvoju.
-          </p>
-        </div>
-    `;
-      }
-    }
 
     navItems.forEach(item => {
       item.addEventListener('click', () => {
