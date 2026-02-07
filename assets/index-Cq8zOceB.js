@@ -683,7 +683,7 @@ ${f}`}class H extends Error{constructor({message:e,code:t,cause:a,name:s}){var n
         font-size: 1.2rem;
     }
   }
-`;document.head.appendChild(es);function Ki(){const r=document.createElement("section");r.className="section services-widget";let e=!0;const t=()=>{const a=e?T.bundles:T.services,s=e?"PAKETI":"USLUGE",n=a.map(i=>{const o=i.id==="best-deal";return`
+`;document.head.appendChild(es);function Ki(){const r=document.createElement("section");r.className="section services-widget";let e=!1;const t=()=>{const a=e?T.bundles:T.services,s=e?"PAKETI":"USLUGE",n=a.map(i=>{const o=i.id==="best-deal";return`
       <div class="card service-card ${o?"best-deal-card":""}" data-id="${i.id}" data-type="${e?"bundle":"service"}">
         ${o?'<div class="best-deal-badge">NAJBOLJA PONUDA</div>':""}
         <div class="service-icon">${i.icon}</div>
@@ -1853,7 +1853,7 @@ ${f}`}class H extends Error{constructor({message:e,code:t,cause:a,name:s}){var n
         margin-bottom: var(--spacing-xl);
     }
   }
-`;document.head.appendChild(ls);function ro({onNext:r,selectedServiceId:e}){const t=document.createElement("div");t.className="booking-step step-service-selection";let a=e||null,s=!0;a&&T.services.find(i=>i.id===a)&&(s=!1);const n=()=>{const i=s?T.bundles:T.services,o=s?"ODABERI PAKET":"ODABERI USLUGU",l=i.map(g=>{const u=g.original_price&&g.price&&g.original_price>g.price,d=g.id==="best-deal";return`
+`;document.head.appendChild(ls);function ro({onNext:r,selectedServiceId:e}){const t=document.createElement("div");t.className="booking-step step-service-selection";let a=e||null,s=!1;a&&T.bundles.find(i=>i.id===a)&&(s=!0);const n=()=>{const i=s?T.bundles:T.services,o=s?"ODABERI PAKET":"ODABERI USLUGU",l=i.map(g=>{const u=g.original_price&&g.price&&g.original_price>g.price,d=g.id==="best-deal";return`
         <div class="service-selection-card card ${g.id===a?"selected":""} ${d?"best-deal-card":""}" data-id="${g.id}">
         ${d?'<div class="best-deal-badge">NAJBOLJA PONUDA</div>':""}
         <div class="service-icon-large">${g.icon}</div>
@@ -2473,8 +2473,8 @@ ${f}`}class H extends Error{constructor({message:e,code:t,cause:a,name:s}){var n
 
                     ${c||h?`
                         <div class="form-group">
-                            <label class="form-label">Slika verzije softvera</label>
-                            <input type="file" class="input" name="softverSlika" accept="image/*" ${a.softverSlika?"":"required"}>
+                            <label class="form-label">Slika verzije softvera (opcionalno)</label>
+                            <input type="file" class="input" name="softverSlika" accept="image/*">
                             <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:5px;">Molimo učitajte sliku trenutne verzije softvera. Ako ne znate kako ju pronaći, preskočite ovaj dio i nazovite naš tim.</p>
                         </div>
                     `:""}
@@ -3684,13 +3684,15 @@ ${f}`}class H extends Error{constructor({message:e,code:t,cause:a,name:s}){var n
         <div class="upsell-container">
             <p class="upsell-intro">Dodajte još usluga uz vaš odabir i ostvarite značajne uštede uz naše pakete.</p>
             
+            <div style="text-align: center;">
+                <button class="btn btn-white" id="skip-btn">
+                    Ne želim paket, nastavi s rezervacijom
+                </button>
+            </div>
+            
             <div class="upsell-grid">
                 ${n}
             </div>
-            
-            <button class="btn btn-link btn-skip" id="skip-btn">
-                Ne želim paket, nastavi s rezervacijom
-            </button>
         </div>
     `,a.querySelectorAll(".btn-upgrade").forEach(o=>{o.addEventListener("click",()=>{const l=o.dataset.id;e(l)})}),a.querySelector("#skip-btn").addEventListener("click",t),a}const vs=document.createElement("style");vs.textContent=`
     .step-upsell {
