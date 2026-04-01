@@ -5,7 +5,7 @@ export function ServicesWidget() {
   const section = document.createElement('section');
   section.className = 'section services-widget';
 
-  let showBundles = true;
+  let showBundles = false;
 
   const render = () => {
     const items = showBundles ? state.bundles : state.services;

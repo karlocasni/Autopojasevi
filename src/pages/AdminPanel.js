@@ -523,12 +523,18 @@ export function AdminPanel() {
     container.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg); flex-wrap: wrap; gap: 10px;">
       <h1 class="admin-title" style="margin: 0;">Rezervacije</h1>
-      <div id="status-filter-container" class="filter-pills" style="display: flex; gap: 5px; flex-wrap: wrap;">
-        <button class="filter-pill active" data-value="all">Sve</button>
-        <button class="filter-pill" data-value="pending">Na čekanju</button>
-        <button class="filter-pill" data-value="confirmed">Potrđeno</button>
-        <button class="filter-pill" data-value="completed">Završeno</button>
-        <button class="filter-pill" data-value="cancelled">Otkazano</button>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <button id="export-btn" class="btn btn-secondary" style="height: 38px; display: flex; align-items: center; gap: 5px;">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> 
+          Eksportiraj
+        </button>
+        <div id="status-filter-container" class="filter-pills" style="display: flex; gap: 5px; flex-wrap: wrap;">
+          <button class="filter-pill active" data-value="all">Sve</button>
+          <button class="filter-pill" data-value="pending">Na čekanju</button>
+          <button class="filter-pill" data-value="confirmed">Potvrđeno</button>
+          <button class="filter-pill" data-value="completed">Završeno</button>
+          <button class="filter-pill" data-value="cancelled">Otkazano</button>
+        </div>
       </div>
     </div>
     
@@ -598,6 +604,80 @@ export function AdminPanel() {
         pill.classList.add('active');
         loadReservations();
       });
+    });
+
+    const exportBtn = container.querySelector('#export-btn');
+    exportBtn.addEventListener('click', async () => {
+      try {
+        const reservations = await state.getReservations();
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const futureReservations = reservations.filter(r => {
+          const resDate = new Date(r.appointment_date);
+          resDate.setHours(0, 0, 0, 0);
+          return resDate >= today;
+        });
+
+        if (futureReservations.length === 0) {
+          alert('Nema budućih rezervacija za eksport.');
+          return;
+        }
+
+        const headers = [
+          'ID', 'Ime', 'Prezime', 'Email', 'Telefon', 'Marka', 'Model', 'Godina', 'VIN', 
+          'Usluga', 'Detalji usluge', 'Napomena', 'Cijena (EUR)', 'Datum', 'Vrijeme', 'Status', 'Kreirano'
+        ];
+
+        const rows = futureReservations.map(r => {
+          const service = state.services.find(s => s.id === r.service_id) || state.bundles?.find(b => b.id === r.service_id);
+          const serviceName = service?.name || r.service_name || '-';
+          
+          let details = '-';
+          if (r.service_id === 'pojasevi') {
+             details = `Pojaseva: ${r.broj_pojaseva || 0}, Demontaža: ${r.vlastiti_pojasevi ? 'NE (Vlastiti)' : 'DA'}`;
+          } else if (r.service_id === 'zvjezdano-nebo') {
+             details = `Zvjezdica: ${r.broj_zvjezdica || 0}`;
+          }
+
+          let price = r.price || r.cijena || (service ? service.price : null) || 0;
+          
+          return [
+             r.id,
+             r.ime || '',
+             r.prezime || '',
+             r.email || '',
+             r.telefon ? `="${r.telefon}"` : '',
+             r.marka || '',
+             r.model || '',
+             r.godina || '',
+             r.vin ? `="${r.vin}"` : '',
+             serviceName,
+             details,
+             (r.napomena || '').replace(/\r?\n/g, ' '),
+             price,
+             r.appointment_date ? new Date(r.appointment_date).toLocaleDateString('hr-HR') : '',
+             r.appointment_time || '',
+             r.status || '',
+             r.created_at ? new Date(r.created_at).toLocaleString('hr-HR') : ''
+          ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(',');
+        });
+
+        const csvContent = [headers.join(','), ...rows].join('\n');
+        
+        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `rezervacije_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        console.error('Error exporting records:', err);
+        alert('Došlo je do greške prilikom eksporta.');
+      }
     });
 
     async function loadReservations() {

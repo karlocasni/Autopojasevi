@@ -55,13 +55,15 @@ export function StepUpsell({ currentServiceId, onUpgrade, onSkip }) {
         <div class="upsell-container">
             <p class="upsell-intro">Dodajte još usluga uz vaš odabir i ostvarite značajne uštede uz naše pakete.</p>
             
+            <div style="text-align: center;">
+                <button class="btn btn-white" id="skip-btn">
+                    Ne želim paket, nastavi s rezervacijom
+                </button>
+            </div>
+            
             <div class="upsell-grid">
                 ${upgradesHtml}
             </div>
-            
-            <button class="btn btn-link btn-skip" id="skip-btn">
-                Ne želim paket, nastavi s rezervacijom
-            </button>
         </div>
     `;
 

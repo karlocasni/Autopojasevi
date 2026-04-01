@@ -384,8 +384,8 @@ export function Step2VehicleInfo({ serviceId, onNext, onBack, initialData = {} }
 
                     ${(isKodiranje || isMapiranje) ? `
                         <div class="form-group">
-                            <label class="form-label">Slika verzije softvera</label>
-                            <input type="file" class="input" name="softverSlika" accept="image/*" ${initialData.softverSlika ? '' : 'required'}>
+                            <label class="form-label">Slika verzije softvera (opcionalno)</label>
+                            <input type="file" class="input" name="softverSlika" accept="image/*">
                             <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:5px;">Molimo učitajte sliku trenutne verzije softvera. Ako ne znate kako ju pronaći, preskočite ovaj dio i nazovite naš tim.</p>
                         </div>
                     ` : ''}

@@ -6,10 +6,10 @@ export function Step1ServiceSelection({ onNext, selectedServiceId }) {
 
   let selected = selectedServiceId || null;
 
-  // Determine initial view: if selected ID is a standard service, show services. Otherwise (bundle or null) show bundles.
-  let showBundles = true;
-  if (selected && state.services.find(s => s.id === selected)) {
-    showBundles = false;
+  // Determine initial view: if selected ID is a bundle, show bundles. Otherwise (service or null) show services.
+  let showBundles = false;
+  if (selected && state.bundles.find(b => b.id === selected)) {
+    showBundles = true;
   }
 
   const render = () => {
